@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/25 17:58:07 by clundber          #+#    #+#             */
-/*   Updated: 2024/02/07 15:23:17 by clundber         ###   ########.fr       */
+/*   Updated: 2024/02/26 15:02:55 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,6 @@
 
 # define INT_MAX 2147483647
 # define INT_MIN -2147483648
-
-typedef enum e_bool
-{
-	false,
-	true
-}	t_bool;
 
 typedef struct s_list
 {
