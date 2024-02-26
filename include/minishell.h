@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:17:52 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/26 15:07:45 by clundber         ###   ########.fr       */
+/*   Updated: 2024/02/26 18:12:00 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,17 @@
 
 typedef struct s_cmd
 {
-	char			*cmd;
-	char			**flags;
+	char			**cmd;
+	//char			**flags;
+	int				pipe[2];
+	int				num_of_cmds;
 	char			*infile;
 	char			*outfile;
 	char			*errorfile;
+	char			**paths;
 	struct s_cmd	*next;
-	struct s_cmd	*previous;
-	int				entry_pipe;
-	int				exit_pipe;
+	struct s_cmd	*previous;s
+	// int				entry_pipe;
+	// int				exit_pipe;
 }	t_cmd;
 #endif
