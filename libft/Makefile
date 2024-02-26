@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: clundber <clundber@student.42.fr>          +#+  +:+       +#+         #
+#    By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/26 11:59:53 by clundber          #+#    #+#              #
-#    Updated: 2024/01/31 16:03:15 by clundber         ###   ########.fr        #
+#    Updated: 2024/02/26 16:52:04 by clundber         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -50,7 +50,7 @@ OFILES = $(SRC_FLS:.c=.o)
 #--------- FLAGS ----------#
 
 CC = @cc
-CFLAGS = -Wall -Wextra -Werror -I includes
+CFLAGS = -Wall -Wextra -Werror -I include
 
 all: $(NAME)
 
