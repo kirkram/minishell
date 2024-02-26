@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:17:52 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/26 11:47:22 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/02/26 15:07:45 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,4 +29,16 @@
 
 # include "../libft/include/libft.h"
 
+typedef struct s_cmd
+{
+	char			*cmd;
+	char			**flags;
+	char			*infile;
+	char			*outfile;
+	char			*errorfile;
+	struct s_cmd	*next;
+	struct s_cmd	*previous;
+	int				entry_pipe;
+	int				exit_pipe;
+}	t_cmd;
 #endif
