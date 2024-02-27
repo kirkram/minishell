@@ -6,19 +6,13 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/26 18:37:45 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/02/27 16:29:26 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //test in the file change
 
 #include "../../include/minishell.h"
-
-// int	child_first()
-// int	child_middle();
-// int	child_last();
-
-void	execute(char **av, char **envp);
 
 int	main(int ac, char **av, char **envp)
 {
@@ -31,31 +25,25 @@ int	main(int ac, char **av, char **envp)
 	return (0);
 }
 
-void	execute(char **av, char **envp, t_cmd *big_cmd)
+int	execute(char **av, char **envp, t_bigcmd *big_cmd)
 {
-	/*The strategy for your shell is to have the parent process do all the piping
-	and redirection before forking the processes.
-	In this way the children will inherit the redirection. The parent
-	needs to save input/output and restore it at the end.
-	Stderr is the same for all processes */
+	int			fd[2];
+	int			savestdio[2];
+	pid_t		pid[42];
+	int			pipefd[2];
+	int			i;
 
-	int	fd[2];
-	///int	fdout[4096];
-	int	savestdio[2];
-	int	pid[42];
-	int	pipefd[2];
-	int	i;
-	t_cmd *ptr;
-	char const *infile;
-	char const *outfile;
-	char	**cmd;
-	int		num_of_cmds;
+	//these vars are part of the struct big_cmd
+	int			err_code;
+	char const	*infile;
+	char const	*outfile;
+	int			num_of_cmds;
+	t_scmd		**scmds;
 
 	savestdio[0] = dup(STDIN_FILENO);
 	savestdio[1] = dup(STDOUT_FILENO);
-
-	//if (cmd->infile) meaning if there is redirection
-	infile = av[1];
+	scmds = big_cmd->cmds;
+	infile = big_cmd->infile;
 	if (infile)
 	{
 		fd[0] = open (infile, O_RDONLY);
@@ -68,8 +56,7 @@ void	execute(char **av, char **envp, t_cmd *big_cmd)
 	else
 		fd[0] = dup(savestdio[0]);
 
-
-	cmd = big_cmd->cmd;
+	err_code = 0;
 	num_of_cmds = big_cmd->num_of_cmds;
 	i = 0;
 	while (i < num_of_cmds)
@@ -81,7 +68,7 @@ void	execute(char **av, char **envp, t_cmd *big_cmd)
 			if (big_cmd->outfile)
 			{
 				outfile = av[4];
-				fd[1] = open(outfile, O_WRONLY | O_RDWR | O_TRUNC, 0644);
+				fd[1] = open(outfile, O_WRONLY, O_TRUNC);
 				if (fd[1] < 0)
 				{
 					{
@@ -100,57 +87,55 @@ void	execute(char **av, char **envp, t_cmd *big_cmd)
 			fd[0] = pipefd[0];
 			fd[1] = pipefd[1];
 		}
-		dup2(fd[1], 1);
+		dup2(fd[1], STDOUT_FILENO);
 		close(fd[1]);
-
-
-
+		pid[i] = fork();
+		if (pid[i] == 0)
+		{
+			if (scmds[i]->path != NULL)
+				execve(scmds[i]->path, scmds[i]->args, NULL);
+			handle_execve_errors(scmds[i]->path);
+		}
 		i ++;
 	}
+	dup2(savestdio[0], STDIN_FILENO);
+	dup2(savestdio[1], STDOUT_FILENO);
+	close(savestdio[0]);
+	close(savestdio[1]);
 
-
-
-
-	// if (access(infile, F_OK) == 0 && access(infile, R_OK) == 0)
-	// 	dup2(fd[0], STDIN_FILENO);
-
-	return (0);
+	i = 0;
+	while (i < num_of_cmds)
+	{
+		if (i == num_of_cmds - 1)
+			waitpid(pid[i], &err_code, 0);
+		else
+			waitpid(pid[i], NULL, 0);
+		i ++;
+	}
+	return (err_code);
 }
 
-
 /*
-
-
-// Command Data Structure
-// Describes a simple command and arguments
-struct SimpleCommand {
-        // Available space for arguments currently preallocated
-        int _numberOfAvailableArguments;
-        // Number of arguments
-        int _numberOfArguments;
-        // Array of arguments
-        char ** _arguments;
-        SimpleCommand();
-        void insertArgument( char * argument );
-};
-// Describes a complete command with the multiple pipes if any
-// and input/output redirection if any.
-struct Command {
-        int _numberOfAvailableSimpleCommands;
-        int _numberOfSimpleCommands;
-        SimpleCommand ** _simpleCommands;
-        char * _outFile;
-        char * _inputFile;
-        char * _errFile;
-        int _background;
-        void prompt();
-        void print();
-        void execute();
-        void clear();
-        Command();
-        void insertSimpleCommand( SimpleCommand * simpleCommand );
-        static Command _currentCommand;
-        static SimpleCommand *_currentSimpleCommand;
-};
-
+All built­in functions except printenv are executed by the parent process. The reason for this is
+that we want setenv, cd etc to modify the state of the parent. If they are executed by the child,
+the changes will go away when the child exits. For this built it functions, call the function inside
+execute instead of forking a new process
 */
+
+void	handle_execve_errors(char *failed_cmd)
+{
+	if (failed_cmd[0] == 0)
+		return (msg_stderr("pipex: permission denied: ", failed_cmd, 126));
+	else if (failed_cmd[0] == '.' && failed_cmd[1] == 0)
+		return (msg_stderr(".: not enough arguments", NULL, 1));
+	else if (access(failed_cmd, F_OK) == -1 && ft_strchr(failed_cmd, '/'))
+		return (msg_stderr("pipex: no such file or directory ", failed_cmd, 127));
+	else if (access(failed_cmd, F_OK) == -1)
+		return (msg_stderr("pipex: command not found: ", failed_cmd, 127));
+	else if (access(failed_cmd, X_OK) == -1 || access(failed_cmd, R_OK) == -1 || \
+	ft_strncmp(failed_cmd, "./", 3) == 0)
+		return (msg_stderr("pipex: permission denied: ", failed_cmd, 126));
+	else
+		return (msg_stderr("pipex: permission denied: ", failed_cmd, 127));
+	return (127);
+}

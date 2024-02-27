@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:17:52 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/26 18:37:44 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/02/27 16:29:47 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,19 +29,22 @@
 
 # include "../libft/include/libft.h"
 
-typedef struct s_cmd
+typedef struct s_scmd
 {
-	char			**cmd;
-	//char			**flags;
-	int				pipe[2];
+	int				num_of_args;
+	char			**args;
+	char			*path;
+
+}	t_scmd;
+
+typedef struct s_bigcmd
+{
+	t_scmd			**cmds;
 	int				num_of_cmds;
 	char			*infile;
 	char			*outfile;
-	char			*errorfile;
-	char			**paths;
-	struct s_cmd	*next;
-	struct s_cmd	*previous;s
-	// int				entry_pipe;
-	// int				exit_pipe;
-}	t_cmd;
+	struct s_bigcmd	*next;
+	struct s_bigcmd	*previous;
+}	t_bigcmd;
+
 #endif
