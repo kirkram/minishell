@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:17:52 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/27 16:29:47 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/02/28 13:10:15 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,16 @@
 # include <sys/wait.h>   // for wait, waitpid, wait3, wait4
 
 # include "../libft/include/libft.h"
+
+typedef struct s_paths
+{
+	int		i;
+	char	*path;
+	char	*pwd;
+	char	*bigpath;
+	char	**paths;
+
+}	t_paths;
 
 typedef struct s_scmd
 {
