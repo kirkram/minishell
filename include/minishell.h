@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:17:52 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/28 13:10:15 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/02/28 17:36:07 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,8 @@ typedef struct s_scmd
 {
 	int				num_of_args;
 	char			**args;
-	char			*path;
+	char			*cmd_with_path;
+	char			*av_cmd;
 
 }	t_scmd;
 

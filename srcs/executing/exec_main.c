@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/28 15:55:42 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/02/28 17:37:16 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,9 @@ int	main(int ac, char **av, char **envp)
 	t_bigcmd	big_cmd;
 	int			i;
 
-	if (ac == 5)
-	{
 		ft_memset(&big_cmd, 0, sizeof(big_cmd));
 		big_cmd.infile = av[1];
-		big_cmd.outfile = av[4];
+		big_cmd.outfile = av[ac - 1];
 		i = 0;
 		big_cmd.cmds = malloc(((ac - 2) + 1) * sizeof(t_scmd *));
 		while (i < (ac - 3))
@@ -44,16 +42,16 @@ int	main(int ac, char **av, char **envp)
 				return (1);
 			big_cmd.cmds[i] = malloc(sizeof(t_scmd));
 			big_cmd.cmds[i]->args = ppx_split(av[i + 2], ' ');
-			//printf("added args for [%d], the arg[0] is %s\n", i, big_cmd.cmds[i]->args[0]);
-			big_cmd.cmds[i]->path = find_scmd_path(big_cmd.cmds[i]->args[0], envp);
+			printf("added args for [%d], the arg[0] is %s\n", i, big_cmd.cmds[i]->args[0]);
+			big_cmd.cmds[i]->cmd_with_path = find_scmd_path(big_cmd.cmds[i]->args[0], envp);
 			//printf("The path for i=[%d] is %s\n", i, big_cmd.cmds[i]->path);
 			i ++;
 		}
 		big_cmd.cmds[i] = NULL;
 		big_cmd.num_of_cmds = i;
 
-		i = 0;
-		t_scmd		**scmds = big_cmd.cmds;
+		//i = 0;
+		//t_scmd		**scmds = big_cmd.cmds;
 		//printf("The num of cmds is %d\n", big_cmd.num_of_cmds);
 		// while (scmds[i])
 		// {
@@ -63,27 +61,23 @@ int	main(int ac, char **av, char **envp)
 		// 	i ++;
 		// }
 		execute(av, envp, &big_cmd);
-	}
-	else
-		ft_putendl_fd("Needs 4 arguments", 2);
-
+		i = 0;
+		while (i < big_cmd.num_of_cmds)
+		{
+			free(big_cmd.cmds[i]->cmd_with_path);
+			free_and_1(big_cmd.cmds[i]->args, NULL);
+			i ++;
+		}
+		i = 0;
+		while (big_cmd.cmds[i])
+		{
+			free (big_cmd.cmds[i]);
+			i ++;
+		}
+		free (big_cmd.cmds);
 
 	//freeing the heap
-	i = 0;
-	while (i < big_cmd.num_of_cmds)
-	{
-		free(big_cmd.cmds[i]->path);
-		free_and_1(big_cmd.cmds[i]->args, NULL);
-		i ++;
-	}
-	i = 0;
-	while (big_cmd.cmds[i])
-	{
-		free (big_cmd.cmds[i]);
-		i ++;
-	}
-	free (big_cmd.cmds);
-	return (0);
+	return (42);
 }
 
 char	*find_scmd_path(char *scmd, char **envp)
@@ -160,7 +154,7 @@ int	execute(char **av, char **envp, t_bigcmd *big_cmd)
 		{
 			if (big_cmd->outfile)
 			{
-				outfile = av[4];
+				outfile = big_cmd->outfile;
 				fd[1] = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 				if (fd[1] < 0)
 				{
@@ -185,9 +179,14 @@ int	execute(char **av, char **envp, t_bigcmd *big_cmd)
 		pid[i] = fork();
 		if (pid[i] == 0)
 		{
-			if (scmds[i]->path != NULL)
-				execve(scmds[i]->path, scmds[i]->args, NULL);
-			handle_execve_errors(scmds[i]->path);
+			if (scmds[i]->cmd_with_path != NULL)
+			{
+				execve(scmds[i]->cmd_with_path, scmds[i]->args, NULL);
+				err_code = handle_execve_errors(scmds[i]->cmd_with_path);
+			}
+			else
+				err_code = handle_execve_errors(scmds[i]->args[0]);
+			exit (err_code);
 		}
 		i ++;
 	}
@@ -217,6 +216,7 @@ execute instead of forking a new process
 
 int		handle_execve_errors(char *failed_cmd)
 {
+	//is access command slow?
 	if (failed_cmd[0] == 0)
 		return (msg_stderr("minishell: permission denied: ", failed_cmd, 126));
 	else if (failed_cmd[0] == '.' && failed_cmd[1] == 0)
@@ -242,8 +242,6 @@ int	msg_stderr(char *message, char *cmd, int err_code)
 	ft_putstr_fd("\n", 2);
 	return (err_code);
 }
-
-
 
 
 char	**find_path(char **envp)
