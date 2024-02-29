@@ -6,11 +6,12 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/07 15:04:39 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/27 11:18:52 by clundber         ###   ########.fr       */
+/*   Updated: 2024/02/28 10:34:47 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+#include "parsing.h"
 
 char	**ppx_split(char const *str, char c)
 {

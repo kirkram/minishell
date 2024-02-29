@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/02/28 17:33:21 by clundber         ###   ########.fr       */
+/*   Updated: 2024/02/29 14:29:48 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,15 +160,124 @@ int	*tokenizer(char **array)
 		i++;
 	}
 	return (tokens);
-	
+}
+
+char	**get_bigcmd(char **cmds, int *tokens, int start, int end)
+
+{
+	char	**temp_arr;
+	int		i;
+
+	i = 0;
+	temp_arr = NULL;
+	temp_arr = malloc(sizeof (char **) * ((end - start) + 2));
+	while (cmds[start] && start <= end)
+	{
+		temp_arr[i] = ft_strdup(cmds[start]);
+		if (!temp_arr[i])
+			error_func("Malloc failure\n");
+		i++;
+		start++;
+	}
+	temp_arr[i] = NULL;
+	return (temp_arr);
+}
+
+char	**array_copy(char **array)
+
+{
+	char	**new_array;
+	int		i;
+
+	i = 0;
+	new_array = NULL;
+	while (array[i])
+		i++;
+	new_array = malloc(sizeof(char *) * (i +1));
+	if (!new_array)
+		return (0);
+	i = 0;
+	while (array[i])
+	{
+		new_array[i] = ft_strdup(array[i]);
+		if (!new_array[i])
+		{
+			ft_arrfree(new_array);
+			return (0);
+		}
+		i++;
+	}
+	new_array[i] = NULL;
+	return (new_array);
+}
+
+void	listmaker(t_bigcmd **head, char **cmds, int *tokens)
+
+{
+	int		i;
+	char	**temp_arr;
+	int		start;
+
+	start = 0;
+	temp_arr = NULL;
+	i = 0;
+
+	while (cmds[i])
+	{
+		if (i == 0 && (tokens[i] == IN_FD || tokens[i] == IN_HD))
+			i++;
+		if (cmds[i +1] == '\0')
+		{
+					printf("ok here1\n");
+			temp_arr = get_bigcmd(cmds, tokens, start, i);
+			if (ms_lstadd_back(head, ms_lstnew(temp_arr)) == 0)
+			{
+				lst_clear(head); // more freeing etc.
+				error_func("Malloc failed\n");
+			}
+			//make list with array;
+			free(temp_arr);
+					printf("ok here4\n");
+			break ;
+		}
+		if (tokens[i] == IN_FD || tokens[i] == IN_HD)
+		{
+					printf("ok here2\n");
+			temp_arr = get_bigcmd(cmds, tokens, start, i);
+			if (ms_lstadd_back(head, ms_lstnew(temp_arr)) == 0)
+			{
+				lst_clear(head); // more freeing etc.
+				error_func("Malloc failed\n");
+			}
+			//make list with array;
+			free(temp_arr);
+			start = i +1;
+		}
+		if (tokens[i] == RED || tokens[i] == RED_AP)
+		{
+					printf("ok here3\n");
+			i++;
+			//if statement for CMD?
+			temp_arr = get_bigcmd(cmds, tokens, start, i);
+			if (ms_lstadd_back(head, ms_lstnew(temp_arr)) == 0)
+			{
+				lst_clear(head); // more freeing etc.
+				error_func("Malloc failed\n");
+			}
+			//make list with array;
+			free(temp_arr);
+			start = i +1;
+		}
+		i++;
+	}
 }
 
 int	main(int argc, char *argv[], char *envp[])
 
 {
-	t_cmd	*cmd_head;
-	char	**array;
-	int		*tokens;
+	t_bigcmd	*cmd_head;
+	char		**array;
+	int			*tokens;
 
 	tokens = NULL;
 	array = NULL;
@@ -177,13 +286,14 @@ int	main(int argc, char *argv[], char *envp[])
 		return (0);
 	array = lexer(argv[1], envp);
 	tokens = tokenizer(array);
-	int	i = 0;
-	while (array[i])
+	listmaker(&cmd_head, array, tokens);
+/*	int	x = 0;
+ 	while (array[x])
 	{
-		printf("%s    ", array[i]);
-		printf("%d\n", tokens[i]);
-		i++;
-	}
+		printf("%s    ", array[x]);
+		printf("%d\n", tokens[x]);
+		x++;
+	} */
 	ft_arrfree(array);
 	free (tokens);
 }
