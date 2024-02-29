@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:17:52 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/28 17:36:07 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/02/29 13:42:13 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ typedef struct s_scmd
 
 }	t_scmd;
 
-typedef struct s_bigcmd
+typedef struct s_pipeline
 {
 	t_scmd			**cmds;
 	int				num_of_cmds;
@@ -56,6 +56,6 @@ typedef struct s_bigcmd
 	char			*outfile;
 	struct s_bigcmd	*next;
 	struct s_bigcmd	*previous;
-}	t_bigcmd;
+}	t_pline;
 
 #endif
