@@ -6,20 +6,12 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/02/29 14:29:48 by clundber         ###   ########.fr       */
+/*   Updated: 2024/02/29 17:00:08 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "parsing.h"
-
-/* void	initiate_node(t_cmd *cmd_node)
-
-{
-
-
-	
-} */
 
 char	*get_variable(char *temp, char **envp, char *new_str)
 
@@ -110,31 +102,20 @@ void	error_func(char *str)
 	exit (1);
 }
 
-char	**lexer(char *argv, char **envp)
 
-{
-	char	**array;
-
-	array = NULL;
-	array = ppx_split(argv, ' ');
-	if (!array)
-		exit(1);
-	var_substitution(array, envp);
-	return (array);
-}
 
 int	get_token(char *str)
 
 {
-	if (strncmp(str, "|", 2) == 0)
+	if (ft_strncmp(str, "|", 2) == 0)
 		return (2);
-	else if (strncmp(str, "<", 2) == 0)
+	else if (ft_strncmp(str, "<", 2) == 0)
 		return (3);
-	else if (strncmp(str, "<<", 3) == 0)
+	else if (ft_strncmp(str, "<<", 3) == 0)
 		return (4);
-	else if (strncmp(str, ">", 2) == 0)
+	else if (ft_strncmp(str, ">", 2) == 0)
 		return (5);
-	else if (strncmp(str, ">>", 3) == 0)
+	else if (ft_strncmp(str, ">>", 3) == 0)
 		return (6);
 	else
 		return (1);
@@ -211,7 +192,7 @@ char	**array_copy(char **array)
 	return (new_array);
 }
 
-void	listmaker(t_bigcmd **head, char **cmds, int *tokens)
+void	listmaker(t_pline **head, char **cmds, int *tokens)
 
 {
 	int		i;
@@ -228,34 +209,28 @@ void	listmaker(t_bigcmd **head, char **cmds, int *tokens)
 			i++;
 		if (cmds[i +1] == '\0')
 		{
-					printf("ok here1\n");
 			temp_arr = get_bigcmd(cmds, tokens, start, i);
 			if (ms_lstadd_back(head, ms_lstnew(temp_arr)) == 0)
 			{
 				lst_clear(head); // more freeing etc.
 				error_func("Malloc failed\n");
 			}
-			//make list with array;
 			free(temp_arr);
-					printf("ok here4\n");
 			break ;
 		}
 		if (tokens[i] == IN_FD || tokens[i] == IN_HD)
 		{
-					printf("ok here2\n");
 			temp_arr = get_bigcmd(cmds, tokens, start, i);
 			if (ms_lstadd_back(head, ms_lstnew(temp_arr)) == 0)
 			{
 				lst_clear(head); // more freeing etc.
 				error_func("Malloc failed\n");
 			}
-			//make list with array;
 			free(temp_arr);
 			start = i +1;
 		}
-		if (tokens[i] == RED || tokens[i] == RED_AP)
+		if (tokens[i] == OUT || tokens[i] == OUT_AP)
 		{
-					printf("ok here3\n");
 			i++;
 			//if statement for CMD?
 			temp_arr = get_bigcmd(cmds, tokens, start, i);
@@ -264,7 +239,6 @@ void	listmaker(t_bigcmd **head, char **cmds, int *tokens)
 				lst_clear(head); // more freeing etc.
 				error_func("Malloc failed\n");
 			}
-			//make list with array;
 			free(temp_arr);
 			start = i +1;
 		}
@@ -272,28 +246,20 @@ void	listmaker(t_bigcmd **head, char **cmds, int *tokens)
 	}
 }
 
-int	main(int argc, char *argv[], char *envp[])
+void	**lexer(char *argv, char **envp, t_pline *pipe)
 
 {
-	t_bigcmd	*cmd_head;
-	char		**array;
-	int			*tokens;
+	char	**array;
+	int		*tokens;
 
 	tokens = NULL;
 	array = NULL;
-	cmd_head = NULL;
-	if (argc < 2 || !argv[1][0])
-		return (0);
-	array = lexer(argv[1], envp);
+	array = ppx_split(argv, ' ');
+	if (!array)
+		exit(1);
+	var_substitution(array, envp);
 	tokens = tokenizer(array);
-	listmaker(&cmd_head, array, tokens);
-/*	int	x = 0;
- 	while (array[x])
-	{
-		printf("%s    ", array[x]);
-		printf("%d\n", tokens[x]);
-		x++;
-	} */
+	listmaker(pipe, array, tokens);
 	ft_arrfree(array);
 	free (tokens);
 }
