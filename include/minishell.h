@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:17:52 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/29 10:57:26 by clundber         ###   ########.fr       */
+/*   Updated: 2024/02/29 13:42:13 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,33 @@
 
 # include "../libft/include/libft.h"
 
-typedef struct s_bigcmd
+typedef struct s_paths
 {
-	char			**cmds;
-	int				*tokens;
-	//char			*infile;
-	//char			*outfile;
-	//char			*errorfile;
+	int		i;
+	char	*path;
+	char	*pwd;
+	char	*bigpath;
+	char	**paths;
+
+}	t_paths;
+
+typedef struct s_scmd
+{
+	int				num_of_args;
+	char			**args;
+	char			*cmd_with_path;
+	char			*av_cmd;
+
+}	t_scmd;
+
+typedef struct s_pipeline
+{
+	t_scmd			**cmds;
+	int				num_of_cmds;
+	char			*infile;
+	char			*outfile;
 	struct s_bigcmd	*next;
 	struct s_bigcmd	*previous;
-}	t_bigcmd;
+}	t_pline;
+
 #endif
