@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:17:52 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/29 13:42:13 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/02/29 16:50:14 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,23 +39,18 @@ typedef struct s_paths
 
 }	t_paths;
 
-typedef struct s_scmd
+typedef struct s_pipe
 {
-	int				num_of_args;
-	char			**args;
-	char			*cmd_with_path;
-	char			*av_cmd;
-
-}	t_scmd;
+	char	**args;
+	char	*cmd_with_path;
+	int		*tokens;
+	char	*infile;
+}	t_pipe;
 
 typedef struct s_pipeline
 {
-	t_scmd			**cmds;
-	int				num_of_cmds;
-	char			*infile;
-	char			*outfile;
-	struct s_bigcmd	*next;
-	struct s_bigcmd	*previous;
+	t_pipe			**pipes;
+
 }	t_pline;
 
 #endif
