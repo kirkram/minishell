@@ -26,8 +26,6 @@ rm ./outfile.txt; < ./infile.txt lsss -l | ls | pipe | \
  hesshe | afe | eccho | jump | wc | wc -w > \
  ./outfile.txt ; echo $? >> ./results.txt ; cat ./outfile.txt >> \
  ./results.txt
-
-
 #####################
 #####################
 #####################
@@ -40,7 +38,6 @@ echo "-------------------" >> ./results.txt
 
 ../m_shell < ./infile.txt "ls -l" "wc -w" "echo "xxx"" > ./no_wr_perm.txt ; echo $? >> ./results.txt ;\
  cat ./no_wr_perm.txt >> ./results.txt
-
 #####################
 #####################
 #####################
