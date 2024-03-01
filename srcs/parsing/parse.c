@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/02/29 17:00:08 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/01 14:22:38 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,17 +108,17 @@ int	get_token(char *str)
 
 {
 	if (ft_strncmp(str, "|", 2) == 0)
-		return (2);
+		return (PIPE);
 	else if (ft_strncmp(str, "<", 2) == 0)
-		return (3);
+		return (IN_FD);
 	else if (ft_strncmp(str, "<<", 3) == 0)
-		return (4);
+		return (IN_HD);
 	else if (ft_strncmp(str, ">", 2) == 0)
-		return (5);
+		return (OUT);
 	else if (ft_strncmp(str, ">>", 3) == 0)
-		return (6);
+		return (OUT_AP);
 	else
-		return (1);
+		return (CMD);
 }
 
 int	*tokenizer(char **array)
@@ -140,29 +140,11 @@ int	*tokenizer(char **array)
 		tokens[i] = get_token(array[i]);
 		i++;
 	}
+	tokens[i] = 0;
 	return (tokens);
 }
 
-char	**get_bigcmd(char **cmds, int *tokens, int start, int end)
 
-{
-	char	**temp_arr;
-	int		i;
-
-	i = 0;
-	temp_arr = NULL;
-	temp_arr = malloc(sizeof (char **) * ((end - start) + 2));
-	while (cmds[start] && start <= end)
-	{
-		temp_arr[i] = ft_strdup(cmds[start]);
-		if (!temp_arr[i])
-			error_func("Malloc failure\n");
-		i++;
-		start++;
-	}
-	temp_arr[i] = NULL;
-	return (temp_arr);
-}
 
 char	**array_copy(char **array)
 
@@ -192,7 +174,122 @@ char	**array_copy(char **array)
 	return (new_array);
 }
 
-void	listmaker(t_pline **head, char **cmds, int *tokens)
+char	**get_cmd(char **cmds, int start, int end)
+
+{
+	char	**temp_arr;
+	int		i;
+
+	i = 0;
+	temp_arr = NULL;
+	temp_arr = malloc(sizeof (char *) * ((end - start) + 2));
+	while (cmds[start] && start <= end)
+	{
+		temp_arr[i] = ft_strdup(cmds[start]);
+		if (!temp_arr[i])
+			error_func("Malloc failure\n");
+		i++;
+		start++;
+	}
+	temp_arr[i] = NULL;
+	return (temp_arr);
+}
+
+
+void	pipeline_init(int *tokens, t_pipe **pipe)
+
+{
+	int	i;
+	int	x;
+
+	i = 0;
+	x = 1;
+	while (tokens[i])
+	{
+		if (tokens[i] == PIPE)
+			x++;
+		i++;
+	}
+	pipe = malloc(sizeof(t_pipe *) * (x +1));
+	if (!pipe)
+		error_func("malloc failed\n");
+ 	i = 0;
+	while (i <= x)
+	{
+		pipe[i] = malloc(sizeof(t_pipe));
+		i++;
+	} 
+	pipe[x] = NULL;	
+}
+
+void	parser(char **array, int *tokens, t_pipe **pipe)
+
+{
+	int	i;
+	int	x;
+	int	start;
+
+	i = 0;
+	x = 0;
+	start = 0;
+	printf("ok here\n");
+	pipe[0]->args = malloc(100);
+	while (array[i])
+	{
+		if ((tokens[i] == PIPE || array[i +1] == '\0') && i > start)
+		{
+			printf("ass\n");
+			pipe[0]->args = get_cmd(array, start, i);
+			printf("what\n");
+			x++;
+			start = i +1;
+		}
+		i++;
+	}
+	printf("got here\n");
+}
+
+void	lexer(char *argv, char **envp)
+
+{
+	t_pipe	**pipe;
+	char	**array;
+	int		*tokens;
+
+	pipe = NULL;
+	tokens = NULL;
+	array = NULL;
+	array = ppx_split(argv, ' ');
+	if (!array)
+		error_func("no valid argument\n");
+	var_substitution(array, envp);
+	tokens = tokenizer(array);
+	pipeline_init(tokens, pipe);
+	parser(array, tokens, pipe);
+
+
+/* 	int	i = 0;
+	int	x = 0;
+	while (pipe[i])
+	{
+		x = 0;
+		while (pipe[i]->args[x])
+		{
+			printf("%s\n", pipe[i]->args[x]);
+			x++;
+		}
+		i++;
+	} */
+	ft_arrfree(array);
+	free (tokens);
+
+	//listmaker(pipe, array, tokens);
+}
+
+/// theese are obsolete ///
+
+
+ /* void	listmaker(t_pline **head, char **cmds, int *tokens)
 
 {
 	int		i;
@@ -244,22 +341,4 @@ void	listmaker(t_pline **head, char **cmds, int *tokens)
 		}
 		i++;
 	}
-}
-
-void	**lexer(char *argv, char **envp, t_pline *pipe)
-
-{
-	char	**array;
-	int		*tokens;
-
-	tokens = NULL;
-	array = NULL;
-	array = ppx_split(argv, ' ');
-	if (!array)
-		exit(1);
-	var_substitution(array, envp);
-	tokens = tokenizer(array);
-	listmaker(pipe, array, tokens);
-	ft_arrfree(array);
-	free (tokens);
-}
+}  */
