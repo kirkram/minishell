@@ -39,6 +39,7 @@ echo "-------------------" >> ./results.txt
 
 ../m_shell < ./infile.txt "ls -l" "wc -w" "echo "xxx"" > ./no_wr_perm.txt ; echo $? >> ./results.txt ;\
  cat ./no_wr_perm.txt >> ./results.txt
+<<<<<<< HEAD
 
 chmod 777 no_wr_perm.txt
 ####################
@@ -80,6 +81,11 @@ echo "EXPORT NOT YET IMPLEMENTED" >> ./results.txt
 ####################
 ####################
 ####################
+=======
+#####################
+#####################
+#####################
+>>>>>>> executing
 echo "" >> ./results.txt
 echo "End of tests" >> ./results.txt
 
