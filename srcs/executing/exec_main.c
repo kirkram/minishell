@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   exec_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/04 15:31:18 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/04 15:40:45 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //test in the file change
 
 #include "../../include/minishell.h"
-#include "../../include/kirtemp/ppx_split.h"
 
 int		handle_execve_errors(char *failed_cmd);
 int		msg_stderr(char *message, char *cmd, int err_code);
