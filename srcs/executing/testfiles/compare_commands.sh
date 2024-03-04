@@ -85,3 +85,13 @@ echo "End of tests" >> ./results.txt
 
 cat ./results.txt
 
+#########!!!!!
+# Test ideas 
+# input file is not a file but a directory that exists <./testfiles/ ls -l
+# should just ignore the redirection of input?
+#
+#
+# 2:  bash echo <./testfiles "hello world!!"
+# it outputs something like bash echo <./testfiles "hello worldbash " ""
+# but with three exclamation marks bash echo <./testfiles "hello world!!!"   
+# it waits for a dquote
