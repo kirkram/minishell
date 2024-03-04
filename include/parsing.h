@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/04 15:25:19 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/04 17:20:05 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@ int			countstrings(char *str, char c);
 
 // LEXER
 
-t_pipe		**lexer(char *argv, char **envp);
-void		error_func(char *str);
+int			lexer(char *argv, char **envp, t_pipe ***pipe);
+void		error_func(char *str, int err);
 void		var_substitution(char **array, char *envp[]);
 char		*env_variable(char *str, char **envp);
 char		**array_copy(char **array);
@@ -58,7 +58,7 @@ int	        get_token(char *str);
 
 char		**get_cmd(char **cmds, int start, int end);
 void	    pre_parse(char **array, t_pipe ***pipe);
-void	    parser(char **array, t_pipe ***pipe);
+int	    	parser(char **array, t_pipe ***pipe);
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2

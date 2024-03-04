@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   preparse.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/02 21:46:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/04 12:43:41 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/04 17:22:33 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,10 @@ char	*env_variable(char *str, char **envp)
 				return (str);
 			new_str = ft_substr(str, start, i);
 			if (!new_str)
-				error_func("malloc failed in lexer\n");
+				{
+				error_func("malloc failed\n" ,1);
+				exit (1);
+				}
 			start = i + 1;
 		}
 		else if ((str[i] == '$' || str[i] == '\0') && i > start)

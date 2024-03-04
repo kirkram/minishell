@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   parse_main.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 15:50:37 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/04 12:55:22 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/04 17:02:48 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	error_func(char *str)
+void	error_func(char *str, int err)
 
 {
 	ft_putendl_fd(str, 2);
-	exit (1);
+	g_signal = err;
 }
 
 // int	main(int argc, char *argv[], char *envp[])

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/04 12:56:17 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/04 17:22:27 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,10 @@
 		i++;
 	pipe->tokens = malloc (sizeof(int *) * (i +2));
 	if (!pipe->tokens)
-		error_func("Token malloc failure\n");
+		{
+		error_func("malloc failed\n" ,1);
+		exit (1);
+		}
 	i = 0;
 	while (pipe->args[i])
 	{
@@ -35,7 +38,7 @@
 	pipe->tokens[i] = 0;
 }
 
-void	make_tokens(t_pipe *pipe)
+int	make_tokens(t_pipe *pipe)
 
 {
 	int	i;
@@ -51,7 +54,10 @@ void	make_tokens(t_pipe *pipe)
 			if (pipe->tokens[i +1] == CMD)
 				pipe->tokens[i +1] = IN_FD;
 			else
-				error_func("syntax error near unexpected token 'insert token here'");
+			{
+				error_func("syntax error near unexpected token 'insert token here'", 258); // need error code update
+				return(1);
+			}
 			x = (i -1);
 			while (x >= 0)
 			{
@@ -68,7 +74,10 @@ void	make_tokens(t_pipe *pipe)
 			if (pipe->tokens[i +1] == CMD)
 				pipe->tokens[i +1] = IN_HD;
 			else
-				error_func("syntax error near unexpected token 'insert token here'");
+			{
+				error_func("syntax error near unexpected token 'insert token here'", 258); // need error code update
+				return(1);
+			}
 			while (x >= 0)
 			{
 				if (pipe->tokens[x] == IN_FD)
@@ -84,7 +93,10 @@ void	make_tokens(t_pipe *pipe)
 			if (pipe->tokens[i +1] == CMD)
 				pipe->tokens[i +1] = OUT;
 			else
-				error_func("syntax error near unexpected token 'insert token here'");
+			{
+				error_func("syntax error near unexpected token 'insert token here'", 258); // need error code update
+				return(1);
+			}
 			x = (i -1);
 			while (x >= 0)
 			{
@@ -99,7 +111,10 @@ void	make_tokens(t_pipe *pipe)
 			if (pipe->tokens[i +1] == CMD)
 				pipe->tokens[i +1] = OUT_AP;
 			else
-				error_func("syntax error near unexpected token 'insert token here'");
+			{
+				error_func("syntax error near unexpected token 'insert token here'", 258); // need error code update
+				return(1);
+			}
 			x = (i -1);
 			while (x >= 0)
 			{
@@ -110,7 +125,7 @@ void	make_tokens(t_pipe *pipe)
 		}
 		i++;
 	}
-
+	return (0);
 }
 
 void	remove_red(t_pipe *pipe)
@@ -151,7 +166,7 @@ void	remove_red(t_pipe *pipe)
 	pipe->tokens = i_temp;
 }
 
-void	parser(char **array, t_pipe ***pipe)
+int	parser(char **array, t_pipe ***pipe)
 
 {
 	int	x;
@@ -163,9 +178,10 @@ void	parser(char **array, t_pipe ***pipe)
 	while ((*pipe)[x])
 	{
 		init_token((*pipe)[x]);
-		make_tokens((*pipe)[x]);
+		if(make_tokens((*pipe)[x]) == 1)
+			return(1);
 		remove_red((*pipe)[x]);
 		x++;
 	}
-
+	return(0);
 }
