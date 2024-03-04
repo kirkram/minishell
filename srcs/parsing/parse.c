@@ -5,295 +5,168 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/02/29 14:29:48 by clundber         ###   ########.fr       */
+/*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
+/*   Updated: 2024/03/04 11:44:01 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "parsing.h"
 
-/* void	initiate_node(t_cmd *cmd_node)
-
-{
-
-
-	
-} */
-
-char	*get_variable(char *temp, char **envp, char *new_str)
-
-{
-	int		i;
-	char	*ptr;
-
-	ptr = new_str;
-	i = 0;
-	while (envp[i])
-	{
-		if (ft_strnstr(envp[i], temp, ft_strlen(temp)))
-		{
-			new_str = ft_strjoin(new_str, ft_substr(envp[i], ft_strlen(temp), ft_strlen(envp[i] - ft_strlen(temp))));
-			break ;
-		}
-		i++;
-	}
-	free(ptr);
-	return (new_str);
-}
-
-char	*env_variable(char *str, char **envp)
-
-{
-	int		i;
-	int		start;
-	char	*new_str;
-	char	*temp;
-	char	*ptr;
-
-	ptr = NULL;
-	temp = NULL;
-	new_str = NULL;
-	start = 0;
-	i = -1;
-	while (i == -1 || str[i])
-	{
-		i++;
-		if (str[i] == '$' && start == 0 && i > start)
-		{
-			if (str[i +1] == '\0')
-				return (str);
-			new_str = ft_substr(str, start, i);
-			if (!new_str)
-				error_func("malloc failed in lexer\n");
-			start = i + 1;
-		}
-		else if ((str[i] == '$' || str[i] == '\0') && i > start)
-		{
-			temp = ft_strjoin(ft_substr(str, start, i), "=");
-			new_str = get_variable(temp, envp, new_str);
-			start = i +1;
-		}
-		if (str[i] == '$' && str[i +1] == '\0')
-		{
-			if (!new_str)
-				return (str);
-			ptr = new_str;
-			new_str = ft_strjoin(new_str, "$");
-			free (ptr);
-			break ;
-		}
-	}
-	free (str);
-	return (new_str);
-}
-
-void	var_substitution(char **array, char *envp[])
+ void	init_token(t_pipe *pipe)
 
 {
 	int	i;
 
 	i = 0;
-	while (array[i])
-	{
-		if (ft_strrchr(array[i], '$'))
-			array[i] = env_variable(array[i], envp);
+	while (pipe->args[i])
 		i++;
-	}
-
-}
-
-void	error_func(char *str)
-
-{
-	ft_putendl_fd(str, 2);
-	exit (1);
-}
-
-char	**lexer(char *argv, char **envp)
-
-{
-	char	**array;
-
-	array = NULL;
-	array = ppx_split(argv, ' ');
-	if (!array)
-		exit(1);
-	var_substitution(array, envp);
-	return (array);
-}
-
-int	get_token(char *str)
-
-{
-	if (strncmp(str, "|", 2) == 0)
-		return (2);
-	else if (strncmp(str, "<", 2) == 0)
-		return (3);
-	else if (strncmp(str, "<<", 3) == 0)
-		return (4);
-	else if (strncmp(str, ">", 2) == 0)
-		return (5);
-	else if (strncmp(str, ">>", 3) == 0)
-		return (6);
-	else
-		return (1);
-}
-
-int	*tokenizer(char **array)
-
-{
-	int	i;
-	int	*tokens;
-
-	tokens = NULL;
-	i = 0;
-	while (array[i])
-		i++;
-	tokens = malloc (sizeof(int *) * (i +1));
-	if (!tokens)
+	pipe->tokens = malloc (sizeof(int *) * (i +2));
+	if (!pipe->tokens)
 		error_func("Token malloc failure\n");
 	i = 0;
-	while (array[i])
+	while (pipe->args[i])
 	{
-		tokens[i] = get_token(array[i]);
+		if (get_token(pipe->args[i]) == CMD)
+			pipe->tokens[i] = CMD;
+		else
+			pipe->tokens[i] = 0;
 		i++;
 	}
-	return (tokens);
-}
+	pipe->tokens[i] = 0;
+} 
 
-char	**get_bigcmd(char **cmds, int *tokens, int start, int end)
-
-{
-	char	**temp_arr;
-	int		i;
-
-	i = 0;
-	temp_arr = NULL;
-	temp_arr = malloc(sizeof (char **) * ((end - start) + 2));
-	while (cmds[start] && start <= end)
-	{
-		temp_arr[i] = ft_strdup(cmds[start]);
-		if (!temp_arr[i])
-			error_func("Malloc failure\n");
-		i++;
-		start++;
-	}
-	temp_arr[i] = NULL;
-	return (temp_arr);
-}
-
-char	**array_copy(char **array)
+void	make_tokens(t_pipe *pipe)
 
 {
-	char	**new_array;
-	int		i;
-
+	int	i;
+	int	x;
+	
 	i = 0;
-	new_array = NULL;
-	while (array[i])
-		i++;
-	new_array = malloc(sizeof(char *) * (i +1));
-	if (!new_array)
-		return (0);
-	i = 0;
-	while (array[i])
+	// still need freeing function upon error
+	while (pipe->args[i])
 	{
-		new_array[i] = ft_strdup(array[i]);
-		if (!new_array[i])
+		if (ft_strncmp(pipe->args[i],"<", 2) == 0)
 		{
-			ft_arrfree(new_array);
-			return (0);
-		}
-		i++;
-	}
-	new_array[i] = NULL;
-	return (new_array);
-}
-
-void	listmaker(t_bigcmd **head, char **cmds, int *tokens)
-
-{
-	int		i;
-	char	**temp_arr;
-	int		start;
-
-	start = 0;
-	temp_arr = NULL;
-	i = 0;
-
-	while (cmds[i])
-	{
-		if (i == 0 && (tokens[i] == IN_FD || tokens[i] == IN_HD))
-			i++;
-		if (cmds[i +1] == '\0')
-		{
-					printf("ok here1\n");
-			temp_arr = get_bigcmd(cmds, tokens, start, i);
-			if (ms_lstadd_back(head, ms_lstnew(temp_arr)) == 0)
+			pipe->tokens[i] = REMOVE;
+			if (pipe->tokens[i +1] == CMD)
+				pipe->tokens[i +1] = IN_FD;
+			else
+				error_func("syntax error near unexpected token 'insert token here'");
+			x = (i -1);
+			while (x >= 0)
 			{
-				lst_clear(head); // more freeing etc.
-				error_func("Malloc failed\n");
+				if (pipe->tokens[x] == IN_FD)
+					pipe->tokens[x] = SKIP_IN;
+				if (pipe->tokens[x] == IN_HD)
+					pipe->tokens[x] = SKIP_HD;					
+				x--;
 			}
-			//make list with array;
-			free(temp_arr);
-					printf("ok here4\n");
-			break ;
 		}
-		if (tokens[i] == IN_FD || tokens[i] == IN_HD)
+		else if (ft_strncmp(pipe->args[i],"<<", 3) == 0)
 		{
-					printf("ok here2\n");
-			temp_arr = get_bigcmd(cmds, tokens, start, i);
-			if (ms_lstadd_back(head, ms_lstnew(temp_arr)) == 0)
+			pipe->tokens[i] = REMOVE;
+			if (pipe->tokens[i +1] == CMD)
+				pipe->tokens[i +1] = IN_HD;
+			else
+				error_func("syntax error near unexpected token 'insert token here'");
+			while (x >= 0)
 			{
-				lst_clear(head); // more freeing etc.
-				error_func("Malloc failed\n");
+				if (pipe->tokens[x] == IN_FD)
+					pipe->tokens[x] = SKIP_IN;
+				if (pipe->tokens[x] == IN_HD)
+					pipe->tokens[x] = SKIP_HD;					
+				x--;
 			}
-			//make list with array;
-			free(temp_arr);
-			start = i +1;
 		}
-		if (tokens[i] == RED || tokens[i] == RED_AP)
+		else if (ft_strncmp(pipe->args[i],">", 2) == 0)
 		{
-					printf("ok here3\n");
-			i++;
-			//if statement for CMD?
-			temp_arr = get_bigcmd(cmds, tokens, start, i);
-			if (ms_lstadd_back(head, ms_lstnew(temp_arr)) == 0)
+			pipe->tokens[i] = REMOVE;
+			if (pipe->tokens[i +1] == CMD)
+				pipe->tokens[i +1] = OUT;
+			else
+				error_func("syntax error near unexpected token 'insert token here'");
+			x = (i -1);
+			while (x >= 0)
 			{
-				lst_clear(head); // more freeing etc.
-				error_func("Malloc failed\n");
+				if (pipe->tokens[x] == OUT || pipe->tokens[x] == OUT_AP)
+					pipe->tokens[x] = SKIP_OUT;
+				x--;
 			}
-			//make list with array;
-			free(temp_arr);
-			start = i +1;
+		}
+		else if (ft_strncmp(pipe->args[i],">>", 3) == 0)
+		{
+			pipe->tokens[i] = REMOVE;
+			if (pipe->tokens[i +1] == CMD)
+				pipe->tokens[i +1] = OUT_AP;
+			else
+				error_func("syntax error near unexpected token 'insert token here'");
+			x = (i -1);
+			while (x >= 0)
+			{
+				if (pipe->tokens[x] == OUT || pipe->tokens[x] == OUT_AP)
+					pipe->tokens[x] = SKIP_OUT;
+				x--;
+			}
 		}
 		i++;
 	}
+
 }
 
-int	main(int argc, char *argv[], char *envp[])
+void	remove_red(t_pipe *pipe)
 
 {
-	t_bigcmd	*cmd_head;
-	char		**array;
-	int			*tokens;
+	int		i;
+	int		x;
+	char	**temp;
+	int		*i_temp;
 
-	tokens = NULL;
-	array = NULL;
-	cmd_head = NULL;
-	if (argc < 2 || !argv[1][0])
-		return (0);
-	array = lexer(argv[1], envp);
-	tokens = tokenizer(array);
-	listmaker(&cmd_head, array, tokens);
-/*	int	x = 0;
- 	while (array[x])
+	i = 0;
+	x = 1;
+	while (pipe->tokens[i] != 0)
 	{
-		printf("%s    ", array[x]);
-		printf("%d\n", tokens[x]);
+		if (pipe->tokens[i] != REMOVE)
+			x++;
+		i++;
+	}
+	temp = malloc(sizeof(char *) * (x +1));
+	i_temp = malloc(sizeof(int *) * (x +1));
+	x = 0;
+	i = 0;
+	while (pipe->args[i])
+	{
+		if (pipe->tokens[i] != REMOVE)
+		{
+			temp[x] = ft_strdup(pipe->args[i]);
+			i_temp[x] = pipe->tokens[i];
+			x++;
+		}
+		i++;
+	} 
+	temp[x] = '\0';
+	i_temp[x] = 0;
+	ft_arrfree(pipe->args);
+	free(pipe->tokens);
+	pipe->args = temp;
+	pipe->tokens = i_temp;
+}
+
+void	parser(char **array, t_pipe ***pipe)
+
+{
+	int	x;
+	int	i;
+
+	x = 0;
+	i = 0;
+	pre_parse(array, pipe);
+	while ((*pipe)[x])
+	{	
+		init_token((*pipe)[x]);
+		make_tokens((*pipe)[x]);
+		remove_red((*pipe)[x]);
 		x++;
-	} */
-	ft_arrfree(array);
-	free (tokens);
+	}
+	
 }
