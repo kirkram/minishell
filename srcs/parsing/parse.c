@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/04 11:44:01 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/04 12:56:17 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-#include "parsing.h"
 
  void	init_token(t_pipe *pipe)
 
@@ -34,14 +33,14 @@
 		i++;
 	}
 	pipe->tokens[i] = 0;
-} 
+}
 
 void	make_tokens(t_pipe *pipe)
 
 {
 	int	i;
 	int	x;
-	
+
 	i = 0;
 	// still need freeing function upon error
 	while (pipe->args[i])
@@ -59,7 +58,7 @@ void	make_tokens(t_pipe *pipe)
 				if (pipe->tokens[x] == IN_FD)
 					pipe->tokens[x] = SKIP_IN;
 				if (pipe->tokens[x] == IN_HD)
-					pipe->tokens[x] = SKIP_HD;					
+					pipe->tokens[x] = SKIP_HD;
 				x--;
 			}
 		}
@@ -75,7 +74,7 @@ void	make_tokens(t_pipe *pipe)
 				if (pipe->tokens[x] == IN_FD)
 					pipe->tokens[x] = SKIP_IN;
 				if (pipe->tokens[x] == IN_HD)
-					pipe->tokens[x] = SKIP_HD;					
+					pipe->tokens[x] = SKIP_HD;
 				x--;
 			}
 		}
@@ -143,8 +142,8 @@ void	remove_red(t_pipe *pipe)
 			x++;
 		}
 		i++;
-	} 
-	temp[x] = '\0';
+	}
+	temp[x] = NULL;
 	i_temp[x] = 0;
 	ft_arrfree(pipe->args);
 	free(pipe->tokens);
@@ -162,11 +161,11 @@ void	parser(char **array, t_pipe ***pipe)
 	i = 0;
 	pre_parse(array, pipe);
 	while ((*pipe)[x])
-	{	
+	{
 		init_token((*pipe)[x]);
 		make_tokens((*pipe)[x]);
 		remove_red((*pipe)[x]);
 		x++;
 	}
-	
+
 }

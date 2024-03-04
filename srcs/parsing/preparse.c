@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   preparse.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/02 21:46:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/03 13:22:47 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/04 12:43:41 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-#include "parsing.h"
 
 void	var_substitution(char **array, char *envp[])
 
