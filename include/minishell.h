@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:17:52 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/29 16:50:14 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/01 18:53:11 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 # include <sys/ioctl.h>  // for ioctl
 # include <sys/wait.h>   // for wait, waitpid, wait3, wait4
 
-# include "../libft/include/libft.h"
+# include "../lib/libft-kir/libft.h"
 
 typedef struct s_paths
 {

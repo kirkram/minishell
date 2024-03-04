@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/15 15:55:28 by clundber          #+#    #+#             */
-/*   Updated: 2024/02/07 15:23:16 by clundber         ###   ########.fr       */
+/*   Created: 2023/11/16 11:14:40 by klukiano          #+#    #+#             */
+/*   Updated: 2024/01/26 14:16:22 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,19 @@
 # define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 42
+#  define BUFFER_SIZE 1000
 # endif
 
+# include <unistd.h>
 # include <stdlib.h>
 
-char	*ft_substr(const char *s, unsigned int start, size_t len);
+int		get_next_line(char **str, int fd);
+char	*ft_substr(char const *s, unsigned int start, size_t len);
+size_t	ft_strlen(const char *str);
+size_t	ft_strlcpy(char *dst, char *src, size_t dstsize);
+void	*free_str(char *str);
+size_t	find_line(char *str);
 char	*ft_strjoin(char const *s1, char const *s2);
-size_t	ft_len(const char *s);
-char	*ft_strdup(const char *s);
-char	*get_next_line(int fd);
-int		gnlinecheck(char *str);
-char	*ft_reader(char *temp, int fd);
-char	*ft_rowmaker(char *temp, char *row);
-char	*ft_gnlfree(char **str);
-char	*rd_check(char *buffer, char *temp, int rd);
+void	ft_strcpy(char *dest, char *src, char *src2);
 
 #endif
