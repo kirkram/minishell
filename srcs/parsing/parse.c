@@ -6,12 +6,35 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/03 19:04:42 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/04 11:44:01 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "parsing.h"
+
+ void	init_token(t_pipe *pipe)
+
+{
+	int	i;
+
+	i = 0;
+	while (pipe->args[i])
+		i++;
+	pipe->tokens = malloc (sizeof(int *) * (i +2));
+	if (!pipe->tokens)
+		error_func("Token malloc failure\n");
+	i = 0;
+	while (pipe->args[i])
+	{
+		if (get_token(pipe->args[i]) == CMD)
+			pipe->tokens[i] = CMD;
+		else
+			pipe->tokens[i] = 0;
+		i++;
+	}
+	pipe->tokens[i] = 0;
+} 
 
 void	make_tokens(t_pipe *pipe)
 
