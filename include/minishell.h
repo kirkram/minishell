@@ -16,30 +16,13 @@
 # include <sys/ioctl.h>  // for ioctl
 # include <sys/wait.h>   // for wait, waitpid, wait3, wait4
 
-# include "../lib/libft-kir/libft.h"
+# include "../lib/libft/libft.h"
+# include "../lib/get_next_line/get_next_line.h"
+# include "./parsing.h"
 
-typedef struct s_paths
-{
-	int		i;
-	char	*path;
-	char	*pwd;
-	char	*bigpath;
-	char	**paths;
 
-}	t_paths;
+char	*find_scmd_path(char *scmd, char **envp);
+int		execute(char **envp, t_pipe **_pipe);
 
-typedef struct s_pipe
-{
-	char	**args;
-	char	*cmd_with_path;
-	int		*tokens;
-	char	*infile;
-}	t_pipe;
-
-typedef struct s_pipeline
-{
-	t_pipe			**pipes;
-
-}	t_pline;
 
 #endif

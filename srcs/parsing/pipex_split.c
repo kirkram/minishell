@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_split.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/07 15:04:39 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/28 10:34:47 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/04 12:43:38 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-#include "parsing.h"
 
 char	**ppx_split(char const *str, char c)
 {

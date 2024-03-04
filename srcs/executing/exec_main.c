@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/02/29 13:42:10 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/04 15:31:18 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,70 +15,32 @@
 #include "../../include/minishell.h"
 #include "../../include/kirtemp/ppx_split.h"
 
-int		execute(char **av, char **envp, t_pline *pline);
 int		handle_execve_errors(char *failed_cmd);
 int		msg_stderr(char *message, char *cmd, int err_code);
-char	*find_scmd_path(char *scmd, char **envp);
 char	**find_path(char **envp);
 char	*jointhree(char const *s1, char const *s2, char const *s3);
 int		user_cmd_path(char **args, char *arg_cmd, char **paths);
 void	delete_pwd_path(char **paths);
 int		free_and_1(char **paths, int **end);
+int		struct_and_path(int ac, char **av, char **envp, t_pipe **_pipe);
 
 
-int	main(int ac, char **av, char **envp)
-{
-	t_pline	pline;
-	int			i;
-	int			err_code;
+// int	struct_and_path(int ac, char **av, char **envp, t_pipe **_pipe)
+// {
+// 	int			i;
+// 	int			err_code;
 
-	ft_memset(&pline, 0, sizeof(pline));
-	pline.infile = av[1];
-	pline.outfile = av[ac - 1];
-	i = 0;
-	pline.cmds = malloc(((ac - 2) + 1) * sizeof(t_scmd *));
-	while (i < (ac - 3))
-	{
-		if (pline.cmds == NULL)
-			return (1);
-		pline.cmds[i] = malloc(sizeof(t_scmd));
-		pline.cmds[i]->args = ppx_split(av[i + 2], ' ');
-		//printf("added args for [%d], the arg[0] is %s\n", i, pline.cmds[i]->args[0]);
-		pline.cmds[i]->cmd_with_path = find_scmd_path(pline.cmds[i]->args[0], envp);
-		//printf("The path for i=[%d] is %s\n", i, pline.cmds[i]->path);
-		i ++;
-	}
-	pline.cmds[i] = NULL;
-	pline.num_of_cmds = i;
-	//i = 0;
-	//t_scmd		**scmds = pline.cmds;
-	//printf("The num of cmds is %d\n", pline.num_of_cmds);
-	// while (scmds[i])
-	// {
-	// 	ft_putendl_fd("What the hell?", 2);
-	// 	printf("the arg 0 for the [%d] is %s\n", i, scmds[i]->args[0]);
-	// 	printf("The path for [%d] is %s\n", i, scmds[i]->path);
-	// 	i ++;
-	// }
-	err_code = execute(av, envp, &pline);
-	i = 0;
-	while (i < pline.num_of_cmds)
-	{
-		free(pline.cmds[i]->cmd_with_path);
-		free_and_1(pline.cmds[i]->args, NULL);
-		i ++;
-	}
-	i = 0;
-	while (pline.cmds[i])
-	{
-		free (pline.cmds[i]);
-		i ++;
-	}
-	free (pline.cmds);
+// 	(void)ac;
 
-	//freeing the heap
-	return (err_code);
-}
+// 	i = 0;
+// 	while (_pipe[i])
+// 	{
+// 		_pipe[i]->cmd_with_path = find_scmd_path(_pipe[i]->args[0], envp);
+// 		i ++;
+// 	}
+// 	err_code = execute(av, envp, _pipe);
+// 	return (err_code);
+// }
 
 char	*find_scmd_path(char *scmd, char **envp)
 {
@@ -109,29 +71,29 @@ char	*find_scmd_path(char *scmd, char **envp)
 	return (NULL);
 }
 
-int	execute(char **av, char **envp, t_pline *pline)
+int	execute(char **envp, t_pipe **_pipe)
 {
 	int			fd[2];
 	int			savestdio[2];
 	pid_t		pid[42];
 	int			pipefd[2];
 	int			i;
+	int			j;
 
-	//these vars are part of the struct pline
 	int			err_code;
 	char		*infile;
-	char		*outfile;
 	int			num_of_cmds;
-	t_scmd		**scmds;
+	char		*outfile;
+	int			*tokens;
+	char		**args;
+	int			is_append_out;
 
 	(void)		envp;
-	(void)		av;
 
 	savestdio[0] = dup(STDIN_FILENO);
 	savestdio[1] = dup(STDOUT_FILENO);
-	scmds = pline->cmds;
-
-	infile = pline->infile;
+	outfile = NULL;
+	infile = NULL;
 	if (infile)
 	{
 		fd[0] = open (infile, O_RDONLY);
@@ -144,26 +106,43 @@ int	execute(char **av, char **envp, t_pline *pline)
 	else
 		fd[0] = dup(savestdio[0]);
 
-	err_code = 0;
-	num_of_cmds = pline->num_of_cmds;
 	i = 0;
+	while (_pipe[i])
+		i ++;
+	num_of_cmds = i;
+
+	err_code = 0;
+	i = 0;
+	is_append_out = 0;
 	while (i < num_of_cmds)
 	{
 		dup2(fd[0], STDIN_FILENO);
 		close(fd[0]);
+
+		// I need outfile otherwise I have to look for it every time there is a new _pipe
+		tokens = _pipe[i]->tokens;
+		args = _pipe[i]->args;
+		j = -1;
+		while (args[++j])
+		{
+			if (tokens[j] == OUT || tokens[j] == OUT_AP)
+			{
+				if (tokens[j] == OUT_AP)
+					is_append_out = 1;
+				outfile = args[j];
+			}
+		}
+		///////////////////
 		if (i == num_of_cmds - 1)
 		{
-			if (pline->outfile)
+			if (outfile)
 			{
-				outfile = pline->outfile;
 				fd[1] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
 				if (fd[1] < 0)
 				{
-					{
-						ft_putstr_fd("minishell: permission denied: ", 2);
-						ft_putendl_fd(outfile, 2);
-						return (127);
-					}
+					ft_putstr_fd("minishell: permission denied: ", 2);
+					ft_putendl_fd(outfile, 2);
+					return (127);
 				}
 			}
 			else
@@ -180,13 +159,13 @@ int	execute(char **av, char **envp, t_pline *pline)
 		pid[i] = fork();
 		if (pid[i] == 0)
 		{
-			if (scmds[i]->cmd_with_path != NULL)
+			if ((_pipe)[i]->cmd_with_path != NULL)
 			{
-				execve(scmds[i]->cmd_with_path, scmds[i]->args, NULL);
-				err_code = handle_execve_errors(scmds[i]->cmd_with_path);
+				execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->args, NULL);
+				err_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
 			}
 			else
-				err_code = handle_execve_errors(scmds[i]->args[0]);
+				err_code = handle_execve_errors((_pipe)[i]->args[0]);
 			exit (err_code);
 		}
 		i ++;

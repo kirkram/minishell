@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/03 19:06:40 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/04 15:25:10 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-#include "parsing.h"
 
 char	**array_copy(char **array)
 
@@ -85,10 +84,10 @@ void	pipeline_init(char **array, t_pipe ***pipe)
 	{
 		(*pipe)[i] = malloc(sizeof(t_pipe));
 		if (!(*pipe)[i])
-			error_func("malloc failed\n");		
+			error_func("malloc failed\n");
 		i++;
 	}
-	(*pipe)[x] = NULL;	
+	(*pipe)[x] = NULL;
 }
 
 void	pre_parse(char **array, t_pipe ***pipe)
@@ -118,8 +117,8 @@ void	pre_parse(char **array, t_pipe ***pipe)
 	}
 }
 
-void	lexer(char *argv, char **envp)
 
+t_pipe	**lexer(char *argv, char **envp)
 {
 	t_pipe	**pipe;
 	char	**array;
@@ -135,27 +134,29 @@ void	lexer(char *argv, char **envp)
 
 	// NOT PART OF THE ACCTUAL FUNCTION //
 
- 	int	i = 0;
-	int	x = 0;	
-	while (pipe[i])
-	{
-		x = 0;
-		while (pipe[i]->args[x])
-		{
-			printf("%s     ", pipe[i]->args[x]);
-			printf("%d\n", pipe[i]->tokens[x]);
-			x++;
-		}
-		printf("------------\n");
-		i++;
-	} 
-	i = 0;
-	while (pipe[i])
-	{
-		ft_arrfree(pipe[i]->args);
-		free (pipe[i]->tokens);
-		free(pipe[i]);
-		i++;
-	}
-	free (pipe);
+ 	// int	i = 0;
+	// int	x = 0;
+	// while (pipe[i])
+	// {
+	// 	x = 0;
+	// 	while (pipe[i]->args[x])
+	// 	{
+	// 		printf("%s     ", pipe[i]->args[x]);
+	// 		printf("%d\n", pipe[i]->tokens[x]);
+	// 		x++;
+	// 	}
+	// 	printf("------------\n");
+	// 	i++;
+	// }
+	// i = 0;
+	// while (pipe[i])
+	// {
+	// 	ft_arrfree(pipe[i]->args);
+	// 	free (pipe[i]->tokens);
+	// 	free(pipe[i]);
+	// 	i++;
+	// }
+	// free (pipe);
+
+	return (pipe);
 }
