@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/05 11:00:18 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/05 23:39:32 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,10 +140,11 @@ int	lexer(char *argv, char **envp, t_pipe ***pipe)
 	char	**array;
 
 	array = NULL;
+	var_substitution(argv, envp);
 	array = ppx_split(argv, ' ');
 	if (!array)
 		return (0); // or  something else if malloc failed
-	var_substitution(array, envp);
+	//var_substitution(array, envp);
 	pipeline_init(array, pipe);
 	if (parser(array, pipe) == 1)
 		return (1); // free all first

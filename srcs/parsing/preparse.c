@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/02 21:46:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/05 11:15:43 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/05 23:41:36 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,23 +27,10 @@
 
 } */
 
-void	var_substitution(char *str, char *envp[])
+void	var_substitution(char **str, char *envp[])
 
 {
-	int	i;
-	bool	doub;
-	bool	sing;
-
-	doub = false;
-	sing = false;
-	i = 0;
-	while (str[i])
-	{
-		if (ft_strrchr(str[i], '$'))
-			str[i] = env_variable(array[i], envp);
-		i++;
-	}
-
+	str = env_variable(*(str), envp);
 }
 
 char	*env_variable(char *str, char **envp)
@@ -54,7 +41,9 @@ char	*env_variable(char *str, char **envp)
 	char	*new_str;
 	char	*temp;
 	char	*ptr;
+	bool	quote;
 
+	quote = false;
 	ptr = NULL;
 	temp = NULL;
 	new_str = NULL;
@@ -63,7 +52,11 @@ char	*env_variable(char *str, char **envp)
 	while (i == -1 || str[i])
 	{
 		i++;
-		if (str[i] == '$' && start == 0 && i > start)
+		if (str[i] == '\'' && quote == false)
+			quote = true;
+		else if (str[i] == '\'' && quote == true)
+			quote = false;
+		if (str[i] == '$' && start == 0 && i > start && quote == false)
 		{
 			if (str[i +1] == '\0')
 				return (str);
@@ -75,7 +68,7 @@ char	*env_variable(char *str, char **envp)
 			}
 			start = i + 1;
 		}
-		else if ((str[i] == '$' || str[i] == '\0') && i > start)
+		else if ((str[i] == '$' || str[i] == '\0') && i > start && quote == false)
 		{
 			temp = ft_strjoin(ft_substr(str, start, i), "=");
 			ptr = new_str;
