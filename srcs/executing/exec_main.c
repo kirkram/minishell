@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/04 15:40:45 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/05 13:51:57 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 int		handle_execve_errors(char *failed_cmd);
 int		msg_stderr(char *message, char *cmd, int err_code);
 char	**find_path(char **envp);
-char	*jointhree(char const *s1, char const *s2, char const *s3);
 int		user_cmd_path(char **args, char *arg_cmd, char **paths);
 void	delete_pwd_path(char **paths);
 int		free_and_1(char **paths, int **end);
@@ -122,21 +121,31 @@ int	execute(char **envp, t_pipe **_pipe)
 		tokens = _pipe[i]->tokens;
 		args = _pipe[i]->args;
 		j = -1;
-		while (args[++j])
+		//must be really careful that the amount of tokens equals amount of args
+		while (args[++j] && tokens[j] != 0)
 		{
 			if (tokens[j] == OUT || tokens[j] == OUT_AP)
 			{
 				if (tokens[j] == OUT_AP)
 					is_append_out = 1;
 				outfile = args[j];
+				//!!!!!!!!!!!!!!
+				//args[j] = NULL;
+				// ft_putstr_fd("The outfile is %s\n", 2);
+				// ft_putendl_fd(outfile, 2);
 			}
+			if (tokens[j] == 0)
+				ft_putendl_fd("UNEQUAL TOKENS AND ARGS COUNT", 2);
 		}
 		///////////////////
 		if (i == num_of_cmds - 1)
 		{
 			if (outfile)
 			{
-				fd[1] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
+				if (is_append_out == 0)
+					fd[1] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
+				else
+					fd[1] = open(outfile, O_WRONLY | O_APPEND);
 				if (fd[1] < 0)
 				{
 					ft_putstr_fd("minishell: permission denied: ", 2);
@@ -166,6 +175,8 @@ int	execute(char **envp, t_pipe **_pipe)
 			else
 				err_code = handle_execve_errors((_pipe)[i]->args[0]);
 			exit (err_code);
+			// can it happen so that an earlier child will owerwrite
+			// the err code if its slower than the last process?
 		}
 		i ++;
 	}
@@ -184,9 +195,16 @@ int	execute(char **envp, t_pipe **_pipe)
 		i ++;
 	}
 	if (WIFEXITED(err_code))
+	{
+		//ft_putendl_fd("WIFEXITED", 2);
 		return (WEXITSTATUS(err_code));
+	}
 	else
+	{
+		//ft_putendl_fd("NOT WIFEXITED", 2);
 		return (127);
+	}
+
 }
 
 /*
