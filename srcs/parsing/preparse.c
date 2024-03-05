@@ -6,13 +6,13 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/02 21:46:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/04 17:22:33 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/05 11:15:43 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	var_substitution(char **array, char *envp[])
+/* void	var_substitution(char **array, char *envp[])
 
 {
 	int	i;
@@ -22,6 +22,25 @@ void	var_substitution(char **array, char *envp[])
 	{
 		if (ft_strrchr(array[i], '$'))
 			array[i] = env_variable(array[i], envp);
+		i++;
+	}
+
+} */
+
+void	var_substitution(char *str, char *envp[])
+
+{
+	int	i;
+	bool	doub;
+	bool	sing;
+
+	doub = false;
+	sing = false;
+	i = 0;
+	while (str[i])
+	{
+		if (ft_strrchr(str[i], '$'))
+			str[i] = env_variable(array[i], envp);
 		i++;
 	}
 
@@ -50,10 +69,10 @@ char	*env_variable(char *str, char **envp)
 				return (str);
 			new_str = ft_substr(str, start, i);
 			if (!new_str)
-				{
+			{
 				error_func("malloc failed\n" ,1);
 				exit (1);
-				}
+			}
 			start = i + 1;
 		}
 		else if ((str[i] == '$' || str[i] == '\0') && i > start)

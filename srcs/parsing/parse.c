@@ -6,13 +6,13 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/04 17:22:27 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/05 11:12:15 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
- void	init_token(t_pipe *pipe)
+void	init_token(t_pipe *pipe)
 
 {
 	int	i;
@@ -22,10 +22,10 @@
 		i++;
 	pipe->tokens = malloc (sizeof(int *) * (i +2));
 	if (!pipe->tokens)
-		{
+	{
 		error_func("malloc failed\n" ,1);
 		exit (1);
-		}
+	}
 	i = 0;
 	while (pipe->args[i])
 	{
@@ -55,8 +55,8 @@ int	make_tokens(t_pipe *pipe)
 				pipe->tokens[i +1] = IN_FD;
 			else
 			{
-				error_func("syntax error near unexpected token 'insert token here'", 258); // need error code update
-				return(1);
+				error_func("syntax error near unexpected token 'insert token here'", 258);
+				return (1);
 			}
 			x = (i -1);
 			while (x >= 0)
@@ -75,8 +75,8 @@ int	make_tokens(t_pipe *pipe)
 				pipe->tokens[i +1] = IN_HD;
 			else
 			{
-				error_func("syntax error near unexpected token 'insert token here'", 258); // need error code update
-				return(1);
+				error_func("syntax error near unexpected token 'insert token here'", 258);
+				return (1);
 			}
 			while (x >= 0)
 			{
@@ -94,8 +94,8 @@ int	make_tokens(t_pipe *pipe)
 				pipe->tokens[i +1] = OUT;
 			else
 			{
-				error_func("syntax error near unexpected token 'insert token here'", 258); // need error code update
-				return(1);
+				error_func("syntax error near unexpected token 'insert token here'", 258);
+				return (1);
 			}
 			x = (i -1);
 			while (x >= 0)
@@ -112,8 +112,8 @@ int	make_tokens(t_pipe *pipe)
 				pipe->tokens[i +1] = OUT_AP;
 			else
 			{
-				error_func("syntax error near unexpected token 'insert token here'", 258); // need error code update
-				return(1);
+				error_func("syntax error near unexpected token 'insert token here'", 258);
+				return (1);
 			}
 			x = (i -1);
 			while (x >= 0)
@@ -178,10 +178,10 @@ int	parser(char **array, t_pipe ***pipe)
 	while ((*pipe)[x])
 	{
 		init_token((*pipe)[x]);
-		if(make_tokens((*pipe)[x]) == 1)
-			return(1);
+		if (make_tokens((*pipe)[x]) == 1)
+			return (1);
 		remove_red((*pipe)[x]);
 		x++;
 	}
-	return(0);
+	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/04 17:22:31 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/05 11:00:18 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@ char	**array_copy(char **array)
 		i++;
 	new_array = malloc(sizeof(char *) * (i +1));
 	if (!new_array)
-		{
+	{
 		error_func("malloc failed\n" ,1);
 		exit (1);
-		}
+	}
 	i = 0;
 	while (array[i])
 	{
@@ -54,18 +54,18 @@ char	**get_cmd(char **cmds, int start, int end)
 	temp_arr = NULL;
 	temp_arr = malloc(sizeof (char *) * ((end - start) + 2));
 	if (!temp_arr)
-			{
+	{
 		error_func("malloc failed\n" ,1);
 		exit (1);
-		}
+	}
 	while (cmds[start] && start <= end)
 	{
 		temp_arr[i] = ft_strdup(cmds[start]);
 		if (!temp_arr[i])
-			{
+		{
 			error_func("malloc failed\n" ,1);
 			exit (1);
-			}
+		}
 		i++;
 		start++;
 	}
@@ -127,7 +127,7 @@ void	pre_parse(char **array, t_pipe ***pipe)
 		else if (array[i +1] == 0)
 		{
 			(*pipe)[x]->args = get_cmd(array, start, i);
-			break;
+			break ;
 		}
 		i++;
 	}
@@ -146,7 +146,7 @@ int	lexer(char *argv, char **envp, t_pipe ***pipe)
 	var_substitution(array, envp);
 	pipeline_init(array, pipe);
 	if (parser(array, pipe) == 1)
-		return (1); // free all firsst
+		return (1); // free all first
 	ft_arrfree(array);
 
 	// NOT PART OF THE ACCTUAL FUNCTION //
