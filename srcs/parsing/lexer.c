@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/05 23:39:32 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/06 17:28:31 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,11 +140,12 @@ int	lexer(char *argv, char **envp, t_pipe ***pipe)
 	char	**array;
 
 	array = NULL;
-	var_substitution(argv, envp);
+	//printf("%s\n", argv);
+	var_substitution(&argv, envp);
+	//printf("%s\n", argv);
 	array = ppx_split(argv, ' ');
 	if (!array)
-		return (0); // or  something else if malloc failed
-	//var_substitution(array, envp);
+		return (1); // or  something else if malloc failed
 	pipeline_init(array, pipe);
 	if (parser(array, pipe) == 1)
 		return (1); // free all first
@@ -152,28 +153,43 @@ int	lexer(char *argv, char **envp, t_pipe ***pipe)
 
 	// NOT PART OF THE ACCTUAL FUNCTION //
 
- 	// int	i = 0;
-	// int	x = 0;
-	// while (pipe[i])
-	// {
-	// 	x = 0;
-	// 	while (pipe[i]->args[x])
-	// 	{
-	// 		printf("%s     ", pipe[i]->args[x]);
-	// 		printf("%d\n", pipe[i]->tokens[x]);
-	// 		x++;
-	// 	}
-	// 	printf("------------\n");
-	// 	i++;
-	// }
-	// i = 0;
-	// while (pipe[i])
-	// {
-	// 	ft_arrfree(pipe[i]->args);
-	// 	free (pipe[i]->tokens);
-	// 	free(pipe[i]);
-	// 	i++;
-	// }
+/*    	 int	i = 0;
+	 int	x = 0;
+	 while ((*pipe)[i])
+	 {
+	 	x = 0;
+	 	while ((*pipe)[i]->final_args[x])
+	 	{
+	 		printf("%s\n", (*pipe)[i]->final_args[x]);
+	 		//printf("%d\n", (*pipe)[i]->tokens[x]);
+	 		x++;
+	 	}
+	 	printf("------------\n");
+	 	i++;
+	 }  */
+
+	 int	i = 0;
+	 int	x = 0;
+	 while ((*pipe)[i])
+	 {
+	 	x = 0;
+	 	while ((*pipe)[i]->args[x])
+	 	{
+	 		printf("%s        ", (*pipe)[i]->args[x]);
+	 		printf("%d\n", (*pipe)[i]->tokens[x]);
+	 		x++;
+	 	}
+	 	printf("------------\n");
+	 	i++;
+	 } 
+/* 	 i = 0;
+	 while (pipe[i])
+	 {
+	 	ft_arrfree(pipe[i]->args);
+	 	free (pipe[i]->tokens);
+	 	free(pipe[i]);
+	 	i++;
+	 } */
 	// free (pipe);
 
 	return (0);

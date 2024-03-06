@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/05 11:12:15 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/06 17:54:36 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	init_token(t_pipe *pipe)
 	while (pipe->args[i])
 	{
 		if (get_token(pipe->args[i]) == CMD)
-			pipe->tokens[i] = CMD;
+			pipe->tokens[i] = CMD; 
 		else
 			pipe->tokens[i] = 0;
 		i++;
@@ -59,6 +59,7 @@ int	make_tokens(t_pipe *pipe)
 				return (1);
 			}
 			x = (i -1);
+
 			while (x >= 0)
 			{
 				if (pipe->tokens[x] == IN_FD)
@@ -166,6 +167,71 @@ void	remove_red(t_pipe *pipe)
 	pipe->tokens = i_temp;
 }
 
+int	is_builtin(char *str)
+
+{
+	if (ft_strncmp(str, "echo", 5) == 0)
+		return (8);
+	else if (ft_strncmp(str, "cd", 3) == 0)
+		return (8);
+	else if (ft_strncmp(str, "pwd", 4) == 0)
+		return (8);
+	else if (ft_strncmp(str, "export", 7) == 0)
+		return (8);
+	else if (ft_strncmp(str, "unset", 6) == 0)
+		return (8);
+	else if (ft_strncmp(str, "env", 4) == 0)
+		return (8);
+	else if (ft_strncmp(str, "exit", 5) == 0)
+		return (8);
+	return (0);
+}
+
+int	final_args(t_pipe *pipe)
+
+{
+	int	i;
+	int	x;
+
+	x = 0;
+	i = 0;
+	while (pipe->args[i])
+	{
+		if (pipe->tokens[i] == CMD)
+			x++;
+		i++;
+	}
+	pipe->final_args = malloc (sizeof(char *) * (x +1));
+	if (!pipe->final_args)
+	{
+		error_func("malloc failed\n", 1);
+		exit (1);
+	}
+	i = 0;
+	x = 0;
+	while (pipe->args[i])
+	{
+		if (pipe->tokens[i] == CMD)
+		{
+			pipe->final_args[x] = ft_strdup(pipe->args[i]);
+			if (x == 0)
+			{
+				if (is_builtin(pipe->args[i]) == 8)
+					pipe->tokens[i] = 8;
+			}
+			if (!pipe->final_args[x])
+			{
+				error_func("malloc failed\n", 1);
+				exit (1);
+			}
+			x++;
+		}
+		i++;
+	}
+	pipe->final_args[x] = NULL;
+	return (0);
+}
+
 int	parser(char **array, t_pipe ***pipe)
 
 {
@@ -181,6 +247,8 @@ int	parser(char **array, t_pipe ***pipe)
 		if (make_tokens((*pipe)[x]) == 1)
 			return (1);
 		remove_red((*pipe)[x]);
+		if (final_args((*pipe)[x]) == 1)
+			return (1); 
 		x++;
 	}
 	return (0);

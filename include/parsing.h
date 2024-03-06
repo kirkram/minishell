@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/04 17:20:05 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/06 15:21:05 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct s_paths
 
 typedef struct s_pipe
 {
+	char	**final_args;
 	char	**args;
 	char	*cmd_with_path;
 	int		*tokens;
