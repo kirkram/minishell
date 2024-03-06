@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/02 21:46:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/06 17:57:38 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/06 23:07:32 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,11 @@ char	*separator(char *str)
 		i++;
 	}
 	temp = malloc(sizeof(char) * (i + (x *2) + 1));
+	if (!temp)
+		{
+			error_func("malloc failed\n");
+			exit (1);
+		}
 	i = 0;
 	x = 0;
 	quote = false;
@@ -125,7 +130,7 @@ char	*separator(char *str)
 void	var_substitution(char **str, char *envp[])
 
 {
-	//*str = env_variable(*(str), envp); // this cannot be tested before working env in minishell
+	*str = env_variable(*(str), envp); // this cannot be tested before working env in minishell
 	*str = separator(*(str)); // for splitting operatiors from other strings
 }
 
@@ -159,7 +164,7 @@ char	*env_variable(char *str, char **envp)
 			new_str = ft_substr(str, start, i);
 			if (!new_str)
 			{
-				error_func("malloc failed\n" ,1);
+				error_func("malloc failed\n");
 				exit (1);
 			}
 			start = i + 1;
