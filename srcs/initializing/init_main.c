@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/05 18:04:48 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/06 13:23:47 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 char	*rl_gets(char *line_read, int hist_file);
 int		rl_loop(int ac, char **av, char **envp);
 int		open_history_file(int hist_fd);
-int		scripts_and_simple_cmds_mode(char **av, char **envp);
+int		scripts_mode(char **av, char **envp);
 int		interactive_mode_loop(int hist_fd, char **envp);
 int		dash_c_mode(char **av, char **envp);
 
@@ -53,7 +53,7 @@ int	rl_loop(int ac, char **av, char **envp)
 	else if (ft_strncmp(av[1], "-c", 3) == 0)
 		dash_c_mode(av, envp);
 	else
-		scripts_and_simple_cmds_mode(av, envp);
+		scripts_mode(av, envp);
 		//expand_scripts_mode(av);
 	// interactive_mode;
 	//
@@ -68,7 +68,13 @@ int	dash_c_mode(char **av, char **envp)
 	t_pipe	**_pipe;
 	int		err_code;
 
+	line_read = NULL;
 	line_read = ft_calloc(1, ft_strlen(av[2]) + 1);
+	if (!line_read)
+	{
+		//HANDLE ERRORS;
+		return (1);
+	}
 	ft_strlcat(line_read, av[2], -1);
 	_pipe = lexer(line_read, envp);
 	i = 0;
@@ -88,9 +94,10 @@ int	dash_c_mode(char **av, char **envp)
 	return (0);
 
 }
-int	scripts_and_simple_cmds_mode(char **av, char **envp)
+int	scripts_mode(char **av, char **envp)
 {
 	char	*line_read;
+
 	int		i;
 	t_pipe	**_pipe;
 	int		err_code;
@@ -101,6 +108,8 @@ int	scripts_and_simple_cmds_mode(char **av, char **envp)
 	//and neither the -c nor the -s option has been supplied,
 	//the first argument is assumed to be the name of a file containing shell commands.
 
+	ft_putendl_fd("IMPLEMENT OPENING OF THE SCRIPTS, RETURNING...", 2);
+	return (1);
 	i = 1;
 	len = 0;
 	while (av[i])
@@ -111,7 +120,13 @@ int	scripts_and_simple_cmds_mode(char **av, char **envp)
 		len += ft_strlen(av[i]) + 1;
 		i ++;
 	}
+	line_read = NULL;
 	line_read = ft_calloc(1, len + 1);
+	if (!line_read)
+	{
+		//HANDLE ERRORS;
+		return (1);
+	}
 	i = 1;
 	while (av[i])
 	{
@@ -121,6 +136,7 @@ int	scripts_and_simple_cmds_mode(char **av, char **envp)
 		i ++;
 	}
 	_pipe = lexer(line_read, envp);
+	free (line_read);
 	i = 0;
 	while (_pipe[i])
 	{
