@@ -5,7 +5,7 @@ CFLAGS = -Wall -Wextra -Werror
 HEADERS	= -I ./include -L/usr/local/lib -I/usr/local/include -lreadline
 DEBUGFLAGS = -g -fsanitize=address,undefined,integer
 SRCS = \
- ./srcs/parsing/lexer.c ./srcs/parsing/parse_main.c ./srcs/parsing/parse.c ./srcs/parsing/pipex_split_helper.c \
+ ./srcs/parsing/lexer.c ./srcs/parsing/parse.c ./srcs/parsing/pipex_split_helper.c \
  ./srcs/parsing/pipex_split.c ./srcs/parsing/preparse.c \
  ./srcs/initializing/init_main.c \
  ./srcs/executing/exec_main.c \

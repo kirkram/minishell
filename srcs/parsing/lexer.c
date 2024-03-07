@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/06 17:28:31 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/07 12:05:16 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ char	**array_copy(char **array)
 	new_array = malloc(sizeof(char *) * (i +1));
 	if (!new_array)
 	{
-		error_func("malloc failed\n" ,1);
+		error_func("malloc failed\n");
 		exit (1);
 	}
 	i = 0;
@@ -35,7 +35,7 @@ char	**array_copy(char **array)
 		if (!new_array[i])
 		{
 			ft_arrfree(new_array);
-			error_func("malloc failed\n" ,1);
+			error_func("malloc failed\n");
 			exit (1);
 		}
 		i++;
@@ -55,7 +55,7 @@ char	**get_cmd(char **cmds, int start, int end)
 	temp_arr = malloc(sizeof (char *) * ((end - start) + 2));
 	if (!temp_arr)
 	{
-		error_func("malloc failed\n" ,1);
+		error_func("malloc failed\n");
 		exit (1);
 	}
 	while (cmds[start] && start <= end)
@@ -63,7 +63,7 @@ char	**get_cmd(char **cmds, int start, int end)
 		temp_arr[i] = ft_strdup(cmds[start]);
 		if (!temp_arr[i])
 		{
-			error_func("malloc failed\n" ,1);
+			error_func("malloc failed\n");
 			exit (1);
 		}
 		i++;
@@ -89,7 +89,7 @@ void	pipeline_init(char **array, t_pipe ***pipe)
 	*pipe = malloc(sizeof(t_pipe *) * (x +1));
 	if (!*pipe)
 	{
-		error_func("malloc failed\n" ,1);
+		error_func("malloc failed\n");
 		exit (1);
 	}
 	i = 0;
@@ -98,7 +98,7 @@ void	pipeline_init(char **array, t_pipe ***pipe)
 		(*pipe)[i] = malloc(sizeof(t_pipe));
 		if (!(*pipe)[i])
 		{
-			error_func("malloc failed\n" ,1);
+			error_func("malloc failed\n");
 			exit (1);
 		}
 		i++;
@@ -133,21 +133,25 @@ void	pre_parse(char **array, t_pipe ***pipe)
 	}
 }
 
+void	error_func(char *str)
 
-int	lexer(char *argv, char **envp, t_pipe ***pipe)
+{
+	ft_putendl_fd(str, 2);
+}
+
+
+int	lexer(char *argv, char **envp, t_pipe ***pipe, int *err_code)
 
 {
 	char	**array;
 
 	array = NULL;
-	//printf("%s\n", argv);
 	var_substitution(&argv, envp);
-	//printf("%s\n", argv);
 	array = ppx_split(argv, ' ');
 	if (!array)
 		return (1); // or  something else if malloc failed
 	pipeline_init(array, pipe);
-	if (parser(array, pipe) == 1)
+	if (parser(array, pipe, err_code) == 1)
 		return (1); // free all first
 	ft_arrfree(array);
 
@@ -167,7 +171,7 @@ int	lexer(char *argv, char **envp, t_pipe ***pipe)
 	 	printf("------------\n");
 	 	i++;
 	 }  */
-
+/* 
 	 int	i = 0;
 	 int	x = 0;
 	 while ((*pipe)[i])
@@ -181,7 +185,7 @@ int	lexer(char *argv, char **envp, t_pipe ***pipe)
 	 	}
 	 	printf("------------\n");
 	 	i++;
-	 } 
+	 }  */
 /* 	 i = 0;
 	 while (pipe[i])
 	 {

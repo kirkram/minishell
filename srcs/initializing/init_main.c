@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/04 17:23:54 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/07 10:18:55 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ int	main(int ac, char **av, char **envp)
 	(void)ac;
 	int		ret;
 
-	g_signal = 0;
 	ret = 0;
 	ret = rl_loop(ac, av, envp);
 
@@ -98,7 +97,7 @@ int	interactive_mode_loop(int hist_fd, char **envp)
 	{
 		line_read = rl_gets(line_read, hist_fd);
 		
-		if (lexer(line_read, envp, &_pipe) != 1)
+		if (lexer(line_read, envp, &_pipe, &err_code) != 1)
 		{
 			i = 0;
 			while (_pipe[i])

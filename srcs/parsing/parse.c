@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/06 17:54:36 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/06 23:06:46 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	init_token(t_pipe *pipe)
 	pipe->tokens = malloc (sizeof(int *) * (i +2));
 	if (!pipe->tokens)
 	{
-		error_func("malloc failed\n" ,1);
+		error_func("malloc failed\n");
 		exit (1);
 	}
 	i = 0;
@@ -38,7 +38,7 @@ void	init_token(t_pipe *pipe)
 	pipe->tokens[i] = 0;
 }
 
-int	make_tokens(t_pipe *pipe)
+int	make_tokens(t_pipe *pipe, int *err_code)
 
 {
 	int	i;
@@ -55,7 +55,10 @@ int	make_tokens(t_pipe *pipe)
 				pipe->tokens[i +1] = IN_FD;
 			else
 			{
-				error_func("syntax error near unexpected token 'insert token here'", 258);
+				*err_code = 258;
+				ft_putstr_fd("syntax error near unexpected token `", 2);
+				ft_putstr_fd(pipe->args[i +1], 2);
+				ft_putendl_fd("\'", 2);
 				return (1);
 			}
 			x = (i -1);
@@ -76,7 +79,10 @@ int	make_tokens(t_pipe *pipe)
 				pipe->tokens[i +1] = IN_HD;
 			else
 			{
-				error_func("syntax error near unexpected token 'insert token here'", 258);
+				*err_code = 258;
+				ft_putstr_fd("syntax error near unexpected token `", 2);
+				ft_putstr_fd(pipe->args[i +1], 2);
+				ft_putendl_fd("\'", 2);
 				return (1);
 			}
 			while (x >= 0)
@@ -95,7 +101,10 @@ int	make_tokens(t_pipe *pipe)
 				pipe->tokens[i +1] = OUT;
 			else
 			{
-				error_func("syntax error near unexpected token 'insert token here'", 258);
+				*err_code = 258;
+				ft_putstr_fd("syntax error near unexpected token `", 2);
+				ft_putstr_fd(pipe->args[i +1], 2);
+				ft_putendl_fd("\'", 2);
 				return (1);
 			}
 			x = (i -1);
@@ -113,7 +122,10 @@ int	make_tokens(t_pipe *pipe)
 				pipe->tokens[i +1] = OUT_AP;
 			else
 			{
-				error_func("syntax error near unexpected token 'insert token here'", 258);
+				*err_code = 258;
+				ft_putstr_fd("syntax error near unexpected token `", 2);
+				ft_putstr_fd(pipe->args[i +1], 2);
+				ft_putendl_fd("\'", 2);
 				return (1);
 			}
 			x = (i -1);
@@ -204,7 +216,7 @@ int	final_args(t_pipe *pipe)
 	pipe->final_args = malloc (sizeof(char *) * (x +1));
 	if (!pipe->final_args)
 	{
-		error_func("malloc failed\n", 1);
+		error_func("malloc failed\n");
 		exit (1);
 	}
 	i = 0;
@@ -221,7 +233,7 @@ int	final_args(t_pipe *pipe)
 			}
 			if (!pipe->final_args[x])
 			{
-				error_func("malloc failed\n", 1);
+				error_func("malloc failed\n");
 				exit (1);
 			}
 			x++;
@@ -232,19 +244,17 @@ int	final_args(t_pipe *pipe)
 	return (0);
 }
 
-int	parser(char **array, t_pipe ***pipe)
+int	parser(char **array, t_pipe ***pipe, int *err_code)
 
 {
 	int	x;
-	int	i;
 
 	x = 0;
-	i = 0;
 	pre_parse(array, pipe);
 	while ((*pipe)[x])
 	{
 		init_token((*pipe)[x]);
-		if (make_tokens((*pipe)[x]) == 1)
+		if (make_tokens((*pipe)[x], err_code) == 1)
 			return (1);
 		remove_red((*pipe)[x]);
 		if (final_args((*pipe)[x]) == 1)
