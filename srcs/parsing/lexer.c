@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
 /*   Updated: 2024/03/07 13:58:45 by clundber         ###   ########.fr       */
@@ -140,14 +140,14 @@ void	error_func(char *str)
 }
 
 
-int	lexer(char *argv, char **envp, t_pipe ***pipe, int *err_code)
+int	lexer(char *line_read, char **envp, t_pipe ***pipe, int *err_code)
 
 {
 	char	**array;
 
 	array = NULL;
-	var_substitution(&argv, envp);
-	array = ppx_split(argv, ' ');
+	var_substitution(&line_read, envp);
+	array = ppx_split(line_read, ' ');
 	if (!array)
 		return (1); // or  something else if malloc failed
 	pipeline_init(array, pipe);
@@ -171,7 +171,7 @@ int	lexer(char *argv, char **envp, t_pipe ***pipe, int *err_code)
 	 	printf("------------\n");
 	 	i++;
 	 }  */
-/* 
+/*
 	 int	i = 0;
 	 int	x = 0;
 	 while ((*pipe)[i])

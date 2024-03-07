@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/04 15:40:45 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/07 13:16:55 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,29 +17,10 @@
 int		handle_execve_errors(char *failed_cmd);
 int		msg_stderr(char *message, char *cmd, int err_code);
 char	**find_path(char **envp);
-char	*jointhree(char const *s1, char const *s2, char const *s3);
 int		user_cmd_path(char **args, char *arg_cmd, char **paths);
 void	delete_pwd_path(char **paths);
 int		free_and_1(char **paths, int **end);
-int		struct_and_path(int ac, char **av, char **envp, t_pipe **_pipe);
-
-
-// int	struct_and_path(int ac, char **av, char **envp, t_pipe **_pipe)
-// {
-// 	int			i;
-// 	int			err_code;
-
-// 	(void)ac;
-
-// 	i = 0;
-// 	while (_pipe[i])
-// 	{
-// 		_pipe[i]->cmd_with_path = find_scmd_path(_pipe[i]->args[0], envp);
-// 		i ++;
-// 	}
-// 	err_code = execute(av, envp, _pipe);
-// 	return (err_code);
-// }
+int		exec_builtin(t_pipe *_pipe_i);
 
 char	*find_scmd_path(char *scmd, char **envp)
 {
@@ -84,7 +65,7 @@ int	execute(char **envp, t_pipe **_pipe)
 	int			num_of_cmds;
 	char		*outfile;
 	int			*tokens;
-	char		**args;
+	char		**all_args;
 	int			is_append_out;
 
 	(void)		envp;
@@ -110,6 +91,11 @@ int	execute(char **envp, t_pipe **_pipe)
 		i ++;
 	num_of_cmds = i;
 
+	ft_memset(pid, -1, sizeof(pid));
+	// i = -1;
+	// while (++i != 41)
+	// 	printf("The pid is %d\n", pid[i]);
+	// while (1);
 	err_code = 0;
 	i = 0;
 	is_append_out = 0;
@@ -120,23 +106,33 @@ int	execute(char **envp, t_pipe **_pipe)
 
 		// I need outfile otherwise I have to look for it every time there is a new _pipe
 		tokens = _pipe[i]->tokens;
-		args = _pipe[i]->args;
+		all_args = _pipe[i]->args;
 		j = -1;
-		while (args[++j])
+		//must be really careful that the amount of tokens equals amount of args
+		while (all_args[++j] && tokens[j] != 0)
 		{
 			if (tokens[j] == OUT || tokens[j] == OUT_AP)
 			{
 				if (tokens[j] == OUT_AP)
 					is_append_out = 1;
-				outfile = args[j];
+				outfile = all_args[j];
+				//!!!!!!!!!!!!!!
+				//args[j] = NULL;
+				// ft_putstr_fd("The outfile is %s\n", 2);
+				// ft_putendl_fd(outfile, 2);
 			}
+			if (tokens[j] == 0)
+				ft_putendl_fd("UNEQUAL TOKENS AND ARGS COUNT", 2);
 		}
 		///////////////////
 		if (i == num_of_cmds - 1)
 		{
 			if (outfile)
 			{
-				fd[1] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
+				if (is_append_out == 0)
+					fd[1] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
+				else
+					fd[1] = open(outfile, O_WRONLY | O_APPEND);
 				if (fd[1] < 0)
 				{
 					ft_putstr_fd("minishell: permission denied: ", 2);
@@ -155,17 +151,27 @@ int	execute(char **envp, t_pipe **_pipe)
 		}
 		dup2(fd[1], STDOUT_FILENO);
 		close(fd[1]);
-		pid[i] = fork();
-		if (pid[i] == 0)
+		if (tokens && tokens[0] != BUILTIN)
 		{
-			if ((_pipe)[i]->cmd_with_path != NULL)
+			pid[i] = fork();
+			if (pid[i] == 0)
 			{
-				execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->args, NULL);
-				err_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
+				if ((_pipe)[i]->cmd_with_path != NULL)
+				{
+					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, NULL);
+					err_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
+				}
+				else
+					err_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
+				if (i != num_of_cmds - 1)
+					err_code = 127;
+				exit (err_code);
 			}
-			else
-				err_code = handle_execve_errors((_pipe)[i]->args[0]);
-			exit (err_code);
+		}
+		else
+		{
+			ft_putendl_fd("exec builtin", 2);
+			exec_builtin(_pipe[i]);
 		}
 		i ++;
 	}
@@ -177,24 +183,63 @@ int	execute(char **envp, t_pipe **_pipe)
 	i = 0;
 	while (i < num_of_cmds)
 	{
-		if (i == num_of_cmds - 1)
+		if ((_pipe[i])->tokens && (_pipe[i])->tokens[0] == BUILTIN)
+			i ++;
+		if (i == num_of_cmds - 1 && pid[i] != -1)
 			waitpid(pid[i], &err_code, 0);
-		else
+		else if (pid[i] != -1)
 			waitpid(pid[i], NULL, 0);
 		i ++;
 	}
 	if (WIFEXITED(err_code))
+	{
+		//ft_putendl_fd("WIFEXITED", 2);
 		return (WEXITSTATUS(err_code));
+	}
 	else
+	{
+		//ft_putendl_fd("NOT WIFEXITED", 2);
 		return (127);
+	}
+
 }
 
 /*
+When the name of a builtin command is used as the first word of a simple command (see Simple Commands),
+the shell executes the command directly, without invoking another program.
 All built­in functions except printenv are executed by the parent process. The reason for this is
 that we want setenv, cd etc to modify the state of the parent. If they are executed by the child,
 the changes will go away when the child exits. For this built it functions, call the function inside
 execute instead of forking a new process
+All builtins return an exit status of 2 to indicate incorrect usage, generally invalid options or missing arguments.
 */
+int		exec_builtin(t_pipe *_pipe_i)
+{
+	if (!ft_strncmp(_pipe_i->noio_args[0], "echo", -1))
+		// return (echo_builtin());
+		return (0);
+	else if (!ft_strncmp(_pipe_i->noio_args[0], "cd", -1))
+		//return (cd_builtin());
+		return (0);
+	else if (!ft_strncmp(_pipe_i->noio_args[0], "pwd", -1))
+		//return (pwd_builtin());
+		return (0);
+	else if (!ft_strncmp(_pipe_i->noio_args[0], "export", -1))
+		//return (export_builtin());
+		return (0);
+	else if (!ft_strncmp(_pipe_i->noio_args[0], "unset", -1))
+		return (0);
+	else if (!ft_strncmp(_pipe_i->noio_args[0], "env", -1))
+		return (0);
+	else if (!ft_strncmp(_pipe_i->noio_args[0], "exit", -1))
+		return (0);
+	return (0);
+}
+
+// int		echo_builtin(char **noio_args)
+// {
+
+// }
 
 int		handle_execve_errors(char *failed_cmd)
 {
