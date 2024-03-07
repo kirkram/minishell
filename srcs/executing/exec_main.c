@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/07 12:30:46 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/07 13:16:55 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int	execute(char **envp, t_pipe **_pipe)
 	int			num_of_cmds;
 	char		*outfile;
 	int			*tokens;
-	char		**args;
+	char		**all_args;
 	int			is_append_out;
 
 	(void)		envp;
@@ -106,16 +106,16 @@ int	execute(char **envp, t_pipe **_pipe)
 
 		// I need outfile otherwise I have to look for it every time there is a new _pipe
 		tokens = _pipe[i]->tokens;
-		args = _pipe[i]->args;
+		all_args = _pipe[i]->args;
 		j = -1;
 		//must be really careful that the amount of tokens equals amount of args
-		while (args[++j] && tokens[j] != 0)
+		while (all_args[++j] && tokens[j] != 0)
 		{
 			if (tokens[j] == OUT || tokens[j] == OUT_AP)
 			{
 				if (tokens[j] == OUT_AP)
 					is_append_out = 1;
-				outfile = args[j];
+				outfile = all_args[j];
 				//!!!!!!!!!!!!!!
 				//args[j] = NULL;
 				// ft_putstr_fd("The outfile is %s\n", 2);
@@ -158,12 +158,11 @@ int	execute(char **envp, t_pipe **_pipe)
 			{
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
-					//must change to true args
-					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->args, NULL);
+					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, NULL);
 					err_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
 				}
 				else
-					err_code = handle_execve_errors((_pipe)[i]->args[0]); //change to treu args
+					err_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
 				if (i != num_of_cmds - 1)
 					err_code = 127;
 				exit (err_code);

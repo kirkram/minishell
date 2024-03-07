@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/07 12:31:33 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/07 13:13:04 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ int	rl_loop(int ac, char **av, char **envp)
 	if (hist_fd < 0)
 		return (1);
 	 //what are the other possible conditions to use interactive mode with more than 1 arg?
-		interactive_mode_loop(hist_fd, envp);
+	interactive_mode_loop(hist_fd, envp);
 		//expand_scripts_mode(av);
 	// interactive_mode;
 	//
