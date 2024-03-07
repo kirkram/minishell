@@ -22,9 +22,5 @@
 
 int		g_signal;
 
-char	*find_scmd_path(char *scmd, char **envp);
-int		execute(char **envp, t_pipe **_pipe);
-char	*jointhree(char const *s1, char const *s2, char const *s3);
-
 
 #endif
