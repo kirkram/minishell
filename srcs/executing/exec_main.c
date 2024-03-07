@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/06 17:28:24 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/07 12:30:46 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,26 +216,31 @@ All builtins return an exit status of 2 to indicate incorrect usage, generally i
 */
 int		exec_builtin(t_pipe *_pipe_i)
 {
-	if (!ft_strncmp(_pipe_i->true_args[0], "echo", -1))
-		return (echo_builtin());
-	else if (!ft_strncmp(_pipe_i->true_args[0], "cd", -1))
-		return (cd_builtin());
-	else if (!ft_strncmp(_pipe_i->true_args[0], "pwd", -1))
-		return (pwd_builtin());
-	else if (!ft_strncmp(_pipe_i->true_args[0], "export", -1))
-		return (export_builtin());
-	else if (!ft_strncmp(_pipe_i->true_args[0], "unset", -1))
-		return (cd_builtin());
-	else if (!ft_strncmp(_pipe_i->true_args[0], "env", -1))
-		return (env_builtin());
-	else if (!ft_strncmp(_pipe_i->true_args[0], "exit", -1))
-		return (exit_builtin());
+	if (!ft_strncmp(_pipe_i->noio_args[0], "echo", -1))
+		// return (echo_builtin());
+		return (0);
+	else if (!ft_strncmp(_pipe_i->noio_args[0], "cd", -1))
+		//return (cd_builtin());
+		return (0);
+	else if (!ft_strncmp(_pipe_i->noio_args[0], "pwd", -1))
+		//return (pwd_builtin());
+		return (0);
+	else if (!ft_strncmp(_pipe_i->noio_args[0], "export", -1))
+		//return (export_builtin());
+		return (0);
+	else if (!ft_strncmp(_pipe_i->noio_args[0], "unset", -1))
+		return (0);
+	else if (!ft_strncmp(_pipe_i->noio_args[0], "env", -1))
+		return (0);
+	else if (!ft_strncmp(_pipe_i->noio_args[0], "exit", -1))
+		return (0);
+	return (0);
 }
 
-int		echo_builtin(char **true_args)
-{
+// int		echo_builtin(char **noio_args)
+// {
 
-}
+// }
 
 int		handle_execve_errors(char *failed_cmd)
 {
