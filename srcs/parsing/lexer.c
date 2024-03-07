@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/06 22:32:30 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/07 12:05:16 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,9 +146,7 @@ int	lexer(char *argv, char **envp, t_pipe ***pipe, int *err_code)
 	char	**array;
 
 	array = NULL;
-	//printf("%s\n", argv);
 	var_substitution(&argv, envp);
-	//printf("%s\n", argv);
 	array = ppx_split(argv, ' ');
 	if (!array)
 		return (1); // or  something else if malloc failed
@@ -173,7 +171,7 @@ int	lexer(char *argv, char **envp, t_pipe ***pipe, int *err_code)
 	 	printf("------------\n");
 	 	i++;
 	 }  */
-
+/* 
 	 int	i = 0;
 	 int	x = 0;
 	 while ((*pipe)[i])
@@ -187,7 +185,7 @@ int	lexer(char *argv, char **envp, t_pipe ***pipe, int *err_code)
 	 	}
 	 	printf("------------\n");
 	 	i++;
-	 } 
+	 }  */
 /* 	 i = 0;
 	 while (pipe[i])
 	 {

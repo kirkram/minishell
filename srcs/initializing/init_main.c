@@ -6,15 +6,15 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/06 23:14:07 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/07 10:18:55 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../lib/get_next_line/get_next_line.h"
 
-//#include <readline/readline.h>
-//#include <readline/history.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #include <signal.h>
 
 // -L/usr/local/lib -I/usr/local/include -lreadline
