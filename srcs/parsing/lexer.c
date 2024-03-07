@@ -186,14 +186,16 @@ int			lexer(char *line_read, t_pipe ***pipe, t_utils **utils)
 	 	printf("------------\n");
 	 	i++;
 	 }  */
-/* 	 i = 0;
-	 while (pipe[i])
+/* 	 int x = 0;
+ 	 int i = 0;
+	 while ((*pipe)[i])
 	 {
-	 	ft_arrfree(pipe[i]->args);
+		while (pipe[i]->args[x])
+	 		ft_arrfree(pipe[i]->args[x]);
 	 	free (pipe[i]->tokens);
 	 	free(pipe[i]);
 	 	i++;
-	 } */
+	 }  */
 	// free (pipe);
 
 	return (0);
