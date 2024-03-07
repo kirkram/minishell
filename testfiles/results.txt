@@ -1,0 +1,7 @@
+
+/////////////////
+CommandCompare. Version 0.1 
+The file m_shell should be in a folder above current
+Check the results of stderr in the terminal
+
+Test with a mix of existing and nonexisting commands
