@@ -20,6 +20,7 @@
 # include "../lib/get_next_line/get_next_line.h"
 # include "./parsing.h"
 
+int		g_signal;
 
 char	*find_scmd_path(char *scmd, char **envp);
 int		execute(char **envp, t_pipe **_pipe);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/06 13:23:47 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/07 10:18:55 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,14 +165,17 @@ int	interactive_mode_loop(int hist_fd, char **envp)
 	while (1)
 	{
 		line_read = rl_gets(line_read, hist_fd);
-		_pipe = lexer(line_read, envp);
-		i = 0;
-		while (_pipe[i])
+		
+		if (lexer(line_read, envp, &_pipe, &err_code) != 1)
 		{
-			(_pipe)[i]->cmd_with_path = find_scmd_path((_pipe)[i]->args[0], envp);
-			i ++;
+			i = 0;
+			while (_pipe[i])
+			{
+				(_pipe)[i]->cmd_with_path = find_scmd_path((_pipe)[i]->args[0], envp);
+				i ++;
+			}
+			err_code = execute(envp, _pipe);
 		}
-		err_code = execute(envp, _pipe);
 	}
 	free(line_read);
 	return (0);

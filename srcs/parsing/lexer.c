@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/04 15:25:10 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/07 12:05:16 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,10 @@ char	**array_copy(char **array)
 		i++;
 	new_array = malloc(sizeof(char *) * (i +1));
 	if (!new_array)
-		error_func("Malloc failure\n");
+	{
+		error_func("malloc failed\n");
+		exit (1);
+	}
 	i = 0;
 	while (array[i])
 	{
@@ -32,7 +35,8 @@ char	**array_copy(char **array)
 		if (!new_array[i])
 		{
 			ft_arrfree(new_array);
-			error_func("Malloc failure\n");
+			error_func("malloc failed\n");
+			exit (1);
 		}
 		i++;
 	}
@@ -50,12 +54,18 @@ char	**get_cmd(char **cmds, int start, int end)
 	temp_arr = NULL;
 	temp_arr = malloc(sizeof (char *) * ((end - start) + 2));
 	if (!temp_arr)
-		error_func("Malloc failure\n");
+	{
+		error_func("malloc failed\n");
+		exit (1);
+	}
 	while (cmds[start] && start <= end)
 	{
 		temp_arr[i] = ft_strdup(cmds[start]);
 		if (!temp_arr[i])
-			error_func("Malloc failure\n");
+		{
+			error_func("malloc failed\n");
+			exit (1);
+		}
 		i++;
 		start++;
 	}
@@ -78,13 +88,19 @@ void	pipeline_init(char **array, t_pipe ***pipe)
 	}
 	*pipe = malloc(sizeof(t_pipe *) * (x +1));
 	if (!*pipe)
+	{
 		error_func("malloc failed\n");
- 	i = 0;
+		exit (1);
+	}
+	i = 0;
 	while (i < x)
 	{
 		(*pipe)[i] = malloc(sizeof(t_pipe));
 		if (!(*pipe)[i])
+		{
 			error_func("malloc failed\n");
+			exit (1);
+		}
 		i++;
 	}
 	(*pipe)[x] = NULL;
@@ -111,52 +127,74 @@ void	pre_parse(char **array, t_pipe ***pipe)
 		else if (array[i +1] == 0)
 		{
 			(*pipe)[x]->args = get_cmd(array, start, i);
-			break;
+			break ;
 		}
 		i++;
 	}
 }
 
+void	error_func(char *str)
 
-t_pipe	**lexer(char *argv, char **envp)
 {
-	t_pipe	**pipe;
+	ft_putendl_fd(str, 2);
+}
+
+
+int	lexer(char *argv, char **envp, t_pipe ***pipe, int *err_code)
+
+{
 	char	**array;
 
 	array = NULL;
+	var_substitution(&argv, envp);
 	array = ppx_split(argv, ' ');
 	if (!array)
-		error_func("no valid argument\n");
-	var_substitution(array, envp);
-	pipeline_init(array, &pipe);
-	parser(array, &pipe);
+		return (1); // or  something else if malloc failed
+	pipeline_init(array, pipe);
+	if (parser(array, pipe, err_code) == 1)
+		return (1); // free all first
 	ft_arrfree(array);
 
 	// NOT PART OF THE ACCTUAL FUNCTION //
 
- 	// int	i = 0;
-	// int	x = 0;
-	// while (pipe[i])
-	// {
-	// 	x = 0;
-	// 	while (pipe[i]->args[x])
-	// 	{
-	// 		printf("%s     ", pipe[i]->args[x]);
-	// 		printf("%d\n", pipe[i]->tokens[x]);
-	// 		x++;
-	// 	}
-	// 	printf("------------\n");
-	// 	i++;
-	// }
-	// i = 0;
-	// while (pipe[i])
-	// {
-	// 	ft_arrfree(pipe[i]->args);
-	// 	free (pipe[i]->tokens);
-	// 	free(pipe[i]);
-	// 	i++;
-	// }
+/*    	 int	i = 0;
+	 int	x = 0;
+	 while ((*pipe)[i])
+	 {
+	 	x = 0;
+	 	while ((*pipe)[i]->final_args[x])
+	 	{
+	 		printf("%s\n", (*pipe)[i]->final_args[x]);
+	 		//printf("%d\n", (*pipe)[i]->tokens[x]);
+	 		x++;
+	 	}
+	 	printf("------------\n");
+	 	i++;
+	 }  */
+/* 
+	 int	i = 0;
+	 int	x = 0;
+	 while ((*pipe)[i])
+	 {
+	 	x = 0;
+	 	while ((*pipe)[i]->args[x])
+	 	{
+	 		printf("%s        ", (*pipe)[i]->args[x]);
+	 		printf("%d\n", (*pipe)[i]->tokens[x]);
+	 		x++;
+	 	}
+	 	printf("------------\n");
+	 	i++;
+	 }  */
+/* 	 i = 0;
+	 while (pipe[i])
+	 {
+	 	ft_arrfree(pipe[i]->args);
+	 	free (pipe[i]->tokens);
+	 	free(pipe[i]);
+	 	i++;
+	 } */
 	// free (pipe);
 
-	return (pipe);
+	return (0);
 }

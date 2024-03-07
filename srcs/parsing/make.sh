@@ -1,3 +1,3 @@
 #!/usr/bin/bash
-cc parse.c pipex_split.c pipex_split_helper.c parse_main.c preparse.c lexer.c ../../libft/libft.a
+cc parse.c pipex_split.c pipex_split_helper.c parse_main.c preparse.c lexer.c ../../lib/libft/libft.a
 #cc -g -fsanitize=address,undefined,integer parse.c pipex_split.c pipex_split_helper.c parse_main.c preparse.c lexer.c ../../libft/libft.a
