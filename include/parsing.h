@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/07 15:07:28 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/07 16:06:27 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ char		**ppx_split(char const *str, char c);
 char		**splitter(char *str, char c, char **array, int i);
 int			splitlen(char *str, char c);
 int			countstrings(char *str, char c);
-
+void		quote_status(bool *quote);
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2
