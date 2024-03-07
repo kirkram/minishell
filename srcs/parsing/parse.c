@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/06 23:06:46 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/07 12:26:48 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	init_token(t_pipe *pipe)
 	while (pipe->args[i])
 	{
 		if (get_token(pipe->args[i]) == CMD)
-			pipe->tokens[i] = CMD; 
+			pipe->tokens[i] = CMD;
 		else
 			pipe->tokens[i] = 0;
 		i++;
@@ -213,8 +213,8 @@ int	final_args(t_pipe *pipe)
 			x++;
 		i++;
 	}
-	pipe->final_args = malloc (sizeof(char *) * (x +1));
-	if (!pipe->final_args)
+	pipe->noio_args = malloc (sizeof(char *) * (x +1));
+	if (!pipe->noio_args)
 	{
 		error_func("malloc failed\n");
 		exit (1);
@@ -225,13 +225,13 @@ int	final_args(t_pipe *pipe)
 	{
 		if (pipe->tokens[i] == CMD)
 		{
-			pipe->final_args[x] = ft_strdup(pipe->args[i]);
+			pipe->noio_args[x] = ft_strdup(pipe->args[i]);
 			if (x == 0)
 			{
 				if (is_builtin(pipe->args[i]) == 8)
 					pipe->tokens[i] = 8;
 			}
-			if (!pipe->final_args[x])
+			if (!pipe->noio_args[x])
 			{
 				error_func("malloc failed\n");
 				exit (1);
@@ -240,7 +240,7 @@ int	final_args(t_pipe *pipe)
 		}
 		i++;
 	}
-	pipe->final_args[x] = NULL;
+	pipe->noio_args[x] = NULL;
 	return (0);
 }
 
@@ -258,7 +258,7 @@ int	parser(char **array, t_pipe ***pipe, int *err_code)
 			return (1);
 		remove_red((*pipe)[x]);
 		if (final_args((*pipe)[x]) == 1)
-			return (1); 
+			return (1);
 		x++;
 	}
 	return (0);
