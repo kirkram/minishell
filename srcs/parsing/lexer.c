@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/07 12:28:18 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/07 14:58:55 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,18 +140,18 @@ void	error_func(char *str)
 }
 
 
-int	lexer(char *line_read, char **envp, t_pipe ***pipe, int *err_code)
+int			lexer(char *line_read, t_pipe ***pipe, t_utils **utils)
 
 {
 	char	**array;
 
 	array = NULL;
-	var_substitution(&line_read, envp);
+	var_substitution(&line_read, utils);
 	array = ppx_split(line_read, ' ');
 	if (!array)
 		return (1); // or  something else if malloc failed
 	pipeline_init(array, pipe);
-	if (parser(array, pipe, err_code) == 1)
+	if (parser(array, pipe, utils) == 1)
 		return (1); // free all first
 	ft_arrfree(array);
 
