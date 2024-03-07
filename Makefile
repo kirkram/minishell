@@ -9,7 +9,8 @@ SRCS = \
  ./srcs/parsing/pipex_split.c ./srcs/parsing/preparse.c \
  ./srcs/initializing/init_main.c \
  ./srcs/executing/exec_main.c \
- ./lib/get_next_line/get_next_line.c ./lib/get_next_line/get_next_line_utils.c
+ ./lib/get_next_line/get_next_line.c ./lib/get_next_line/get_next_line_utils.c \
+ ./srcs/builtins/builtin.c
 OBJCTS = $(SRCS:.c=.o)
 RM = rm -f
 

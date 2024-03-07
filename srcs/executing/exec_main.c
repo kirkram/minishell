@@ -6,21 +6,13 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/07 13:16:55 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/07 15:07:49 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //test in the file change
 
 #include "../../include/minishell.h"
-
-int		handle_execve_errors(char *failed_cmd);
-int		msg_stderr(char *message, char *cmd, int err_code);
-char	**find_path(char **envp);
-int		user_cmd_path(char **args, char *arg_cmd, char **paths);
-void	delete_pwd_path(char **paths);
-int		free_and_1(char **paths, int **end);
-int		exec_builtin(t_pipe *_pipe_i);
 
 char	*find_scmd_path(char *scmd, char **envp)
 {
@@ -51,7 +43,7 @@ char	*find_scmd_path(char *scmd, char **envp)
 	return (NULL);
 }
 
-int	execute(char **envp, t_pipe **_pipe)
+int	execute(t_utils *utils, t_pipe **_pipe)
 {
 	int			fd[2];
 	int			savestdio[2];
@@ -67,8 +59,6 @@ int	execute(char **envp, t_pipe **_pipe)
 	int			*tokens;
 	char		**all_args;
 	int			is_append_out;
-
-	(void)		envp;
 
 	savestdio[0] = dup(STDIN_FILENO);
 	savestdio[1] = dup(STDOUT_FILENO);
@@ -171,7 +161,7 @@ int	execute(char **envp, t_pipe **_pipe)
 		else
 		{
 			ft_putendl_fd("exec builtin", 2);
-			exec_builtin(_pipe[i]);
+			exec_builtin(_pipe[i], utils);
 		}
 		i ++;
 	}
@@ -213,11 +203,12 @@ the changes will go away when the child exits. For this built it functions, call
 execute instead of forking a new process
 All builtins return an exit status of 2 to indicate incorrect usage, generally invalid options or missing arguments.
 */
-int		exec_builtin(t_pipe *_pipe_i)
+int		exec_builtin(t_pipe *_pipe_i, t_utils *utils)
 {
+	(void) utils;
+
 	if (!ft_strncmp(_pipe_i->noio_args[0], "echo", -1))
-		// return (echo_builtin());
-		return (0);
+		return (echo_builtin(_pipe_i->noio_args));
 	else if (!ft_strncmp(_pipe_i->noio_args[0], "cd", -1))
 		//return (cd_builtin());
 		return (0);
@@ -233,13 +224,21 @@ int		exec_builtin(t_pipe *_pipe_i)
 		return (0);
 	else if (!ft_strncmp(_pipe_i->noio_args[0], "exit", -1))
 		return (0);
-	return (0);
+	else
+	{
+		ft_putendl_fd("Error: no builtin for the builtin token", 2);
+		return (2);
+	}
 }
 
-// int		echo_builtin(char **noio_args)
-// {
+int		echo_builtin(char **noio_args)
+{
+	int	i;
+	i = 0;
+	(void)noio_args;
 
-// }
+	return (2);
+}
 
 int		handle_execve_errors(char *failed_cmd)
 {
