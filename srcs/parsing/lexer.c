@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/07 12:28:18 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/07 13:58:45 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,14 +186,16 @@ int	lexer(char *line_read, char **envp, t_pipe ***pipe, int *err_code)
 	 	printf("------------\n");
 	 	i++;
 	 }  */
-/* 	 i = 0;
-	 while (pipe[i])
+/* 	 int x = 0;
+ 	 int i = 0;
+	 while ((*pipe)[i])
 	 {
-	 	ft_arrfree(pipe[i]->args);
+		while (pipe[i]->args[x])
+	 		ft_arrfree(pipe[i]->args[x]);
 	 	free (pipe[i]->tokens);
 	 	free(pipe[i]);
 	 	i++;
-	 } */
+	 }  */
 	// free (pipe);
 
 	return (0);
