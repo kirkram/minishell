@@ -20,7 +20,6 @@
 # include "../lib/get_next_line/get_next_line.h"
 # include "./parsing.h"
 
-int		g_signal;
-
+void	sort_export(t_utils *utils);
 
 #endif

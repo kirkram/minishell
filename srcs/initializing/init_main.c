@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/07 15:02:28 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/08 12:11:30 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,14 +49,13 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	t_pipe	**_pipe;
 	int		i;
 	t_utils	*utils;
-
 	intialize_utils(sys_envp, &utils);
 	line_read = NULL;
 	while (1)
 	{
 		line_read = rl_gets(line_read, hist_fd);
 
-		if (lexer(line_read, &_pipe, &utils) != 1)
+		if (lexer(line_read, &_pipe, utils) != 1)
 		{
 			i = 0;
 			while (_pipe[i])
@@ -75,21 +74,27 @@ void	intialize_utils(char **sys_envp, t_utils **utils)
 {
 	int i;
 
-	*utils = malloc(sizeof(t_utils));
+	*(utils) = malloc(sizeof(t_utils));
 	i = 0;
-	while(sys_envp[i])
+	while (sys_envp[i])
 		i ++;
 	(*utils)->envp = malloc((i + 1) * sizeof(char *));
+	(*utils)->export = malloc((i + 1) * sizeof(char *));
 	i = 0;
-	while(sys_envp[i])
+	while (sys_envp[i])
 	{
 		(*utils)->envp[i] = ft_strdup(sys_envp[i]);
+		(*utils)->export[i] = ft_strjoin("declare -x ", ft_strdup(sys_envp[i]));
 		i ++;
 	}
 	(*utils)->envp[i] = NULL;
+	(*utils)->export[i] = NULL;
 	(*utils)->err_code = 0;
+	sort_export(*utils);
 }
+
 int	open_history_file(int hist_fd)
+
 {
 	int		err_check;
 	char	*gnl_line;

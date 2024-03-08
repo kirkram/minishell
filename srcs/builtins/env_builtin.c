@@ -6,13 +6,39 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/07 17:23:50 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/08 12:04:44 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int	export(t_utils *utils, char *str)
+void	sort_export(t_utils *utils)
+
+{
+	int		i;
+	char	*temp;
+	bool	sorted;
+
+	sorted = false;
+	while (sorted == false)
+	{
+		sorted = true;
+		i = 0;
+		while (utils->export[i])
+		{
+			if (utils->export[i +1] && ft_strncmp (utils->export[i], utils->export[i +1], -1) < 0)
+			{
+				sorted = false;
+				temp = utils->export[i];
+				utils->export[i] = utils->export[i +1];
+				utils->export[i +1] = temp;
+			}
+			i++;
+		}
+	}
+}
+
+/* int	export(t_utils *utils, char *str)
 
 {
 	int	i;
@@ -42,8 +68,8 @@ int	export(t_utils *utils, char *str)
 	i++;
 	}
 
-
-}
+	return (0);
+} */
 
 int	env(t_utils *utils)
 
@@ -83,9 +109,10 @@ int	pwd(t_utils *utils)
 	return (0);
 }
 
-int	unset(t_utils *utils, char *str)
+/* int	unset(t_utils *utils, char *str)
 
 {
 
 
 }
+ */
