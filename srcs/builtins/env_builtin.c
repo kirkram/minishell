@@ -6,11 +6,26 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/08 12:04:44 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/08 18:13:47 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+
+void	print_exp(t_utils *utils, int fd)
+
+{
+	int	i;
+
+	i = 0;
+	if (!utils->export)
+		return ;
+	while (utils->export[i])
+	{
+		ft_putendl_fd(utils->export[i], fd);
+		i++;
+	}
+}
 
 void	sort_export(t_utils *utils)
 
@@ -26,7 +41,7 @@ void	sort_export(t_utils *utils)
 		i = 0;
 		while (utils->export[i])
 		{
-			if (utils->export[i +1] && ft_strncmp (utils->export[i], utils->export[i +1], -1) < 0)
+			if (utils->export[i +1] && ft_strncmp (utils->export[i], utils->export[i +1], -1) > 0)
 			{
 				sorted = false;
 				temp = utils->export[i];
@@ -38,38 +53,56 @@ void	sort_export(t_utils *utils)
 	}
 }
 
-/* int	export(t_utils *utils, char *str)
+
+
+int	export(t_utils *utils, char **arg)
 
 {
-	int	i;
+	int		i;
+	int		x;
 	bool	quote;
 	bool	dquote;
-	bool	equal;
+	char	*temp;
 
-	equal = false;
-	quote = false;
-	dquote = false;
-	i = 0;
-	if (!str)
+
+	i = 1;
+	if (!utils)
+		return (1);
+	if (!arg || !arg[0])
+		return (0);
+	if (!arg[1])
 	{
-		//print the export?
+		print_exp(utils, 1);
 		return (0);
 	}
-	while(str[i])
+	while (arg[0] && arg[i])
 	{
-		if(str[i] == '\'')
-			quote_status(&quote);
-		else if(str[i] == '\"')
-			quote_status(&dquote);
-		if (str[i] == '=')
-			equal = true;
-
-
-	i++;
+		quote = false;
+		dquote = false;
+		x = 0;
+		while (arg[i][x])
+		{
+			if (arg[i][x] == '\'')
+				quote_status(&quote);
+			else if (arg[i][x] == '\"')
+				quote_status(&dquote);
+			if (arg[i][x] == '=' && quote == false && dquote == false)
+			{
+				temp = jointhree("declare -x ", ft_substr(arg[i], 0, (x +1)), "\"");
+				temp = jointhree(temp, ft_substr(arg[i], (x +1), (ft_strlen(arg[i]) - x)), "\"");
+				change_env_var(&utils, ft_substr(arg[i], 0, (x +1)), arg[i]);
+				change_exp_var(&utils, ft_strjoin("declare -x ", ft_substr(arg[i], 0, (x +1))), temp);
+				break ;
+			}
+			x++;
+			if (arg[i][x] == '\0')
+				add_exp_var(&utils,ft_strjoin("declare -x ", arg[i]));
+		}
+		i++;
 	}
-
+	sort_export(utils);
 	return (0);
-} */
+}
 
 int	env(t_utils *utils)
 
@@ -81,7 +114,7 @@ int	env(t_utils *utils)
 		return (0);
 	while (utils->envp[i])
 	{
-		printf("%s\n", utils->envp[i]);
+		ft_putendl_fd(utils->envp[i], 1);
 		i++;
 	}
 	return (0);

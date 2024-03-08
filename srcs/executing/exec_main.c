@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/07 15:07:49 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/08 16:42:48 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,15 +213,13 @@ int		exec_builtin(t_pipe *_pipe_i, t_utils *utils)
 		//return (cd_builtin());
 		return (0);
 	else if (!ft_strncmp(_pipe_i->noio_args[0], "pwd", -1))
-		//return (pwd_builtin());
-		return (0);
+		return (pwd(utils));
 	else if (!ft_strncmp(_pipe_i->noio_args[0], "export", -1))
-		//return (export_builtin());
-		return (0);
+		return (export(utils, _pipe_i->noio_args));
 	else if (!ft_strncmp(_pipe_i->noio_args[0], "unset", -1))
 		return (0);
 	else if (!ft_strncmp(_pipe_i->noio_args[0], "env", -1))
-		return (0);
+		return (env(utils));
 	else if (!ft_strncmp(_pipe_i->noio_args[0], "exit", -1))
 		return (0);
 	else

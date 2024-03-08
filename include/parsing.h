@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/08 12:00:48 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/08 16:31:02 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,13 @@ int		exec_builtin(t_pipe *_pipe_i, t_utils *utils);
 
 int			change_env_var(t_utils **utils, char *env_name, char *newstr);
 int			echo_builtin(char **noio_args);
-
+int			add_exp_var(t_utils **utils, char *newstr);
+int			change_exp_var(t_utils **utils, char *env_name, char *newstr);
+void		print_exp(t_utils *utils, int fd);
+void		sort_export(t_utils *utils);
+int			export(t_utils *utils, char **arg);
+int			env(t_utils *utils);
+int			pwd(t_utils *utils);
 //PPX SPLIT
 int			skip_chars(int *x, char *str, char stop_char, char c);
 char		**return_and_nullterm(char ***array, int i);
