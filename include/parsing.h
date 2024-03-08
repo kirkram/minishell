@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/07 15:07:28 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/08 12:00:48 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ typedef struct s_utils
 {
 	int		err_code;
 	char	**envp;
-
+	char	**export;
 }	t_utils;
 
 // INIT
@@ -51,10 +51,11 @@ int		rl_loop(int ac, char **av, char **sys_envp);
 int		open_history_file(int hist_fd);
 int		interactive_mode_loop(int hist_fd, char **envp);
 void	intialize_utils(char **sys_envp, t_utils **utils);
+void	sort_export(t_utils *utils);
 
 // LEXER
 
-int			lexer(char *argv, t_pipe ***pipe, t_utils **utils);
+int			lexer(char *argv, t_pipe ***pipe, t_utils *utils);
 void		error_func(char *str);
 void		var_substitution(char **array, char *envp[]);
 char		*env_variable(char *str, char **envp);
@@ -96,7 +97,7 @@ char		**ppx_split(char const *str, char c);
 char		**splitter(char *str, char c, char **array, int i);
 int			splitlen(char *str, char c);
 int			countstrings(char *str, char c);
-
+void		quote_status(bool *quote);
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2

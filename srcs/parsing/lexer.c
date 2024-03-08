@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/07 14:58:55 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/08 11:56:22 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,18 +140,18 @@ void	error_func(char *str)
 }
 
 
-int			lexer(char *line_read, t_pipe ***pipe, t_utils **utils)
+int			lexer(char *line_read, t_pipe ***pipe, t_utils *utils)
 
 {
 	char	**array;
 
 	array = NULL;
-	var_substitution(&line_read, utils);
+	var_substitution(&line_read, utils->envp);
 	array = ppx_split(line_read, ' ');
 	if (!array)
 		return (1); // or  something else if malloc failed
 	pipeline_init(array, pipe);
-	if (parser(array, pipe, utils) == 1)
+	if (parser(array, pipe, &utils->err_code) == 1)
 		return (1); // free all first
 	ft_arrfree(array);
 
