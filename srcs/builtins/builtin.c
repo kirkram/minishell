@@ -6,11 +6,14 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/08 16:57:20 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/09 17:55:52 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+
+
+int	update_pwd_olppwd_env(t_utils *utils, char *cwd);
 
 /*
 env name in the format of [NAME]=
@@ -79,20 +82,27 @@ int		echo_builtin(char **noio_args)
 	if (is_newlined)
 		if (!write(1, "\n", 1))
 			return (2);
-	return (0); //if write error occurs
+	return (0);
 }
 
-int		cd_builtin(char **noio_args, t_utils *utils)
+//should not work if you have a pipe!
+//also the output of the cd command doesnt get redirected to the outfile
+//i guess becuase its just stderr
+// cd ./testfiles/ ; echo "hehe" will not change dir
+// cd ./testfiles/folder_no_x/ | echo "hehe" will print an error as usual
+int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 {
 	int		i;
 	char	*home_path;
 	char	*pwd;
 	char	cwd[4096]; //windows limit is 32767, usually 4096 for unix
-	char	*cwd_env;
 
+	char **noio_args;
 	home_path = NULL;
 	pwd = NULL;
 	i = 0;
+	noio_args = (_pipe)[index]->noio_args;
+
 	while (utils->envp[i])
 	{
 		if (!ft_strncmp(utils->envp[i], "HOME=", 5))
@@ -101,53 +111,59 @@ int		cd_builtin(char **noio_args, t_utils *utils)
 			pwd = utils->envp[i] + 4;
 		i ++;
 	}
-
 	//if malloc fails///
 	getcwd(cwd, 4095);
 	// printf("the cwd is now %s\n", cwd);
+	// If home is unset only cd with no args will not work
 	if (!noio_args[1] || !ft_strncmp(noio_args[1], "~", -1))
 	{
-		if (chdir(home_path) == -1)
+		//this condition is needed to check if there is a pipe in the pipeline
+		if (_pipe[0] && !_pipe[1] && chdir(home_path) == -1)
 		{
-			ft_putendl_fd("chdir failed", 2);
+			if (access(home_path, F_OK) == -1)
+			{
+				ft_putstr_fd("minishell: cd: ", 2);
+				ft_putendl_fd("HOME not set", 2);
+			}
+			else if (access(home_path, X_OK) == -1)
+			{
+				ft_putstr_fd("minishell: cd: ", 2);
+				ft_putstr_fd(home_path, 2);
+				ft_putendl_fd(": Permission denied", 2);
+			}
+			//error message dependiing on why
 			return (2);
 		}
-		//easily goes into a separate function
-		cwd_env = ft_strjoin("OLDPWD=", cwd);
-		//if fail
-		change_env_var(&utils, "OLDPWD=", cwd_env);
-		free(cwd_env);
+		if (update_pwd_olppwd_env(utils, cwd) != 0)
+			return (2); //err handle
 		getcwd(cwd, 4095);
-		cwd_env = ft_strjoin("PWD=", cwd);
-		//if fail
-		change_env_var(&utils, "PWD=", cwd_env);
-		free(cwd_env);
-		// i = 0;
-		// while (utils->envp[i])
-		// {
-		// 	if (!ft_strncmp(utils->envp[i], "OLDPWD=", 7))
-		// 		printf("found oldpwd, its now %s\n", utils->envp[i]);
-		// 	i ++;
-		// }
-		// getcwd(cwd, 4095);
-		// printf("the cwd is now %s\n", cwd);
+		ft_putstr_fd("NoArgs. the cwd is now ", 2);
+		ft_putendl_fd(cwd, 2);
 	}
-	// else if (ft_strncmp(noio_args[1], ".", -1) || ft_strncmp(noio_args[1], "./", -1))
-	// {
-	//		printf("do nothing %s\n");
-	// }
-	else if (chdir(noio_args[1]) == -1)
+	else
 	{
-
-		//not a directory
-		// permission denied
-		// no such file or directory
-
-
-
+		if (_pipe[0] && !_pipe[1] && chdir(noio_args[1]) == -1)
+		{
+			if (access(noio_args[1], F_OK) == -1)
+			{
+				ft_putstr_fd("minishell: cd: ", 2);
+				ft_putstr_fd(noio_args[1], 2);
+				ft_putendl_fd(": No such file or directory", 2);
+			}
+			else if (access(noio_args[1], X_OK) == -1)
+			{
+				ft_putstr_fd("minishell: cd: ", 2);
+				ft_putstr_fd(noio_args[1], 2);
+				ft_putendl_fd(": Permission denied", 2);
+			}
+			return (2);
+		}
+		if (update_pwd_olppwd_env(utils, cwd) != 0)
+			return (2); //err handle
+		getcwd(cwd, 4095);
+		ft_putstr_fd("MoreArgs. the cwd is now ", 2);
+		ft_putendl_fd(cwd, 2);
 	}
-
-
 
 	//chdir
 	//opendir, readdir, closedir:
@@ -156,6 +172,23 @@ int		cd_builtin(char **noio_args, t_utils *utils)
 	// . and ./ without aythhing extra - do nothing
 	// ++++++++ done +++++ cd with no args = cd ~
 	//
+
+	return (0);
+}
+
+int	update_pwd_olppwd_env(t_utils *utils, char *cwd)
+{
+	char	*cwd_env;
+
+	cwd_env = ft_strjoin("OLDPWD=", cwd);
+	//if fail
+	change_env_var(&utils, "OLDPWD=", cwd_env);
+	free(cwd_env);
+	getcwd(cwd, 4095);
+	cwd_env = ft_strjoin("PWD=", cwd);
+	//if fail
+	change_env_var(&utils, "PWD=", cwd_env);
+	free(cwd_env);
 
 	return (0);
 }

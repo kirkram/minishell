@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/08 14:14:00 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/09 17:15:12 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,10 +84,10 @@ int		free_and_1(char **paths, int **end);
 
 // BUILTINS
 
-int			exec_builtin(t_pipe *_pipe_i, t_utils *utils, int *fd);
+int			exec_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			change_env_var(t_utils **utils, char *env_name, char *newstr);
 int			echo_builtin(char **noio_args);
-int			cd_builtin(char **noio_args, t_utils *utils);
+int			cd_builtin(t_pipe **_pipe, t_utils *utils, int i);
 
 //PPX SPLIT
 int			skip_chars(int *x, char *str, char stop_char, char c);

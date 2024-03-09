@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/08 16:30:17 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/09 15:31:22 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		}
 		else
 		{
-			if	(exec_builtin(_pipe[i], utils, fd))
+			if	(exec_builtin(_pipe, utils, i))
 				//handle errors
 				return (2);
 		}
@@ -204,24 +204,23 @@ the changes will go away when the child exits. For this built it functions, call
 execute instead of forking a new process
 All builtins return an exit status of 2 to indicate incorrect usage, generally invalid options or missing arguments.
 */
-int		exec_builtin(t_pipe *_pipe_i, t_utils *utils, int *fd)
+int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
 {
-
-	if (!ft_strncmp(_pipe_i->noio_args[0], "echo", -1))
-		return (echo_builtin(_pipe_i->noio_args));
-	else if (!ft_strncmp(_pipe_i->noio_args[0], "cd", -1))
-		return (cd_builtin(_pipe_i->noio_args, utils));
-	else if (!ft_strncmp(_pipe_i->noio_args[0], "pwd", -1))
+	if (!ft_strncmp((_pipe)[i]->noio_args[0], "echo", -1))
+		return (echo_builtin((_pipe)[i]->noio_args));
+	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "cd", -1))
+		return (cd_builtin(_pipe, utils, i));
+	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "pwd", -1))
 		//return (pwd_builtin());
 		return (0);
-	else if (!ft_strncmp(_pipe_i->noio_args[0], "export", -1))
+	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "export", -1))
 		//return (export_builtin());
 		return (0);
-	else if (!ft_strncmp(_pipe_i->noio_args[0], "unset", -1))
+	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "unset", -1))
 		return (0);
-	else if (!ft_strncmp(_pipe_i->noio_args[0], "env", -1))
+	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "env", -1))
 		return (0);
-	else if (!ft_strncmp(_pipe_i->noio_args[0], "exit", -1))
+	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "exit", -1))
 		return (0);
 	else
 	{
