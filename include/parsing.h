@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/11 12:30:06 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/11 15:03:46 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,15 +62,15 @@ void		error_func(char *str);
 void		var_substitution(char **array, char *envp[]);
 char		*env_variable(char *str, char **envp);
 char		**array_copy(char **array);
-char	    *get_variable(char *temp, char **envp);
-int	        *tokenizer(char **array);
-int	        get_token(char *str);
+char		*get_variable(char *temp, char **envp);
+int			*tokenizer(char **array);
+int			get_token(char *str);
 
 // PARSER
 
 char		**get_cmd(char **cmds, int start, int end);
-void	    pre_parse(char **array, t_pipe ***pipe);
-int	    	parser(char **array, t_pipe ***pipe, int *err_code);
+void		pre_parse(char **array, t_pipe ***pipe);
+int			parser(char **array, t_pipe ***pipe, int *err_code);
 
 //EXECUTE
 
@@ -83,10 +83,10 @@ char	**find_path(char **envp);
 int		user_cmd_path(char **args, char *arg_cmd, char **paths);
 void	delete_pwd_path(char **paths);
 int		free_and_1(char **paths, int **end);
-int		exec_builtin(t_pipe *_pipe_i, t_utils *utils);
 
 // BUILTINS
 
+int			exec_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			change_env_var(t_utils **utils, char *env_name, char *newstr);
 int			echo_builtin(char **noio_args);
 int			add_exp_var(t_utils **utils, char *newstr);
@@ -99,6 +99,9 @@ int			pwd(t_utils *utils);
 int			remove_env(t_utils *utils, int i);
 int			remove_exp(t_utils *utils, int i);
 int			unset(t_utils *utils, char **arg);
+int			cd_builtin(t_pipe **_pipe, t_utils *utils, int i);
+int			exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
+int			update_pwd_oldpwd_env(t_utils *utils, char *cwd);
 
 //PPX SPLIT
 int			skip_chars(int *x, char *str, char stop_char, char c);
@@ -110,6 +113,10 @@ char		**splitter(char *str, char c, char **array, int i);
 int			splitlen(char *str, char c);
 int			countstrings(char *str, char c);
 void		quote_status(bool *quote);
+
+//HELPER
+int			is_only_digits_and_signs(char *str);
+
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2

@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/07 15:04:39 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/04 12:43:38 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/08 14:05:19 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,8 @@ int	countstrings(char *str, char c)
 			str ++;
 			while (*str != stop_char && *str)
 				str ++;
-			str ++;
+			if (*str)
+				str ++;
 		}
 		else
 			while (*str != c && *str != '\0')
