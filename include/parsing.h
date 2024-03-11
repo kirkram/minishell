@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/08 16:31:02 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/09 16:13:08 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 # include <readline/history.h>
 # include <signal.h>
 
+# include </usr/include/readline/readline.h>
+# include </usr/include/readline/history.h>
 typedef struct s_paths
 {
 	int		i;

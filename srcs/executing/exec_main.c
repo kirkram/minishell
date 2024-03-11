@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/08 16:42:48 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/09 16:14:33 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,8 +231,8 @@ int		exec_builtin(t_pipe *_pipe_i, t_utils *utils)
 
 int		echo_builtin(char **noio_args)
 {
-	int	i;
-	i = 0;
+	//int	i;
+	//i = 0;
 	(void)noio_args;
 
 	return (2);

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/08 18:13:47 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/11 11:23:17 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,10 +142,27 @@ int	pwd(t_utils *utils)
 	return (0);
 }
 
-/* int	unset(t_utils *utils, char *str)
+/*  int	unset(t_utils *utils, char **arg)
 
 {
+	int		i;
+	char	*temp;
 
+	temp = ft_strjoin(arg[1], "=");
+	if (!temp)
+		error_func("malloc error");
+	i = 0;
+	while (arg[1] && utils->envp[i])
+	{
+		if (strncmp(arg[1], utils->envp[i], )) //next has to be = or '\0' for EXP
+		if (arg[1][i] == '=')
+		{
+			remove_env(utils, ft_substr(arg[1][i], 0, i +1));
+			remove_exp(utils, ft_strjoin("declare -x " , ft_substr(arg[1][i], 0, i +1)));
+			return (0);
+		}
+		i++;
+	}
+	remove_exp(utils, arg[1][i])
 
-}
- */
+} */

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/08 16:41:38 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/09 17:20:08 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,49 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	return (0);
 }
 
+char *exp_init(char *str1, char *str2)
+
+{
+	int		i;
+	int		x;
+	bool	equal;
+	char	*temp;
+	
+	i = 0;
+	x = 0;
+	equal = false;
+	temp = NULL;
+	temp = malloc(sizeof(char) * (ft_strlen(str1) + ft_strlen(str2) + 3));
+	if (!temp)
+		return (NULL);
+	while(str1[i])
+	{
+		temp[i] = str1[i];
+		i++;
+	}
+	while (str2[x])
+	{
+		if (str2[x] == '=' && equal == false)
+		{
+			equal = true;
+			temp[i] = str2[x];
+			temp[i +1] = '\"';
+			i += 2;
+			x++;
+		}
+		else
+		{
+			temp[i] = str2[x];
+			x++;
+			i++;
+		}
+	}
+	if (equal == true)
+		temp[i++] = '\"';
+	temp[i] = '\0';
+	return (temp);
+}
+
 void	intialize_utils(char **sys_envp, t_utils **utils)
 {
 	int i;
@@ -84,7 +127,8 @@ void	intialize_utils(char **sys_envp, t_utils **utils)
 	while (sys_envp[i])
 	{
 		(*utils)->envp[i] = ft_strdup(sys_envp[i]);
-		(*utils)->export[i] = ft_strjoin("declare -x ", ft_strdup(sys_envp[i]));
+		(*utils)->export[i] = exp_init("declare -x ", sys_envp[i]);
+		//(*utils)->export[i] = ft_strjoin("declare -x ", ft_strdup(sys_envp[i]));
 		i ++;
 	}
 	(*utils)->envp[i] = NULL;

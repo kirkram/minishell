@@ -2,8 +2,8 @@ NAME = m_shell
 LIBFT_PATH = ./lib/libft
 LIBFT = $(LIBFT_PATH)/libft.a
 CFLAGS = -Wall -Wextra -Werror
-HEADERS	= -I ./include -L/usr/local/lib -I/usr/local/include -lreadline
-DEBUGFLAGS = -g -fsanitize=address,undefined,integer
+HEADERS	= -I ./include -L/usr/local/lib -I/usr/local/include #-lreadline
+#DEBUGFLAGS = -g -fsanitize=address,undefined,integer
 SRCS = \
  ./srcs/parsing/lexer.c ./srcs/parsing/parse.c ./srcs/parsing/pipex_split_helper.c \
  ./srcs/parsing/pipex_split.c ./srcs/parsing/preparse.c \
@@ -17,7 +17,7 @@ RM = rm -f
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(SRCS)
-	cc $(CFLAGS) $(HEADERS) $(SRCS)  $(LIBFT) -o $(NAME)
+	cc $(CFLAGS) $(HEADERS) $(SRCS)  $(LIBFT) -lreadline -o $(NAME)
 
 $(LIBFT):
 	make -C $(LIBFT_PATH)

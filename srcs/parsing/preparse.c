@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/02 21:46:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/07 12:04:42 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/09 16:14:06 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,11 +104,11 @@ char	*env_variable(char *str, char **envp)
 	int		start;
 	char	*new_str;
 	char	*temp;
-	char	*ptr;
+	//char	*ptr;
 	bool	quote;
 
 	quote = false;
-	ptr = NULL;
+	//ptr = NULL;
 	temp = NULL;
 	new_str = NULL;
 	start = 0;
