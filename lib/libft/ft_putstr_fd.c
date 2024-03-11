@@ -6,21 +6,27 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/03 12:29:39 by klukiano          #+#    #+#             */
-/*   Updated: 2024/01/16 16:14:25 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/08 13:13:31 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include <unistd.h>
 
-void	ft_putstr_fd(char *s, int fd)
+int		ft_putstr_fd(char *s, int fd)
 {
+	int	i;
+
+	i = 0;
 	if (s)
 	{
 		while (*s != '\0')
 		{
-			write (fd, &*s, 1);
+			if (!write (fd, &*s, 1))
+				return (-1);
 			s ++;
+			i ++;
 		}
 	}
+	return (i);
 }

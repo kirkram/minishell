@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/07 15:07:49 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/11 15:52:16 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		{
 			if (outfile)
 			{
-				if (is_append_out == 0)
+				if (!is_append_out)
 					fd[1] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
 				else
 					fd[1] = open(outfile, O_WRONLY | O_APPEND);
@@ -160,8 +160,9 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		}
 		else
 		{
-			ft_putendl_fd("exec builtin", 2);
-			exec_builtin(_pipe[i], utils);
+			if	(exec_builtin(_pipe, utils, i))
+				//handle errors
+				return (2);
 		}
 		i ++;
 	}
@@ -203,27 +204,24 @@ the changes will go away when the child exits. For this built it functions, call
 execute instead of forking a new process
 All builtins return an exit status of 2 to indicate incorrect usage, generally invalid options or missing arguments.
 */
-int		exec_builtin(t_pipe *_pipe_i, t_utils *utils)
+int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
 {
-	(void) utils;
-
-	if (!ft_strncmp(_pipe_i->noio_args[0], "echo", -1))
-		return (echo_builtin(_pipe_i->noio_args));
-	else if (!ft_strncmp(_pipe_i->noio_args[0], "cd", -1))
-		//return (cd_builtin());
-		return (0);
-	else if (!ft_strncmp(_pipe_i->noio_args[0], "pwd", -1))
+	if (!ft_strncmp((_pipe)[i]->noio_args[0], "echo", -1))
+		return (echo_builtin((_pipe)[i]->noio_args));
+	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "cd", -1))
+		return (cd_builtin(_pipe, utils, i));
+	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "pwd", -1))
 		//return (pwd_builtin());
 		return (0);
-	else if (!ft_strncmp(_pipe_i->noio_args[0], "export", -1))
+	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "export", -1))
 		//return (export_builtin());
 		return (0);
-	else if (!ft_strncmp(_pipe_i->noio_args[0], "unset", -1))
+	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "unset", -1))
 		return (0);
-	else if (!ft_strncmp(_pipe_i->noio_args[0], "env", -1))
+	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "env", -1))
 		return (0);
-	else if (!ft_strncmp(_pipe_i->noio_args[0], "exit", -1))
-		return (0);
+	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "exit", -1))
+		return (exit_builtin(_pipe, utils, i));
 	else
 	{
 		ft_putendl_fd("Error: no builtin for the builtin token", 2);
@@ -231,14 +229,7 @@ int		exec_builtin(t_pipe *_pipe_i, t_utils *utils)
 	}
 }
 
-int		echo_builtin(char **noio_args)
-{
-	int	i;
-	i = 0;
-	(void)noio_args;
 
-	return (2);
-}
 
 int		handle_execve_errors(char *failed_cmd)
 {
