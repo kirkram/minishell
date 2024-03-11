@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/11 15:52:16 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/11 15:28:15 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,20 +206,19 @@ All builtins return an exit status of 2 to indicate incorrect usage, generally i
 */
 int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
 {
+
 	if (!ft_strncmp((_pipe)[i]->noio_args[0], "echo", -1))
 		return (echo_builtin((_pipe)[i]->noio_args));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "cd", -1))
 		return (cd_builtin(_pipe, utils, i));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "pwd", -1))
-		//return (pwd_builtin());
-		return (0);
+		return (pwd(utils));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "export", -1))
-		//return (export_builtin());
-		return (0);
+		return (export(utils, (_pipe)[i]->noio_args));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "unset", -1))
-		return (0);
+			return (unset(utils, (_pipe)[i]->noio_args));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "env", -1))
-		return (0);
+		return (env(utils));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "exit", -1))
 		return (exit_builtin(_pipe, utils, i));
 	else
@@ -228,8 +227,6 @@ int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
 		return (2);
 	}
 }
-
-
 
 int		handle_execve_errors(char *failed_cmd)
 {

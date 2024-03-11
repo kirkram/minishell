@@ -18,6 +18,8 @@
 # include <readline/history.h>
 # include <signal.h>
 
+//# include </usr/include/readline/readline.h> //needed for Linux
+//# include </usr/include/readline/history.h> // needed for Linux
 typedef struct s_paths
 {
 	int		i;
@@ -51,7 +53,7 @@ int		rl_loop(int ac, char **av, char **sys_envp);
 int		open_history_file(int hist_fd);
 int		interactive_mode_loop(int hist_fd, char **envp);
 void	intialize_utils(char **sys_envp, t_utils **utils);
-void	sort_export(t_utils *utils);
+
 
 // LEXER
 
@@ -87,10 +89,19 @@ int		free_and_1(char **paths, int **end);
 int			exec_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			change_env_var(t_utils **utils, char *env_name, char *newstr);
 int			echo_builtin(char **noio_args);
+int			add_exp_var(t_utils **utils, char *newstr);
+int			change_exp_var(t_utils **utils, char *env_name, char *newstr);
+void		print_exp(t_utils *utils, int fd);
+void		sort_export(t_utils *utils);
+int			export(t_utils *utils, char **arg);
+int			env(t_utils *utils);
+int			pwd(t_utils *utils);
+int			remove_env(t_utils *utils, int i);
+int			remove_exp(t_utils *utils, int i);
+int			unset(t_utils *utils, char **arg);
 int			cd_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			update_pwd_oldpwd_env(t_utils *utils, char *cwd);
-
 
 //PPX SPLIT
 int			skip_chars(int *x, char *str, char stop_char, char c);
