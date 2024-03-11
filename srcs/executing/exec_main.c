@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/09 15:31:22 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/11 13:01:01 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,7 +221,7 @@ int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "env", -1))
 		return (0);
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "exit", -1))
-		return (0);
+		return (exit_builtin(_pipe, utils, i));
 	else
 	{
 		ft_putendl_fd("Error: no builtin for the builtin token", 2);

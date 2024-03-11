@@ -6,20 +6,19 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/09 17:55:52 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/11 15:19:22 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 
-int	update_pwd_olppwd_env(t_utils *utils, char *cwd);
-
 /*
 env name in the format of [NAME]=
 will strjoin the env name and the newstr
 returns -1 on malloc fail
 */
+
 int	change_env_var(t_utils **utils, char *env_name, char *newstr)
 {
 	int		i;
@@ -85,6 +84,24 @@ int		echo_builtin(char **noio_args)
 	return (0);
 }
 
+
+int	update_pwd_oldpwd_env(t_utils *utils, char *cwd)
+{
+	char	*cwd_env;
+
+	cwd_env = ft_strjoin("OLDPWD=", cwd);
+	//if fail
+	change_env_var(&utils, "OLDPWD=", cwd_env);
+	free(cwd_env);
+	getcwd(cwd, 4095);
+	cwd_env = ft_strjoin("PWD=", cwd);
+	//if fail
+	change_env_var(&utils, "PWD=", cwd_env);
+	free(cwd_env);
+
+	return (0);
+}
+
 //should not work if you have a pipe!
 //also the output of the cd command doesnt get redirected to the outfile
 //i guess becuase its just stderr
@@ -134,10 +151,10 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 			//error message dependiing on why
 			return (2);
 		}
-		if (update_pwd_olppwd_env(utils, cwd) != 0)
+		if (update_pwd_oldpwd_env(utils, cwd) != 0)
 			return (2); //err handle
 		getcwd(cwd, 4095);
-		ft_putstr_fd("NoArgs. the cwd is now ", 2);
+		ft_putstr_fd("1Arg. the cwd is now ", 2);
 		ft_putendl_fd(cwd, 2);
 	}
 	else
@@ -158,10 +175,10 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 			}
 			return (2);
 		}
-		if (update_pwd_olppwd_env(utils, cwd) != 0)
+		if (update_pwd_oldpwd_env(utils, cwd) != 0)
 			return (2); //err handle
 		getcwd(cwd, 4095);
-		ft_putstr_fd("MoreArgs. the cwd is now ", 2);
+		ft_putstr_fd("MoreThan1Arg. the cwd is now ", 2);
 		ft_putendl_fd(cwd, 2);
 	}
 
@@ -176,19 +193,47 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 	return (0);
 }
 
-int	update_pwd_olppwd_env(t_utils *utils, char *cwd)
+int	exit_builtin(t_pipe **_pipe, t_utils *utils, int i)
 {
-	char	*cwd_env;
+	(void)utils;
+	if (_pipe[1]) //if there is a pipe
+		return (0);
+	else if (!_pipe[i]->args[1])
+	{
+		ft_putendl_fd("exit", 1);
+		exit(0);
+	}
+	else if (!is_only_digits_and_signs(_pipe[i]->args[1]))
+	{
+		ft_putendl_fd("exit", 1);
+		ft_putstr_fd("minishell: exit: ", 2);
+		ft_putstr_fd(_pipe[i]->args[1], 2);
+		ft_putendl_fd(": numeric argument required", 2);
+		exit (255);
+	}
+	else if (_pipe[i]->args[1] && _pipe[i]->args[2])
+	{
+		ft_putendl_fd("exit", 1);
+		ft_putendl_fd("minishell: exit: too many arguments", 1);
+		return (1);
+	}
+	else
+	{
+		ft_putendl_fd("exit", 1);
+		exit(ft_atoi(_pipe[i]->args[1]));
+	}
+}
 
-	cwd_env = ft_strjoin("OLDPWD=", cwd);
-	//if fail
-	change_env_var(&utils, "OLDPWD=", cwd_env);
-	free(cwd_env);
-	getcwd(cwd, 4095);
-	cwd_env = ft_strjoin("PWD=", cwd);
-	//if fail
-	change_env_var(&utils, "PWD=", cwd_env);
-	free(cwd_env);
-
-	return (0);
+int	is_only_digits_and_signs(char *str)
+{
+	while (*str)
+	{
+		if (!ft_isdigit(*str))
+		{
+			if (*str != '-' && *str != '+')
+				return (0);
+		}
+		str ++;
+	}
+	return (1);
 }

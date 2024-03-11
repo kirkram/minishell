@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/09 17:15:12 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/11 15:03:46 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,9 @@ int			exec_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			change_env_var(t_utils **utils, char *env_name, char *newstr);
 int			echo_builtin(char **noio_args);
 int			cd_builtin(t_pipe **_pipe, t_utils *utils, int i);
+int			exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
+int			update_pwd_oldpwd_env(t_utils *utils, char *cwd);
+
 
 //PPX SPLIT
 int			skip_chars(int *x, char *str, char stop_char, char c);
@@ -99,6 +102,10 @@ char		**splitter(char *str, char c, char **array, int i);
 int			splitlen(char *str, char c);
 int			countstrings(char *str, char c);
 void		quote_status(bool *quote);
+
+//HELPER
+int			is_only_digits_and_signs(char *str);
+
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2
