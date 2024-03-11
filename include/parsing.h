@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/09 16:13:08 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/11 12:30:06 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@
 # include <readline/history.h>
 # include <signal.h>
 
-# include </usr/include/readline/readline.h>
-# include </usr/include/readline/history.h>
+//# include </usr/include/readline/readline.h> //needed for Linux
+//# include </usr/include/readline/history.h> // needed for Linux
 typedef struct s_paths
 {
 	int		i;
@@ -53,7 +53,7 @@ int		rl_loop(int ac, char **av, char **sys_envp);
 int		open_history_file(int hist_fd);
 int		interactive_mode_loop(int hist_fd, char **envp);
 void	intialize_utils(char **sys_envp, t_utils **utils);
-void	sort_export(t_utils *utils);
+
 
 // LEXER
 
@@ -96,6 +96,10 @@ void		sort_export(t_utils *utils);
 int			export(t_utils *utils, char **arg);
 int			env(t_utils *utils);
 int			pwd(t_utils *utils);
+int			remove_env(t_utils *utils, int i);
+int			remove_exp(t_utils *utils, int i);
+int			unset(t_utils *utils, char **arg);
+
 //PPX SPLIT
 int			skip_chars(int *x, char *str, char stop_char, char c);
 char		**return_and_nullterm(char ***array, int i);

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/11 11:23:17 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/11 16:10:47 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,7 @@ int	export(t_utils *utils, char **arg)
 	}
 	sort_export(utils);
 	return (0);
+	// NEED TO HANDLE SPACES INSIDE & OUTSIDE OF QUOTES
 }
 
 int	env(t_utils *utils)
@@ -142,27 +143,125 @@ int	pwd(t_utils *utils)
 	return (0);
 }
 
-/*  int	unset(t_utils *utils, char **arg)
+int	unset(t_utils *utils, char **arg)
 
 {
 	int		i;
-	char	*temp;
+	int		x;
+	int		y;
+	int		j;
 
-	temp = ft_strjoin(arg[1], "=");
-	if (!temp)
-		error_func("malloc error");
-	i = 0;
-	while (arg[1] && utils->envp[i])
+	if (!arg || !arg[1] || !arg[1][0])
+		return (0);
+	y = 1;
+	while (arg[y])
 	{
-		if (strncmp(arg[1], utils->envp[i], )) //next has to be = or '\0' for EXP
-		if (arg[1][i] == '=')
+		i = 0;
+		while (arg[y] && utils->envp[i])
 		{
-			remove_env(utils, ft_substr(arg[1][i], 0, i +1));
-			remove_exp(utils, ft_strjoin("declare -x " , ft_substr(arg[1][i], 0, i +1)));
-			return (0);
+			x = 0;
+			while (arg[y][x] && utils->envp[i][x])
+			{
+				if (arg[y][x] == utils->envp[i][x])
+					x++;
+				else
+					break ;
+				if (arg[y][x] == '\0' && utils->envp[i][x] == '=')
+					remove_env(utils, i);
+			}
+			i++;
 		}
-		i++;
+		y++;
 	}
-	remove_exp(utils, arg[1][i])
+	j = 1;
+	while (arg[j])
+	{
+		i = 0;
+		while (arg[j] && utils->export[i])
+		{
+			x = 0;
+			y = 0;
+			while (utils->export[i][y] && y < 11)
+				y++;
+			while (arg[j][x] && utils->export[i][y])
+			{
+				if (arg[j][x] == utils->export[i][y])
+				{
+					x++;
+					y++;
+				}
+				else
+					break ;
+				if (arg[j][x] == '\0' && (utils->export[i][y] == '=' || utils->export[i][y] == '\0'))
+					remove_exp(utils, i);
+			}
+			i++;
+		}
+		j++;
+	}
+	return (0);
+}
 
-} */
+int	remove_exp(t_utils *utils, int i)
+
+{
+	int		x;
+	int		y;
+	char	**temp_arr;
+
+	y = 0;
+	x = 0;
+	while (utils->export[x])
+		x++;
+	temp_arr = malloc(sizeof(char *) * x);
+	if (!temp_arr)
+		return (1);
+	x = 0;
+	while (utils->export[x])
+	{
+		if (x != i)
+		{
+			temp_arr[y] = ft_strdup(utils->export[x]);
+			y++;
+			x++;
+		}
+		else
+			x++;
+	}
+	temp_arr[y] = NULL;
+	ft_arrfree(utils->export);
+	utils->export = temp_arr;
+	return (0);
+}
+
+int	remove_env(t_utils *utils, int i)
+
+{
+	int		x;
+	int		y;
+	char	**temp_arr;
+
+	y = 0;
+	x = 0;
+	while (utils->envp[x])
+		x++;
+	temp_arr = malloc(sizeof(char *) * x);
+	if (!temp_arr)
+		return (1);
+	x = 0;
+	while (utils->envp[x])
+	{
+		if (x != i)
+		{
+			temp_arr[y] = ft_strdup(utils->envp[x]);
+			y++;
+			x++;
+		}
+		else
+			x++;
+	}
+	temp_arr[y] = NULL;
+	ft_arrfree(utils->envp);
+	utils->envp = temp_arr;
+	return (0);
+}
