@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/11 16:10:47 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/12 11:23:34 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ int	export(t_utils *utils, char **arg)
 		print_exp(utils, 1);
 		return (0);
 	}
+	printf("arg = %s\n", arg[1]);
 	while (arg[0] && arg[i])
 	{
 		quote = false;
@@ -139,6 +140,7 @@ int	pwd(t_utils *utils)
 			printf("%s\n", temp);
 			free (temp);
 		}
+		i++;
 	}
 	return (0);
 }

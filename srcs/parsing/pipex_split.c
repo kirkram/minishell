@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_split.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/07 15:04:39 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/08 14:05:19 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/12 14:44:51 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ char	**splitter(char *str, char c, char **array, int i)
 		stop_char = skip_chars(&x, str, stop_char, c);
 		while (str[x] != stop_char && str[x] != '\0')
 		{
+			//if stop char is a space then if we find quote change stop char to this quote i guess 
 			array[i][j] = str[x];
 			j ++;
 			x ++;

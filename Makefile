@@ -3,7 +3,7 @@ LIBFT_PATH = ./lib/libft
 LIBFT = $(LIBFT_PATH)/libft.a
 CFLAGS = -Wall -Wextra -Werror
 HEADERS	= -I ./include -L/usr/local/lib -I/usr/local/include #-lreadline
-#DEBUGFLAGS = -g -fsanitize=address,undefined,integer
+DEBUGFLAGS = -g -fsanitize=address,undefined,integer
 SRCS = \
  ./srcs/parsing/lexer.c ./srcs/parsing/parse.c ./srcs/parsing/pipex_split_helper.c \
  ./srcs/parsing/pipex_split.c ./srcs/parsing/preparse.c \
@@ -25,7 +25,7 @@ $(LIBFT):
 debug: .debug
 
 .debug: $(LIBFT) $(SRCS) 
-	cc $(DEBUGFLAGS) $(HEADERS) $(SRCS) $(LIBFT) -o debug.out
+	cc $(DEBUGFLAGS) $(HEADERS) -lreadline $(SRCS) $(LIBFT) -o debug.out
 	touch .debug
 
 %.o: %.c

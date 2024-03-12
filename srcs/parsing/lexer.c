@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/08 11:56:22 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/12 11:30:26 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,20 +157,20 @@ int			lexer(char *line_read, t_pipe ***pipe, t_utils *utils)
 
 	// NOT PART OF THE ACCTUAL FUNCTION //
 
-/*    	 int	i = 0;
+     int	i = 0;
 	 int	x = 0;
 	 while ((*pipe)[i])
 	 {
 	 	x = 0;
-	 	while ((*pipe)[i]->final_args[x])
+	 	while ((*pipe)[i]->noio_args[x])
 	 	{
-	 		printf("%s\n", (*pipe)[i]->final_args[x]);
+	 		printf("%s\n", (*pipe)[i]->noio_args[x]);
 	 		//printf("%d\n", (*pipe)[i]->tokens[x]);
 	 		x++;
 	 	}
 	 	printf("------------\n");
 	 	i++;
-	 }  */
+	 }  
 /*
 	 int	i = 0;
 	 int	x = 0;

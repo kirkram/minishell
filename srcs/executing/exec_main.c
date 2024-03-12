@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/11 15:28:15 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/12 11:37:33 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			{
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
-					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, NULL);
+					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, utils->envp);
 					err_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
 				}
 				else
