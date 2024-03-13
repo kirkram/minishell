@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/12 11:30:26 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/13 17:14:16 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,63 +140,27 @@ void	error_func(char *str)
 }
 
 
-int			lexer(char *line_read, t_pipe ***pipe, t_utils *utils)
+int	lexer(char *line_read, t_pipe ***pipe, t_utils *utils)
 
 {
 	char	**array;
 
 	array = NULL;
 	var_substitution(&line_read, utils->envp);
-	array = ppx_split(line_read, ' ');
+	array = ms_split(line_read);
 	if (!array)
 		return (1); // or  something else if malloc failed
-	pipeline_init(array, pipe);
+/*  	int	i = 0;
+	while (array[i])
+	{
+		printf("array = %s\n", array[i]);
+	 	i++;
+	}   
+	printf("------------\n"); */
+	pipeline_init(array, pipe); 
 	if (parser(array, pipe, &utils->err_code) == 1)
 		return (1); // free all first
 	ft_arrfree(array);
-
-	// NOT PART OF THE ACCTUAL FUNCTION //
-
-     int	i = 0;
-	 int	x = 0;
-	 while ((*pipe)[i])
-	 {
-	 	x = 0;
-	 	while ((*pipe)[i]->noio_args[x])
-	 	{
-	 		printf("%s\n", (*pipe)[i]->noio_args[x]);
-	 		//printf("%d\n", (*pipe)[i]->tokens[x]);
-	 		x++;
-	 	}
-	 	printf("------------\n");
-	 	i++;
-	 }  
-/*
-	 int	i = 0;
-	 int	x = 0;
-	 while ((*pipe)[i])
-	 {
-	 	x = 0;
-	 	while ((*pipe)[i]->args[x])
-	 	{
-	 		printf("%s        ", (*pipe)[i]->args[x]);
-	 		printf("%d\n", (*pipe)[i]->tokens[x]);
-	 		x++;
-	 	}
-	 	printf("------------\n");
-	 	i++;
-	 }  */
-/* 	 int x = 0;
- 	 int i = 0;
-	 while ((*pipe)[i])
-	 {
-		while (pipe[i]->args[x])
-	 		ft_arrfree(pipe[i]->args[x]);
-	 	free (pipe[i]->tokens);
-	 	free(pipe[i]);
-	 	i++;
-	 }  */
-	// free (pipe);
 
 	return (0);
 }

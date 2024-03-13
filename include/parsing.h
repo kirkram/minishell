@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/11 15:03:46 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/13 15:45:10 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ char		**array_copy(char **array);
 char		*get_variable(char *temp, char **envp);
 int			*tokenizer(char **array);
 int			get_token(char *str);
+void		quote_status(bool *quote);
 
 // PARSER
 
@@ -103,16 +104,14 @@ int			cd_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			update_pwd_oldpwd_env(t_utils *utils, char *cwd);
 
-//PPX SPLIT
-int			skip_chars(int *x, char *str, char stop_char, char c);
-char		**return_and_nullterm(char ***array, int i);
-void		skip_esc_and_c(char stop_char, int *x, char *str, char c);
-char		**free_reverse(int i, char **array);
-char		**ppx_split(char const *str, char c);
-char		**splitter(char *str, char c, char **array, int i);
-int			splitlen(char *str, char c);
-int			countstrings(char *str, char c);
-void		quote_status(bool *quote);
+//MS SPLIT
+
+int		str_count(char *str);
+char	**ms_splitter(char *str, char **array);
+char	**ms_split(char *str);
+char	**free_reverse(int i, char **array);
+char	*remove_quote(char *str);
+int		quote_count(char *str);
 
 //HELPER
 int			is_only_digits_and_signs(char *str);
