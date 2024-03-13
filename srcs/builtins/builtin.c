@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/11 15:19:22 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/13 15:43:23 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	change_env_var(t_utils **utils, char *env_name, char *newstr)
 {
 	int		i;
 	char	**tmp_arr;
-	
+
 	i = 0;
 	if (!env_name || !newstr || !utils)
 		return (1);
@@ -113,6 +113,7 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 	char	*home_path;
 	char	*pwd;
 	char	cwd[4096]; //windows limit is 32767, usually 4096 for unix
+	DIR		*directory;
 
 	char **noio_args;
 	home_path = NULL;
@@ -161,19 +162,30 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 	{
 		if (_pipe[0] && !_pipe[1] && chdir(noio_args[1]) == -1)
 		{
+			directory = opendir(noio_args[1]);
 			if (access(noio_args[1], F_OK) == -1)
 			{
 				ft_putstr_fd("minishell: cd: ", 2);
 				ft_putstr_fd(noio_args[1], 2);
 				ft_putendl_fd(": No such file or directory", 2);
 			}
+			else if (access(noio_args[1], X_OK) == -1 && !directory)
+			{
+				ft_putstr_fd("minishell: cd: ", 2);
+				ft_putstr_fd(noio_args[1], 2);
+				ft_putendl_fd(": Not a directory", 2);
+			}
 			else if (access(noio_args[1], X_OK) == -1)
 			{
 				ft_putstr_fd("minishell: cd: ", 2);
 				ft_putstr_fd(noio_args[1], 2);
 				ft_putendl_fd(": Permission denied", 2);
+				closedir(directory);
+				return (127);
 			}
-			return (2);
+			if (directory)
+				closedir(directory);
+			return (1);
 		}
 		if (update_pwd_oldpwd_env(utils, cwd) != 0)
 			return (2); //err handle
@@ -181,7 +193,6 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 		ft_putstr_fd("MoreThan1Arg. the cwd is now ", 2);
 		ft_putendl_fd(cwd, 2);
 	}
-
 	//chdir
 	//opendir, readdir, closedir:
 	//if we cd add oldpwd to the env vars
@@ -280,7 +291,7 @@ int	add_exp_var(t_utils **utils, char *newstr)
 {
 	int		i;
 	char	**tmp_arr;
-	
+
 	i = 0;
 	while ((*utils)->export[i])
 	{
