@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/12 11:37:33 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/13 15:07:15 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,6 +242,15 @@ int		handle_execve_errors(char *failed_cmd)
 	else if (access(failed_cmd, X_OK) == -1 || access(failed_cmd, R_OK) == -1 || \
 	ft_strncmp(failed_cmd, "./", 3) == 0)
 		return (msg_stderr("minishell: permission denied: ", failed_cmd, 126));
+	else if (!closedir(opendir(failed_cmd)))
+	{
+		if (ft_strnstr(failed_cmd, "../", -1))
+			return (msg_stderr("minishell: is a directory: ", ft_strnstr(failed_cmd, "../", -1), 126));
+		else if (ft_strnstr(failed_cmd, "./", -1))
+			return (msg_stderr("minishell: is a directory: ", ft_strnstr(failed_cmd, "./", -1), 126));
+		else
+			return (msg_stderr("minishell: is a directory: ", failed_cmd, 126));
+	}
 	else
 		return (msg_stderr("minishell: permission denied: ", failed_cmd, 127));
 	return (127);

@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/11 15:03:46 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/13 14:51:28 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <signal.h>
+# include <dirent.h>
 
 //# include </usr/include/readline/readline.h> //needed for Linux
 //# include </usr/include/readline/history.h> // needed for Linux
