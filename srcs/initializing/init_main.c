@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/14 14:08:00 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/14 14:30:57 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	t_pipe	**_pipe;
 	int		i;
 	t_utils	*utils;
+	int		j;
 	// struct	sigaction sa1;
 	// struct	sigaction sa2;
 
@@ -89,9 +90,20 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 			//throughout the execution so that on a sigstop signal
 			//it would return a proper code?
 			utils->err_code = execute(utils, _pipe);
+			i = 0;
+			while (_pipe[i])
+			{
+				ft_arrfree(_pipe[i]->args);
+				ft_arrfree(_pipe[i]->noio_args);
+				free(_pipe[i]->tokens);
+				free(_pipe[i]);
+				i ++;
+			}
+			free (_pipe);
 		}
 	}
-	free(line_read);
+	free (utils);
+	free (line_read);
 	return (0);
 }
 
