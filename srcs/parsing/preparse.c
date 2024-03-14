@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/02 21:46:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/12 11:15:28 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/13 23:34:46 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,13 +104,12 @@ char	*env_variable(char *str, char **envp)
 	int		start;
 	char	*new_str;
 	char	*temp;
-	//char	*ptr;
+	char	*ptr;
 	bool	quote;
 	bool	dquote;
 
 	dquote = false;
 	quote = false;
-	//ptr = NULL;
 	temp = NULL;
 	new_str = NULL;
 	start = 0;
@@ -128,7 +127,11 @@ char	*env_variable(char *str, char **envp)
 			if (!new_str)
 				new_str = ft_substr(str, start, i);
 			else
+			{
+				ptr = new_str;
 				new_str = ft_strjoin(new_str, ft_substr(str, start, i - start));
+				free (ptr);
+			}
 			if (str[i] == '\0')
 				break ;
 			i++;
@@ -136,7 +139,9 @@ char	*env_variable(char *str, char **envp)
 			while (str[i] != ' ' && str[i] != '\0' && str[i] != '$' && str[i] != '\'' && str[i] !='\"')
 				i++;
 			temp = ft_strjoin(ft_substr(str, start, i - start), "=");
+			ptr = new_str;
 			new_str = ft_strjoin(new_str, get_variable(temp, envp));
+			free (ptr);
 			free (temp);
 			temp = NULL;
 			start = i;
@@ -146,11 +151,15 @@ char	*env_variable(char *str, char **envp)
 		else
 			i++;
 		if (str[i] == '\0')
+		{
+			ptr = new_str;
 			new_str = ft_strjoin(new_str, ft_substr(str, start, i - start));
+			free(ptr);
+		}
 	}
 	if (!new_str)
 		return (str);
-	//free (str);
+	free (str); //hmm
 	return (new_str);
 }
 

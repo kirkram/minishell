@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/13 15:59:26 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/13 23:03:35 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,6 @@ int	export(t_utils *utils, char **arg)
 		print_exp(utils, 1);
 		return (0);
 	}
-	printf("arg = %s\n", arg[1]);
 	while (arg[0] && arg[i])
 	{
 		quote = false;
@@ -103,7 +102,6 @@ int	export(t_utils *utils, char **arg)
 	}
 	sort_export(utils);
 	return (0);
-	// NEED TO HANDLE SPACES INSIDE & OUTSIDE OF QUOTES
 }
 
 int	env(t_utils *utils)

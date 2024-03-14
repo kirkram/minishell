@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/13 11:18:05 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/13 17:03:10 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/13 22:46:43 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,7 @@
 char	**ms_split(char *str)
 {
 	char	**array;
-	int		i;
 
-	i = 0;
 	array = NULL;
 	if (!str)
 		return (0);
