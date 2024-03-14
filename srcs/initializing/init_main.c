@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/14 14:30:57 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/14 14:51:50 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,7 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 			{
 				ft_arrfree(_pipe[i]->args);
 				ft_arrfree(_pipe[i]->noio_args);
+				free(_pipe[i]->cmd_with_path);
 				free(_pipe[i]->tokens);
 				free(_pipe[i]);
 				i ++;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/14 12:41:02 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/14 14:46:24 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,20 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 					child_exit_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
 				if (i != num_of_cmds - 1)
 					child_exit_code = 127;
+				i = 0;
+				while (_pipe[i])
+				{
+					ft_arrfree(_pipe[i]->args);
+					ft_arrfree(_pipe[i]->noio_args);
+					free(_pipe[i]->tokens);
+					free(_pipe[i]->cmd_with_path);
+					free(_pipe[i]);
+					i ++;
+				}
+				ft_arrfree(utils->envp);
+				ft_arrfree(utils->export);
+				free(utils);
+				free (_pipe);
 				exit (child_exit_code);
 			}
 		}
