@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/13 15:15:36 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/14 11:28:32 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,15 @@
 
 #include "../../include/minishell.h"
 
-char	*find_scmd_path(char *scmd, char **envp)
+char	*assign_scmd_path(char *scmd, char **envp)
 {
 	char	**env_paths;
 	char	*cmd_path;
 	int		i;
 
-	env_paths = find_path(envp);
+	env_paths = find_path_and_pwd(envp);
 	if (!env_paths)
 		return (NULL);
-	// if (!env_paths && !does_scmd_contain_path(scmd))
-	// 	return (NULL);
-	//	if scmd contains local or abosolute path in it
-	//	then  make the cmd_path an empry string;
 	i = 0;
 	while (env_paths[i])
 	{
@@ -52,7 +48,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	int			i;
 	int			j;
 
-	int			err_code;
+	int			child_exit_code;
 	char		*infile;
 	int			num_of_cmds;
 	char		*outfile;
@@ -82,11 +78,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	num_of_cmds = i;
 
 	ft_memset(pid, -1, sizeof(pid));
-	// i = -1;
-	// while (++i != 41)
-	// 	printf("The pid is %d\n", pid[i]);
-	// while (1);
-	err_code = 0;
+
 	i = 0;
 	is_append_out = 0;
 	while (i < num_of_cmds)
@@ -106,15 +98,10 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				if (tokens[j] == OUT_AP)
 					is_append_out = 1;
 				outfile = all_args[j];
-				//!!!!!!!!!!!!!!
-				//args[j] = NULL;
-				// ft_putstr_fd("The outfile is %s\n", 2);
-				// ft_putendl_fd(outfile, 2);
 			}
 			if (tokens[j] == 0)
 				ft_putendl_fd("UNEQUAL TOKENS AND ARGS COUNT", 2);
 		}
-		///////////////////
 		if (i == num_of_cmds - 1)
 		{
 			if (outfile)
@@ -127,6 +114,10 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				{
 					ft_putstr_fd("minishell: permission denied: ", 2);
 					ft_putendl_fd(outfile, 2);
+					// dup2(savestdio[0], STDIN_FILENO);
+					// dup2(savestdio[1], STDOUT_FILENO);
+					// close(savestdio[0]);
+					// close(savestdio[1]);
 					return (127);
 				}
 			}
@@ -149,20 +140,18 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
 					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, utils->envp);
-					err_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
+					child_exit_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
 				}
 				else
-					err_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
+					child_exit_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
 				if (i != num_of_cmds - 1)
-					err_code = 127;
-				exit (err_code);
+					child_exit_code = 127;
+				exit (child_exit_code);
 			}
 		}
 		else
 		{
-			if	(exec_builtin(_pipe, utils, i))
-				//handle errors
-				return (2);
+			utils->err_code = exec_builtin(_pipe, utils, i);
 		}
 		i ++;
 	}
@@ -177,22 +166,16 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		if ((_pipe[i])->tokens && (_pipe[i])->tokens[0] == BUILTIN)
 			i ++;
 		if (i == num_of_cmds - 1 && pid[i] != -1)
-			waitpid(pid[i], &err_code, 0);
+			waitpid(pid[i], &child_exit_code, 0);
 		else if (pid[i] != -1)
 			waitpid(pid[i], NULL, 0);
 		i ++;
 	}
-	if (WIFEXITED(err_code))
-	{
-		//ft_putendl_fd("WIFEXITED", 2);
-		return (WEXITSTATUS(err_code));
-	}
+	//
+	if (WIFEXITED(child_exit_code))
+		return (WEXITSTATUS(child_exit_code));
 	else
-	{
-		//ft_putendl_fd("NOT WIFEXITED", 2);
-		return (127);
-	}
-
+		return (child_exit_code);
 }
 
 /*
@@ -208,7 +191,7 @@ int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
 {
 
 	if (!ft_strncmp((_pipe)[i]->noio_args[0], "echo", -1))
-		return (echo_builtin((_pipe)[i]->noio_args));
+		return (echo_builtin((_pipe)[i]->noio_args, utils));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "cd", -1))
 		return (cd_builtin(_pipe, utils, i));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "pwd", -1))
@@ -267,7 +250,7 @@ int	msg_stderr(char *message, char *cmd, int err_code)
 }
 
 
-char	**find_path(char **envp)
+char	**find_path_and_pwd(char **envp)
 {
 	t_paths	vars;
 

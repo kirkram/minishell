@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/13 15:43:23 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/14 11:49:20 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,13 +57,22 @@ int	change_env_var(t_utils **utils, char *env_name, char *newstr)
 	return (0);
 }
 
-int		echo_builtin(char **noio_args)
+int		echo_builtin(char **noio_args, t_utils *utils)
 {
 	int	i;
 	int	is_newlined;
 
 	i = 1;
 	is_newlined = 1;
+	(void)utils;
+	// //tmp for exit codes
+	// if (noio_args[1] && !ft_strncmp(noio_args[1], "$?", -1))
+	// {
+	// 	ft_putendl_fd("hehe", 1);
+	// 	//don't update the error code
+	// 	ft_putendl_fd(ft_itoa(utils->err_code), 1);
+	// 	return (utils->err_code);
+	// }
 	if (noio_args[1] && !ft_strncmp(noio_args[1], "-n", -1))
 	{
 		is_newlined = 0;

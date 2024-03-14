@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/13 14:51:28 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/14 11:27:22 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,12 +75,12 @@ int			parser(char **array, t_pipe ***pipe, int *err_code);
 
 //EXECUTE
 
-char	*find_scmd_path(char *scmd, char **envp);
+char	*assign_scmd_path(char *scmd, char **envp);
 int		execute(t_utils *utils, t_pipe **_pipe);
 char	*jointhree(char const *s1, char const *s2, char const *s3);
 int		handle_execve_errors(char *failed_cmd);
 int		msg_stderr(char *message, char *cmd, int err_code);
-char	**find_path(char **envp);
+char	**find_path_and_pwd(char **envp);
 int		user_cmd_path(char **args, char *arg_cmd, char **paths);
 void	delete_pwd_path(char **paths);
 int		free_and_1(char **paths, int **end);
@@ -89,7 +89,7 @@ int		free_and_1(char **paths, int **end);
 
 int			exec_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			change_env_var(t_utils **utils, char *env_name, char *newstr);
-int			echo_builtin(char **noio_args);
+int			echo_builtin(char **noio_args, t_utils *utils);
 int			add_exp_var(t_utils **utils, char *newstr);
 int			change_exp_var(t_utils **utils, char *env_name, char *newstr);
 void		print_exp(t_utils *utils, int fd);

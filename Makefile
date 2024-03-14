@@ -10,7 +10,7 @@ SRCS = \
  ./srcs/initializing/init_main.c \
  ./srcs/executing/exec_main.c \
  ./lib/get_next_line/get_next_line.c ./lib/get_next_line/get_next_line_utils.c \
- ./srcs/builtins/env_builtin.c ./srcs/builtins/builtin.c
+ ./srcs/builtins/env_builtin.c ./srcs/builtins/builtin.c 
 OBJCTS = $(SRCS:.c=.o)
 RM = rm -f
 
