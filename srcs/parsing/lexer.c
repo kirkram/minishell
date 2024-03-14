@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/13 23:58:40 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/14 12:40:56 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ int	lexer(char *line_read, t_pipe ***pipe, t_utils *utils)
 	char	**array;
 
 	array = NULL;
-	var_substitution(&line_read, utils->envp);
+	var_substitution(&line_read, utils->envp, utils->err_code);
 	array = ms_split(line_read);
 	free(line_read);
 	if (!array)

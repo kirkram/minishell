@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/13 23:03:35 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/14 12:41:01 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,16 +56,16 @@ void	sort_export(t_utils *utils)
 
 
 int	export(t_utils *utils, char **arg)
-
 {
 	int		i;
 	int		x;
 	bool	quote;
 	bool	dquote;
 	char	*temp;
-
-
+	bool	fault;
+	
 	i = 1;
+	x = 0;
 	if (!utils)
 		return (1);
 	if (!arg || !arg[0])
@@ -79,8 +79,19 @@ int	export(t_utils *utils, char **arg)
 	{
 		quote = false;
 		dquote = false;
+		fault = false;
+		while (arg[i][x] && (arg[i][x] == '\'' || arg[i][x] == '\"'))
+			x++;
+		if (arg[i][x] >= '0' && arg[i][x] <= '9')
+		{
+			ft_putstr_fd("export: `", 2);
+			ft_putstr_fd(arg[i], 2);
+			ft_putendl_fd("\': not a valid identifier", 2);
+			utils->err_code = 1;
+			fault = true;
+		}
 		x = 0;
-		while (arg[i][x])
+		while (arg[i][x] && fault == false)
 		{
 			if (arg[i][x] == '\'')
 				quote_status(&quote);

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/13 15:45:10 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/14 12:40:57 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,10 +59,10 @@ void	intialize_utils(char **sys_envp, t_utils **utils);
 
 int			lexer(char *argv, t_pipe ***pipe, t_utils *utils);
 void		error_func(char *str);
-void		var_substitution(char **array, char *envp[]);
-char		*env_variable(char *str, char **envp);
+void		var_substitution(char **array, char *envp[], int err_code);
+char		*env_variable(char *str, char **envp, int err_code);
 char		**array_copy(char **array);
-char		*get_variable(char *temp, char **envp);
+char		*get_variable(char *temp, char **envp, int err_code);
 int			*tokenizer(char **array);
 int			get_token(char *str);
 void		quote_status(bool *quote);
