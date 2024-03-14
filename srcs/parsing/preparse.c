@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/02 21:46:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/12 11:15:28 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/14 14:00:30 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,31 +86,29 @@ char	*separator(char *str)
 		i++;
 	}
 	temp[x] = '\0';
-	//free (str);
 	return (temp);
 }
 
-void	var_substitution(char **str, char *envp[])
+void	var_substitution(char **str, char *envp[], int err_code)
 
 {
-	*str = env_variable(*(str), envp);
+	*str = env_variable(*(str), envp, err_code);
 	*str = separator(*(str));
 }
 
-char	*env_variable(char *str, char **envp)
+char	*env_variable(char *str, char **envp, int err_code)
 
 {
 	int		i;
 	int		start;
 	char	*new_str;
 	char	*temp;
-	//char	*ptr;
+	char	*ptr;
 	bool	quote;
 	bool	dquote;
 
 	dquote = false;
 	quote = false;
-	//ptr = NULL;
 	temp = NULL;
 	new_str = NULL;
 	start = 0;
@@ -128,15 +126,21 @@ char	*env_variable(char *str, char **envp)
 			if (!new_str)
 				new_str = ft_substr(str, start, i);
 			else
+			{
+				ptr = new_str;
 				new_str = ft_strjoin(new_str, ft_substr(str, start, i - start));
+				free (ptr);
+			}
 			if (str[i] == '\0')
 				break ;
 			i++;
 			start = i;
-			while (str[i] != ' ' && str[i] != '\0' && str[i] != '$' && str[i] != '\'' && str[i] !='\"')
+			while (str[i] != ' ' && str[i] != '\0' && str[i] != '$' && str[i] != '\'' && str[i] != '\"')
 				i++;
 			temp = ft_strjoin(ft_substr(str, start, i - start), "=");
-			new_str = ft_strjoin(new_str, get_variable(temp, envp));
+			ptr = new_str;
+			new_str = ft_strjoin(new_str, get_variable(temp, envp, err_code));
+			free (ptr);
 			free (temp);
 			temp = NULL;
 			start = i;
@@ -146,15 +150,19 @@ char	*env_variable(char *str, char **envp)
 		else
 			i++;
 		if (str[i] == '\0')
+		{
+			ptr = new_str;
 			new_str = ft_strjoin(new_str, ft_substr(str, start, i - start));
+			free(ptr);
+		}
 	}
 	if (!new_str)
 		return (str);
-	//free (str);
+	free (str); //hmm
 	return (new_str);
 }
 
-char	*get_variable(char *temp, char **envp)
+char	*get_variable(char *temp, char **envp, int err_code)
 
 {
 	int		i;
@@ -162,6 +170,8 @@ char	*get_variable(char *temp, char **envp)
 
 	env_var = NULL;
 	i = 0;
+	if (ft_strnstr("?=", temp, ft_strlen(temp)))
+		 return (ft_itoa(err_code));
 	while (envp[i])
 	{
 		if (ft_strnstr(envp[i], temp, ft_strlen(temp)))

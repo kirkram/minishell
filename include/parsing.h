@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/14 11:27:22 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/14 12:40:57 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,12 +60,13 @@ void	intialize_utils(char **sys_envp, t_utils **utils);
 
 int			lexer(char *argv, t_pipe ***pipe, t_utils *utils);
 void		error_func(char *str);
-void		var_substitution(char **array, char *envp[]);
-char		*env_variable(char *str, char **envp);
+void		var_substitution(char **array, char *envp[], int err_code);
+char		*env_variable(char *str, char **envp, int err_code);
 char		**array_copy(char **array);
-char		*get_variable(char *temp, char **envp);
+char		*get_variable(char *temp, char **envp, int err_code);
 int			*tokenizer(char **array);
 int			get_token(char *str);
+void		quote_status(bool *quote);
 
 // PARSER
 
@@ -104,16 +105,14 @@ int			cd_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			update_pwd_oldpwd_env(t_utils *utils, char *cwd);
 
-//PPX SPLIT
-int			skip_chars(int *x, char *str, char stop_char, char c);
-char		**return_and_nullterm(char ***array, int i);
-void		skip_esc_and_c(char stop_char, int *x, char *str, char c);
-char		**free_reverse(int i, char **array);
-char		**ppx_split(char const *str, char c);
-char		**splitter(char *str, char c, char **array, int i);
-int			splitlen(char *str, char c);
-int			countstrings(char *str, char c);
-void		quote_status(bool *quote);
+//MS SPLIT
+
+int		str_count(char *str);
+char	**ms_splitter(char *str, char **array);
+char	**ms_split(char *str);
+char	**free_reverse(int i, char **array);
+char	*remove_quote(char *str);
+int		quote_count(char *str);
 
 //HELPER
 int			is_only_digits_and_signs(char *str);
