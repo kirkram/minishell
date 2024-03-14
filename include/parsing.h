@@ -17,6 +17,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <signal.h>
+# include <dirent.h>
 
 //# include </usr/include/readline/readline.h> //needed for Linux
 //# include </usr/include/readline/history.h> // needed for Linux
@@ -75,12 +76,12 @@ int			parser(char **array, t_pipe ***pipe, int *err_code);
 
 //EXECUTE
 
-char	*find_scmd_path(char *scmd, char **envp);
+char	*assign_scmd_path(char *scmd, char **envp);
 int		execute(t_utils *utils, t_pipe **_pipe);
 char	*jointhree(char const *s1, char const *s2, char const *s3);
 int		handle_execve_errors(char *failed_cmd);
 int		msg_stderr(char *message, char *cmd, int err_code);
-char	**find_path(char **envp);
+char	**find_path_and_pwd(char **envp);
 int		user_cmd_path(char **args, char *arg_cmd, char **paths);
 void	delete_pwd_path(char **paths);
 int		free_and_1(char **paths, int **end);
@@ -89,7 +90,7 @@ int		free_and_1(char **paths, int **end);
 
 int			exec_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			change_env_var(t_utils **utils, char *env_name, char *newstr);
-int			echo_builtin(char **noio_args);
+int			echo_builtin(char **noio_args, t_utils *utils);
 int			add_exp_var(t_utils **utils, char *newstr);
 int			change_exp_var(t_utils **utils, char *env_name, char *newstr);
 void		print_exp(t_utils *utils, int fd);

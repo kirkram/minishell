@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/09 17:20:08 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/14 14:08:00 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ int	main(int ac, char **av, char **sys_envp)
 {
 	(void)ac;
 	int		ret;
-
 
 	ret = 0;
 	ret = rl_loop(ac, av, sys_envp);
@@ -35,12 +34,20 @@ int	rl_loop(int ac, char **av, char **sys_envp)
 	hist_fd = open_history_file(hist_fd);
 	if (hist_fd < 0)
 		return (1);
-	 //what are the other possible conditions to use interactive mode with more than 1 arg?
 	return (interactive_mode_loop(hist_fd, sys_envp));
-		//expand_scripts_mode(av);
-	// interactive_mode;
-	//
-	// expand_local_script_mode
+}
+void	handle_sigint(int sig)
+{
+	(void)sig;
+	ft_putendl_fd("hehe", 1);
+	// ft_putstr_fd("minishell-0.5$ ", 1);
+}
+
+void	handle_sigquit(int sig)
+{
+	(void)sig;
+	ft_putendl_fd("wfeffefeffeefawa", 1);
+	// ft_putstr_fd("minishell-0.5$ ", 1);
 }
 
 int	interactive_mode_loop(int hist_fd, char **sys_envp)
@@ -49,21 +56,39 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	t_pipe	**_pipe;
 	int		i;
 	t_utils	*utils;
+	// struct	sigaction sa1;
+	// struct	sigaction sa2;
+
+
+	// sa1.sa_flags = SA_RESTART;
+	// sa1.sa_handler = &handle_sigquit;
+	// sigemptyset(&sa1.sa_mask);
+	// sigaction(SIGQUIT, &sa1, NULL);
+
+	// sa2.sa_handler = &handle_sigint;
+	// sa2.sa_flags = SA_RESTART;
+	// sigemptyset(&sa2.sa_mask);
+	// sigaction(SIGINT, &sa2, NULL);
+
+
 	intialize_utils(sys_envp, &utils);
 	line_read = NULL;
+
 	while (1)
 	{
 		line_read = rl_gets(line_read, hist_fd);
-
-		if (lexer(line_read, &_pipe, utils) != 1)
+		if (line_read && lexer(line_read, &_pipe, utils) != 1)
 		{
 			i = 0;
 			while (_pipe[i])
 			{
-				(_pipe)[i]->cmd_with_path = find_scmd_path((_pipe)[i]->args[0], utils->envp);
+				(_pipe)[i]->cmd_with_path = assign_scmd_path((_pipe)[i]->args[0], utils->envp);
 				i ++;
 			}
-			execute(utils, _pipe);
+			//should we assign (duplicating) err code to the utils in the execute
+			//throughout the execution so that on a sigstop signal
+			//it would return a proper code?
+			utils->err_code = execute(utils, _pipe);
 		}
 	}
 	free(line_read);
@@ -77,7 +102,7 @@ char *exp_init(char *str1, char *str2)
 	int		x;
 	bool	equal;
 	char	*temp;
-	
+
 	i = 0;
 	x = 0;
 	equal = false;
@@ -175,7 +200,7 @@ char *rl_gets(char *line_read, int hist_file)
 		free (line_read);
 		line_read = NULL;
 	}
-	line_read = readline("minishell-0.1$ ");
+	line_read = readline("minishell-0.5$ ");
 	if (line_read && *line_read)
 	{
 		add_history(line_read);
@@ -183,4 +208,3 @@ char *rl_gets(char *line_read, int hist_file)
 	}
 	return (line_read);
 }
-
