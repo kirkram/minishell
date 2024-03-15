@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/14 14:46:24 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/15 10:49:42 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				if (!is_append_out)
 					fd[1] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
 				else
-					fd[1] = open(outfile, O_WRONLY | O_APPEND);
+					fd[1] = open(outfile, O_CREAT | O_RDWR | O_APPEND, 0644);
 				if (fd[1] < 0)
 				{
 					ft_putstr_fd("minishell: permission denied: ", 2);
