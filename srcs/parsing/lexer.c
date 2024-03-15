@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/14 12:40:56 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/15 11:15:49 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,16 +149,16 @@ int	lexer(char *line_read, t_pipe ***pipe, t_utils *utils)
 	var_substitution(&line_read, utils->envp, utils->err_code);
 	array = ms_split(line_read);
 	free(line_read);
-	if (!array)
+	if (!array || !*array)
 		return (1); // or  something else if malloc failed
 /*  	int	i = 0;
 	while (array[i])
 	{
 		printf("array = %s\n", array[i]);
 	 	i++;
-	}   
+	}
 	printf("------------\n"); */
-	pipeline_init(array, pipe); 
+	pipeline_init(array, pipe);
 	if (parser(array, pipe, &utils->err_code) == 1)
 		return (1); // free all first
 	ft_arrfree(array);

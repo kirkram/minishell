@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/15 10:49:42 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/15 16:16:05 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,84 +50,152 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 
 	int			child_exit_code;
 	char		*infile;
-	int			num_of_cmds;
+	int			num_of_pipes;
 	char		*outfile;
 	int			*tokens;
-	char		**all_args;
 	int			is_append_out;
 
 	savestdio[0] = dup(STDIN_FILENO);
 	savestdio[1] = dup(STDOUT_FILENO);
-	outfile = NULL;
-	infile = NULL;
-	if (infile)
-	{
-		fd[0] = open (infile, O_RDONLY);
-		if (fd[0] < 0)
-		{
-			ft_putstr_fd("minishell: no such file or directory: ", 2);
-			ft_putendl_fd(infile, 2);
-		}
-	}
-	else
-		fd[0] = dup(savestdio[0]);
 
+	//PREP
 	i = 0;
 	while (_pipe[i])
 		i ++;
-	num_of_cmds = i;
-
+	num_of_pipes = i;
 	ft_memset(pid, -1, sizeof(pid));
+	fd[0] = 0;
+	fd[1] = 0;
 
+	//CREATE OUTFILES
 	i = 0;
-	is_append_out = 0;
-	while (i < num_of_cmds)
+	while (i < num_of_pipes)
 	{
+		j = 0;
+		tokens = _pipe[i]->tokens;
+		while (_pipe[i]->args[j] && tokens[j] != 0)
+		{
+			if (tokens[j] == OUT)
+				fd[0] = open(_pipe[i]->args[j], O_CREAT | O_RDWR | O_TRUNC, 0644);
+			else if (tokens[j] == OUT_AP)
+				fd[0] = open(_pipe[i]->args[j], O_CREAT | O_RDWR | O_APPEND, 0644);
+			else if (tokens[j] == SKIP_OUT)
+				fd[0] = open(_pipe[i]->args[j], O_CREAT | O_RDWR);
+			if (tokens[j] == OUT || tokens[j] == OUT_AP || tokens[j] == SKIP_OUT)
+				close(fd[0]);
+			j ++;
+		}
+		i ++;
+	}
+
+	//MAIN LOOP
+	i = 0;
+	while (i < num_of_pipes)
+	{
+
+		//OPEN INFILE AND TRY TO ACCESS
+		infile = NULL;
+		j = 0;
+		while(_pipe[i]->args[j])
+		{
+			if (_pipe[i]->tokens[j] == IN_FD)
+			{
+				infile = _pipe[i]->args[j];
+				fd[0] = open (infile, O_RDONLY);
+				if (fd[0] < 0)
+				{
+					ft_putstr_fd("minishell: ", 2);
+					ft_putstr_fd(infile, 2);
+					if (access(infile, F_OK) == -1)
+						ft_putendl_fd(": No such file or directory", 2);
+					else if (access(infile, R_OK) == -1)
+						ft_putendl_fd(": Permission denied", 2);
+					//STDIN should not work if the open failed anyway (?)
+				}
+			}
+			else if (_pipe[i]->tokens[j] == SKIP_IN)
+			{
+				if (access(_pipe[i]->args[j], F_OK) == -1 || access(_pipe[i]->args[j], X_OK) == -1)
+				{
+					ft_putstr_fd("minishell: ", 2);
+					ft_putstr_fd(_pipe[i]->args[j], 2);
+					if (access(_pipe[i]->args[j], F_OK) == -1)
+						ft_putendl_fd(": No such file or directory", 2);
+					else if (access(_pipe[i]->args[j], R_OK) == -1)
+						ft_putendl_fd(": Permission denied", 2);
+					//STDIN should not work if the open failed anyway (?)
+				}
+			}
+			j ++;
+		}
+
 		dup2(fd[0], STDIN_FILENO);
 		close(fd[0]);
 
-		// I need outfile otherwise I have to look for it every time there is a new _pipe
+		//LOOK FOR AN OUTFILE
 		tokens = _pipe[i]->tokens;
-		all_args = _pipe[i]->args;
+		outfile = NULL;
 		j = -1;
-		//must be really careful that the amount of tokens equals amount of args
-		while (all_args[++j] && tokens[j] != 0)
+		is_append_out = 0;
+		while (_pipe[i]->args[++j] && tokens[j] != 0)
 		{
 			if (tokens[j] == OUT || tokens[j] == OUT_AP)
 			{
 				if (tokens[j] == OUT_AP)
 					is_append_out = 1;
-				outfile = all_args[j];
+				outfile = _pipe[i]->args[j];
 			}
-			if (tokens[j] == 0)
-				ft_putendl_fd("UNEQUAL TOKENS AND ARGS COUNT", 2);
-		}
-		if (i == num_of_cmds - 1)
-		{
-			if (outfile)
+			//NEW REDIR LOGIC
+			else if (tokens[j] == SKIP_OUT)
 			{
-				if (!is_append_out)
-					fd[1] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
-				else
-					fd[1] = open(outfile, O_CREAT | O_RDWR | O_APPEND, 0644);
+				fd[1] = open(outfile, O_RDWR);
 				if (fd[1] < 0)
 				{
-					ft_putstr_fd("minishell: permission denied: ", 2);
-					ft_putendl_fd(outfile, 2);
-					// dup2(savestdio[0], STDIN_FILENO);
-					// dup2(savestdio[1], STDOUT_FILENO);
-					// close(savestdio[0]);
-					// close(savestdio[1]);
-					return (127);
+					outfile = _pipe[i]->args[j];
+					break ;
 				}
+				//if it fails to open then dont pass anything to the other outfile
+				//make it go throush so the STDOUT wouldnt work
 			}
-			else
-				fd[1] = dup(savestdio[1]);
+			else if (tokens[j] == 0)
+				ft_putendl_fd("UNEQUAL TOKENS AND ARGS COUNT", 2);
+		}
+		if (outfile)
+		{
+			if (!is_append_out && fd[1] >= 0)
+				fd[1] = open(outfile, O_RDWR | O_TRUNC, 0644);
+			else if (is_append_out && fd[1] >= 0)
+				fd[1] = open(outfile, O_RDWR | O_APPEND, 0644);
+			if (fd[1] < 0)
+			{
+				ft_putstr_fd("minishell: ", 2);
+				ft_putstr_fd(outfile, 2);
+				ft_putendl_fd(": Permission denied", 2);
+				//NEW REDIR LOGIC
+				//return (127);
+			}
 		}
 		else
-		{
+			fd[1] = dup(savestdio[1]);
+
+
+		//PIPING
+
+		if (i != num_of_pipes - 1)
 			pipe(pipefd);
+		if (i != 0)
 			fd[0] = pipefd[0];
+		// else if (i != num_of_pipes - 1)
+		// 	close(pipefd[0]);
+		if (i != num_of_pipes - 1)
+		{
+			//fd[0] = pipefd[0];
+			// pipe(pipefd);
+			// fd[0] = pipefd[0];
+			// //NEW REDIR LOGIC
+			//if (!outfile)
+			//SOMEHOW i gotta add the information to the file and pass it to the pipe as well
+			//it needs fd[1] being the outfile and the pipe at the same iteration
 			fd[1] = pipefd[1];
 		}
 		dup2(fd[1], STDOUT_FILENO);
@@ -137,14 +205,19 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			pid[i] = fork();
 			if (pid[i] == 0)
 			{
+				if (outfile)
+					dup2(fd[0], STDIN_FILENO);
+
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
+					// fprintf(stderr, "we're here the i is %d\n", i);
+					// fprintf(stderr, "fd[0] is %d fd[1] is %d\n", fd[0], fd[1]);
 					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, utils->envp);
 					child_exit_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
 				}
 				else
 					child_exit_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
-				if (i != num_of_cmds - 1)
+				if (i != num_of_pipes - 1)
 					child_exit_code = 127;
 				i = 0;
 				while (_pipe[i])
@@ -175,16 +248,17 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	close(savestdio[1]);
 
 	i = 0;
-	while (i < num_of_cmds)
+	while (i < num_of_pipes)
 	{
 		if ((_pipe[i])->tokens && (_pipe[i])->tokens[0] == BUILTIN)
 			i ++;
-		if (i == num_of_cmds - 1 && pid[i] != -1)
+		if (i == num_of_pipes - 1 && pid[i] != -1)
 			waitpid(pid[i], &child_exit_code, 0);
 		else if (pid[i] != -1)
 			waitpid(pid[i], NULL, 0);
 		i ++;
 	}
+	// while (1);
 	//
 	if (WIFEXITED(child_exit_code))
 		return (WEXITSTATUS(child_exit_code));

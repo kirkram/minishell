@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/15 10:45:16 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/15 16:06:15 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,7 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	}
 	free (utils);
 	free (line_read);
+	close(hist_fd);
 	return (0);
 }
 
