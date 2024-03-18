@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/14 14:51:50 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/18 11:46:54 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	t_pipe	**_pipe;
 	int		i;
 	t_utils	*utils;
-	int		j;
+	//int		j;
 	// struct	sigaction sa1;
 	// struct	sigaction sa2;
 
