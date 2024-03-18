@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/15 14:36:33 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/18 12:29:26 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	intialize_utils(char **sys_envp, t_utils **utils);
 
 int			lexer(char *argv, t_pipe ***pipe, t_utils *utils);
 void		malloc_error(int err);
-void		var_substitution(char **array, char *envp[], int err_code);
+int			var_substitution(char **array, char *envp[], int err_code);
 char		*env_variable(char *str, char **envp, int err_code, bool quote, bool dquote);
 char		**array_copy(char **array);
 char		*get_variable(char *temp, char **envp, int err_code);
@@ -74,6 +74,7 @@ char		**get_cmd(char **cmds, int start, int end);
 void		pre_parse(char **array, t_pipe ***pipe);
 int			parser(char **array, t_pipe ***pipe, int *err_code);
 int			syntax_err(t_pipe *pipe, int *err_code, int i);
+int			remove_space(char **str, bool quote, bool dquote);
 //EXECUTE
 
 char	*assign_scmd_path(char *scmd, char **envp);

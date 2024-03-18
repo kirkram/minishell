@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/15 14:26:54 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/18 16:51:17 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,13 +124,34 @@ void	malloc_error(int err)
 	exit(err);
 }
 
+int	line_checker(char **str, int *err_code)
+{
+	int	i;
+
+	i = 0;
+	while ((*str)[i] == ' ')
+		i++;
+	if ((*str)[i] == '|')
+		{
+			ft_putendl_fd("syntax error near unexpected token `|'", 2);
+			*err_code = 258;
+			return (1);
+		}
+	return (0);
+}
+
 
 int	lexer(char *line_read, t_pipe ***pipe, t_utils *utils)
 {
 	char	**array;
 
 	array = NULL;
-	var_substitution(&line_read, utils->envp, utils->err_code);
+	if (var_substitution(&line_read, utils->envp, utils->err_code) == 1)
+		return (1);
+	if (!line_read || !line_read[0])
+		return(1);
+	if (line_checker(&line_read, &utils->err_code) == 1)
+		return (1);
 	array = ms_split(line_read);
 	free(line_read);
 	if (!array)
@@ -160,5 +181,6 @@ int	lexer(char *line_read, t_pipe ***pipe, t_utils *utils)
 		i++;
 	} */
 	
+
 	return (0);
 }
