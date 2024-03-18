@@ -154,16 +154,16 @@ int	lexer(char *line_read, t_pipe ***pipe, t_utils *utils)
 		return (1);
 	array = ms_split(line_read);
 	free(line_read);
-	if (!array)
+	if (!array || !*array)
 		return (1); // or  something else if malloc failed
 /*  	int	i = 0;
 	while (array[i])
 	{
 		printf("array = %s\n", array[i]);
 	 	i++;
-	}   
+	}
 	printf("------------\n"); */
-	pipeline_init(array, pipe); 
+	pipeline_init(array, pipe);
 	if (parser(array, pipe, &utils->err_code) == 1)
 		return (1); // free all first
 	ft_arrfree(array);
