@@ -6,14 +6,13 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/02 21:46:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/14 14:49:03 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/15 14:26:37 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 void	quote_status(bool *quote)
-
 {
 	if ((*quote) == false)
 		(*quote) = true;
@@ -21,17 +20,12 @@ void	quote_status(bool *quote)
 		(*quote) = false;
 }
 
-char	*separator(char *str)
-
+char	*separator(char *str, bool quote, bool dquote)
 {
 	int		i;
 	int		x;
 	char	*temp;
-	bool	quote;
-	bool	dquote;
 
-	quote = false;
-	dquote = false;
 	i = 0;
 	x = 0;
 	while (str[i])
@@ -49,10 +43,7 @@ char	*separator(char *str)
 	}
 	temp = malloc(sizeof(char) * (i + (x *2) + 1));
 	if (!temp)
-	{
-		error_func("malloc failed\n");
-		exit (1);
-	}
+		malloc_error(1);
 	i = 0;
 	x = 0;
 	quote = false;
@@ -92,23 +83,23 @@ char	*separator(char *str)
 void	var_substitution(char **str, char *envp[], int err_code)
 
 {
-	*str = env_variable(*(str), envp, err_code);
-	*str = separator(*(str));
+	bool	quote;
+	bool	dquote;
+
+	quote = false;
+	dquote = false;
+	*str = env_variable(*(str), envp, err_code, quote, dquote);
+	*str = separator(*(str), quote, dquote);
 }
 
-char	*env_variable(char *str, char **envp, int err_code)
-
+char	*env_variable(char *str, char **envp, int err_code, bool quote, bool dquote)
 {
 	int		i;
 	int		start;
 	char	*new_str;
 	char	*temp;
 	char	*ptr;
-	bool	quote;
-	bool	dquote;
 
-	dquote = false;
-	quote = false;
 	temp = NULL;
 	new_str = NULL;
 	start = 0;
@@ -163,7 +154,6 @@ char	*env_variable(char *str, char **envp, int err_code)
 }
 
 char	*get_variable(char *temp, char **envp, int err_code)
-
 {
 	int		i;
 	char	*env_var;
