@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/15 11:15:49 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/18 16:51:17 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,7 @@ char	**array_copy(char **array)
 		i++;
 	new_array = malloc(sizeof(char *) * (i +1));
 	if (!new_array)
-	{
-		error_func("malloc failed\n");
-		exit (1);
-	}
+		malloc_error(1);
 	i = 0;
 	while (array[i])
 	{
@@ -35,8 +32,7 @@ char	**array_copy(char **array)
 		if (!new_array[i])
 		{
 			ft_arrfree(new_array);
-			error_func("malloc failed\n");
-			exit (1);
+			malloc_error(1);
 		}
 		i++;
 	}
@@ -54,18 +50,12 @@ char	**get_cmd(char **cmds, int start, int end)
 	temp_arr = NULL;
 	temp_arr = malloc(sizeof (char *) * ((end - start) + 2));
 	if (!temp_arr)
-	{
-		error_func("malloc failed\n");
-		exit (1);
-	}
+		malloc_error(1);
 	while (cmds[start] && start <= end)
 	{
 		temp_arr[i] = ft_strdup(cmds[start]);
 		if (!temp_arr[i])
-		{
-			error_func("malloc failed\n");
-			exit (1);
-		}
+			malloc_error(1);
 		i++;
 		start++;
 	}
@@ -88,19 +78,13 @@ void	pipeline_init(char **array, t_pipe ***pipe)
 	}
 	*pipe = malloc(sizeof(t_pipe *) * (x +1));
 	if (!*pipe)
-	{
-		error_func("malloc failed\n");
-		exit (1);
-	}
+		malloc_error(1);
 	i = 0;
 	while (i < x)
 	{
 		(*pipe)[i] = malloc(sizeof(t_pipe));
 		if (!(*pipe)[i])
-		{
-			error_func("malloc failed\n");
-			exit (1);
-		}
+			malloc_error(1);
 		i++;
 	}
 	(*pipe)[x] = NULL;
@@ -133,20 +117,41 @@ void	pre_parse(char **array, t_pipe ***pipe)
 	}
 }
 
-void	error_func(char *str)
+void	malloc_error(int err)
 
 {
-	ft_putendl_fd(str, 2);
+	ft_putendl_fd("Malloc failed\n", 2);
+	exit(err);
+}
+
+int	line_checker(char **str, int *err_code)
+{
+	int	i;
+
+	i = 0;
+	while ((*str)[i] == ' ')
+		i++;
+	if ((*str)[i] == '|')
+		{
+			ft_putendl_fd("syntax error near unexpected token `|'", 2);
+			*err_code = 258;
+			return (1);
+		}
+	return (0);
 }
 
 
 int	lexer(char *line_read, t_pipe ***pipe, t_utils *utils)
-
 {
 	char	**array;
 
 	array = NULL;
-	var_substitution(&line_read, utils->envp, utils->err_code);
+	if (var_substitution(&line_read, utils->envp, utils->err_code) == 1)
+		return (1);
+	if (!line_read || !line_read[0])
+		return(1);
+	if (line_checker(&line_read, &utils->err_code) == 1)
+		return (1);
 	array = ms_split(line_read);
 	free(line_read);
 	if (!array || !*array)
@@ -162,5 +167,20 @@ int	lexer(char *line_read, t_pipe ***pipe, t_utils *utils)
 	if (parser(array, pipe, &utils->err_code) == 1)
 		return (1); // free all first
 	ft_arrfree(array);
+/* 	int i = 0;
+	int x = 0;
+	while ((*pipe)[i])
+	{
+		x = 0;
+		while ((*pipe)[i]->args[x])
+		{
+			printf("args = %s\n", (*pipe)[i]->args[x]);
+			printf("token = %d\n", (*pipe)[i]->tokens[x]);
+			x++;
+		}
+		i++;
+	} */
+	
+
 	return (0);
 }
