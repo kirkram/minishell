@@ -6,14 +6,13 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/02 21:46:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/14 14:49:03 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/18 16:59:00 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 void	quote_status(bool *quote)
-
 {
 	if ((*quote) == false)
 		(*quote) = true;
@@ -21,25 +20,20 @@ void	quote_status(bool *quote)
 		(*quote) = false;
 }
 
-char	*separator(char *str)
-
+char	*separator(char *str, bool quote, bool dquote)
 {
 	int		i;
 	int		x;
 	char	*temp;
-	bool	quote;
-	bool	dquote;
 
-	quote = false;
-	dquote = false;
 	i = 0;
 	x = 0;
-	while (str[i])
+	while (str && str[i])
 	{
-		if (str[i] == '\'')
-			quote_status(&quote);
-		else if (str[i] == '\"')
+		if (str[i] == '\"' && quote == false)
 			quote_status(&dquote);
+		if (str[i] == '\'' && dquote == false)
+			quote_status(&quote);
 		if (quote == false && dquote == false)
 		{
 			if ((str[i] == '>' || str[i] == '|' || str[i] == '<') && (i == 0 || (i > 0 && str[i -1] != str[i])))
@@ -49,15 +43,12 @@ char	*separator(char *str)
 	}
 	temp = malloc(sizeof(char) * (i + (x *2) + 1));
 	if (!temp)
-	{
-		error_func("malloc failed\n");
-		exit (1);
-	}
+		malloc_error(1);
 	i = 0;
 	x = 0;
 	quote = false;
 	dquote = false;
-	while (str[i])
+	while (str && str[i])
 	{
 		if (str[i] == '\'')
 			quote_status(&quote);
@@ -89,31 +80,73 @@ char	*separator(char *str)
 	return (temp);
 }
 
-void	var_substitution(char **str, char *envp[], int err_code)
+int	var_substitution(char **str, char *envp[], int err_code)
 
 {
-	*str = env_variable(*(str), envp, err_code);
-	*str = separator(*(str));
+	bool	quote;
+	bool	dquote;
+	char	*ptr;
+
+	ptr = NULL;
+	quote = false;
+	dquote = false;
+	if (remove_space(str, quote, dquote) == 1)
+		return (1);
+	*str = env_variable((*str), envp, err_code, quote, dquote);
+	*str = separator(*(str), quote, dquote);
+	return (0);
 }
 
-char	*env_variable(char *str, char **envp, int err_code)
+int	remove_space(char **str, bool quote, bool dquote)
+{
+	int		i;
+	int		end;
+	char	*temp;
 
+	temp = NULL;
+	i = 0;
+	end = 0;
+	while ((*str)[i])
+	{
+		if ((*str)[i] == '\"' && quote == false)
+			quote_status(&dquote);
+		if ((*str)[i] == '\'' && dquote == false)
+			quote_status(&quote);
+		i++;
+	}
+	if (quote == true || dquote == true)
+	{
+		ft_putendl_fd("unclosed quotes detected", 2);
+		return (1);	
+	}
+	if (i > 0)
+		i--;
+	end = i;
+	while ((*str)[i] == ' ')
+		i--;
+	if (i != end)
+	{
+		temp = ft_substr((*str), 0, i +1);
+		free (*str);
+		(*str) = temp;
+		return (0);
+	}
+	return (0);
+}
+
+char	*env_variable(char *str, char **envp, int err_code, bool quote, bool dquote)
 {
 	int		i;
 	int		start;
 	char	*new_str;
 	char	*temp;
 	char	*ptr;
-	bool	quote;
-	bool	dquote;
 
-	dquote = false;
-	quote = false;
 	temp = NULL;
 	new_str = NULL;
 	start = 0;
 	i = 0;
-	while (str[i])
+	while (str && str[i])
 	{
 		if (str[i] == '\"' && quote == false)
 			quote_status(&dquote);
@@ -135,7 +168,7 @@ char	*env_variable(char *str, char **envp, int err_code)
 				break ;
 			i++;
 			start = i;
-			while (str[i] != ' ' && str[i] != '\0' && str[i] != '$' && str[i] != '\'' && str[i] != '\"')
+			while (str[i] != ' ' && str[i] != '\0' && str[i] != '$' && str[i] != '\'' && str[i] != '\"' && str[i -1] != '?')
 				i++;
 			temp = ft_strjoin(ft_substr(str, start, i - start), "=");
 			ptr = new_str;
@@ -145,7 +178,7 @@ char	*env_variable(char *str, char **envp, int err_code)
 			temp = NULL;
 			start = i;
 			if (str[i] == '\0')
-				break;
+				break ;
 		}
 		else
 			i++;
@@ -158,12 +191,11 @@ char	*env_variable(char *str, char **envp, int err_code)
 	}
 	if (!new_str)
 		return (str);
-	free (str); //hmm
+	//free (str); //hmm
 	return (new_str);
 }
 
 char	*get_variable(char *temp, char **envp, int err_code)
-
 {
 	int		i;
 	char	*env_var;
@@ -171,7 +203,7 @@ char	*get_variable(char *temp, char **envp, int err_code)
 	env_var = NULL;
 	i = 0;
 	if (ft_strnstr("?=", temp, ft_strlen(temp)))
-		 return (ft_itoa(err_code));
+		return (ft_itoa(err_code));
 	while (envp[i])
 	{
 		if (ft_strnstr(envp[i], temp, ft_strlen(temp)))
@@ -199,6 +231,8 @@ int	get_token(char *str)
 		return (OUT);
 	else if (ft_strncmp(str, ">>", 3) == 0)
 		return (OUT_AP);
+	else if (!str || !str[0])
+		return (0);
 	else
 		return (CMD);
 }

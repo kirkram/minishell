@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/07 12:26:48 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/18 16:58:05 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 void	init_token(t_pipe *pipe)
-
 {
 	int	i;
 
@@ -22,10 +21,7 @@ void	init_token(t_pipe *pipe)
 		i++;
 	pipe->tokens = malloc (sizeof(int *) * (i +2));
 	if (!pipe->tokens)
-	{
-		error_func("malloc failed\n");
-		exit (1);
-	}
+		malloc_error(1);
 	i = 0;
 	while (pipe->args[i])
 	{
@@ -38,8 +34,19 @@ void	init_token(t_pipe *pipe)
 	pipe->tokens[i] = 0;
 }
 
-int	make_tokens(t_pipe *pipe, int *err_code)
+int	syntax_err(t_pipe *pipe, int *err_code, int i)
+{
+	*err_code = 258;
+	ft_putstr_fd("syntax error near unexpected token `", 2);
+	if (!pipe->args[i+1] || !pipe->args[i+1][0])
+		ft_putstr_fd("newline", 2);
+	else
+		ft_putstr_fd(pipe->args[i +1], 2);
+	ft_putendl_fd("\'", 2);
+	return (1);
+}
 
+int	make_tokens(t_pipe *pipe, int *err_code)
 {
 	int	i;
 	int	x;
@@ -51,18 +58,11 @@ int	make_tokens(t_pipe *pipe, int *err_code)
 		if (ft_strncmp(pipe->args[i],"<", 2) == 0)
 		{
 			pipe->tokens[i] = REMOVE;
-			if (pipe->tokens[i +1] == CMD)
+			if (pipe->tokens[i +1] == CMD || ft_strncmp(pipe->args[i +1], ">", 2) == 0)
 				pipe->tokens[i +1] = IN_FD;
 			else
-			{
-				*err_code = 258;
-				ft_putstr_fd("syntax error near unexpected token `", 2);
-				ft_putstr_fd(pipe->args[i +1], 2);
-				ft_putendl_fd("\'", 2);
-				return (1);
-			}
+				return (syntax_err(pipe, err_code, i));
 			x = (i -1);
-
 			while (x >= 0)
 			{
 				if (pipe->tokens[x] == IN_FD)
@@ -78,13 +78,7 @@ int	make_tokens(t_pipe *pipe, int *err_code)
 			if (pipe->tokens[i +1] == CMD)
 				pipe->tokens[i +1] = IN_HD;
 			else
-			{
-				*err_code = 258;
-				ft_putstr_fd("syntax error near unexpected token `", 2);
-				ft_putstr_fd(pipe->args[i +1], 2);
-				ft_putendl_fd("\'", 2);
-				return (1);
-			}
+				return (syntax_err(pipe, err_code, i));
 			while (x >= 0)
 			{
 				if (pipe->tokens[x] == IN_FD)
@@ -100,13 +94,7 @@ int	make_tokens(t_pipe *pipe, int *err_code)
 			if (pipe->tokens[i +1] == CMD)
 				pipe->tokens[i +1] = OUT;
 			else
-			{
-				*err_code = 258;
-				ft_putstr_fd("syntax error near unexpected token `", 2);
-				ft_putstr_fd(pipe->args[i +1], 2);
-				ft_putendl_fd("\'", 2);
-				return (1);
-			}
+				return (syntax_err(pipe, err_code, i));
 			x = (i -1);
 			while (x >= 0)
 			{
@@ -121,13 +109,7 @@ int	make_tokens(t_pipe *pipe, int *err_code)
 			if (pipe->tokens[i +1] == CMD)
 				pipe->tokens[i +1] = OUT_AP;
 			else
-			{
-				*err_code = 258;
-				ft_putstr_fd("syntax error near unexpected token `", 2);
-				ft_putstr_fd(pipe->args[i +1], 2);
-				ft_putendl_fd("\'", 2);
-				return (1);
-			}
+				return (syntax_err(pipe, err_code, i));
 			x = (i -1);
 			while (x >= 0)
 			{
@@ -142,7 +124,6 @@ int	make_tokens(t_pipe *pipe, int *err_code)
 }
 
 void	remove_red(t_pipe *pipe)
-
 {
 	int		i;
 	int		x;
@@ -159,6 +140,8 @@ void	remove_red(t_pipe *pipe)
 	}
 	temp = malloc(sizeof(char *) * (x +1));
 	i_temp = malloc(sizeof(int *) * (x +1));
+	if (!temp || !i_temp)
+		malloc_error(1);
 	x = 0;
 	i = 0;
 	while (pipe->args[i])
@@ -180,7 +163,6 @@ void	remove_red(t_pipe *pipe)
 }
 
 int	is_builtin(char *str)
-
 {
 	if (ft_strncmp(str, "echo", 5) == 0)
 		return (8);
@@ -200,7 +182,6 @@ int	is_builtin(char *str)
 }
 
 int	final_args(t_pipe *pipe)
-
 {
 	int	i;
 	int	x;
@@ -215,14 +196,15 @@ int	final_args(t_pipe *pipe)
 	}
 	pipe->noio_args = malloc (sizeof(char *) * (x +1));
 	if (!pipe->noio_args)
-	{
-		error_func("malloc failed\n");
-		exit (1);
-	}
+		malloc_error(1);
 	i = 0;
 	x = 0;
 	while (pipe->args[i])
 	{
+		if (pipe->tokens[i] == IN_FD)
+			pipe->infile = ft_strdup(pipe->args[i]);
+		if (pipe->tokens[i] == IN_HD)
+			pipe->infile = ft_strdup(pipe->args[i]);
 		if (pipe->tokens[i] == CMD)
 		{
 			pipe->noio_args[x] = ft_strdup(pipe->args[i]);
@@ -232,10 +214,7 @@ int	final_args(t_pipe *pipe)
 					pipe->tokens[i] = 8;
 			}
 			if (!pipe->noio_args[x])
-			{
-				error_func("malloc failed\n");
-				exit (1);
-			}
+				malloc_error(1);
 			x++;
 		}
 		i++;
@@ -245,7 +224,6 @@ int	final_args(t_pipe *pipe)
 }
 
 int	parser(char **array, t_pipe ***pipe, int *err_code)
-
 {
 	int	x;
 
