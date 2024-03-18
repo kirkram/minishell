@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/18 17:23:24 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/18 17:55:06 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,178 +43,93 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 {
 	int			fd[2];
 	int			savestdio[2];
-	pid_t		pid[256]; //zsh limit descriptors = 256
+	pid_t		pid[42];
 	int			pipefd[2];
 	int			i;
 	int			j;
 
 	int			child_exit_code;
 	char		*infile;
-	int			num_of_pipes;
+	int			num_of_cmds;
 	char		*outfile;
 	int			*tokens;
+	char		**all_args;
 	int			is_append_out;
 
 	savestdio[0] = dup(STDIN_FILENO);
 	savestdio[1] = dup(STDOUT_FILENO);
+	outfile = NULL;
+	infile = NULL;
+	if (infile)
+	{
+		fd[0] = open (infile, O_RDONLY);
+		if (fd[0] < 0)
+		{
+			ft_putstr_fd("minishell: no such file or directory: ", 2);
+			ft_putendl_fd(infile, 2);
+		}
+	}
+	else
+		fd[0] = dup(savestdio[0]);
 
-	//PREP
 	i = 0;
 	while (_pipe[i])
 		i ++;
-	num_of_pipes = i;
+	num_of_cmds = i;
+
 	ft_memset(pid, -1, sizeof(pid));
-	fd[0] = 0;
-	fd[1] = 0;
 
-	//CREATE OUTFILES
 	i = 0;
-	while (i < num_of_pipes && i < 256)
+	is_append_out = 0;
+	while (i < num_of_cmds)
 	{
-		j = 0;
-		tokens = _pipe[i]->tokens;
-		while (_pipe[i]->args[j] && tokens[j] != 0)
-		{
-			if (tokens[j] == OUT)
-				fd[0] = open(_pipe[i]->args[j], O_CREAT | O_RDWR | O_TRUNC, 0644);
-			else if (tokens[j] == OUT_AP)
-				fd[0] = open(_pipe[i]->args[j], O_CREAT | O_RDWR | O_APPEND, 0644);
-			else if (tokens[j] == SKIP_OUT)
-				fd[0] = open(_pipe[i]->args[j], O_CREAT | O_RDWR);
-			if (tokens[j] == OUT || tokens[j] == OUT_AP || tokens[j] == SKIP_OUT)
-			{
-				//system couldnt create a file, abort everything
-				if (access(_pipe[i]->args[j], F_OK == -1))
-					return (127);
-				//we dont them opened right now so we close it instantly
-				close(fd[0]);
-			}
-			j ++;
-		}
-		i ++;
-	}
-
-	//MAIN LOOP
-	i = 0;
-	while (i < num_of_pipes)
-	{
-
-		//OPEN INFILE AND TRY TO ACCESS
-		infile = NULL;
-		j = 0;
-		while(_pipe[i]->args[j])
-		{
-			if (_pipe[i]->tokens[j] == IN_FD)
-			{
-				infile = _pipe[i]->args[j];
-				fd[0] = open (infile, O_RDONLY);
-				if (fd[0] < 0)
-				{
-					ft_putstr_fd("minishell: ", 2);
-					ft_putstr_fd(infile, 2);
-					if (access(infile, F_OK) == -1)
-						ft_putendl_fd(": No such file or directory", 2);
-					else if (access(infile, R_OK) == -1)
-						ft_putendl_fd(": Permission denied", 2);
-					//STDIN should not work if the open failed anyway (?)
-				}
-			}
-			else if (_pipe[i]->tokens[j] == SKIP_IN)
-			{
-				if (access(_pipe[i]->args[j], F_OK) == -1 || access(_pipe[i]->args[j], X_OK) == -1)
-				{
-					ft_putstr_fd("minishell: ", 2);
-					ft_putstr_fd(_pipe[i]->args[j], 2);
-					if (access(_pipe[i]->args[j], F_OK) == -1)
-						ft_putendl_fd(": No such file or directory", 2);
-					else if (access(_pipe[i]->args[j], R_OK) == -1)
-						ft_putendl_fd(": Permission denied", 2);
-					//STDIN should not work if the open failed anyway (?)
-				}
-			}
-			j ++;
-		}
-
 		dup2(fd[0], STDIN_FILENO);
 		close(fd[0]);
 
-		//LOOK FOR AN OUTFILE
+		// I need outfile otherwise I have to look for it every time there is a new _pipe
 		tokens = _pipe[i]->tokens;
-		outfile = NULL;
+		all_args = _pipe[i]->args;
 		j = -1;
-		is_append_out = 0;
-		while (_pipe[i]->args[++j] && tokens[j] != 0)
+		//must be really careful that the amount of tokens equals amount of args
+		while (all_args[++j] && tokens[j] != 0)
 		{
 			if (tokens[j] == OUT || tokens[j] == OUT_AP)
 			{
 				if (tokens[j] == OUT_AP)
 					is_append_out = 1;
-				outfile = _pipe[i]->args[j];
+				outfile = all_args[j];
 			}
-			//NEW REDIR LOGIC
-			else if (tokens[j] == SKIP_OUT)
-			{
-				//No wr/read rights kill the whole outfile even if its not the true outfile
-				if(!access(_pipe[i]->args[j], F_OK) && access(_pipe[i]->args[j], X_OK) == -1)
-				{
-					outfile = _pipe[i]->args[j];
-					break ;
-				}
-				//if it fails to open then dont pass anything to the other outfile
-				//we make it go through so the STDOUT wouldnt work
-			}
-			else if (tokens[j] == 0)
+			if (tokens[j] == 0)
 				ft_putendl_fd("UNEQUAL TOKENS AND ARGS COUNT", 2);
 		}
-		if (outfile)
+		if (i == num_of_cmds - 1)
 		{
-			if (!is_append_out && fd[1] >= 0)
-				fd[1] = open(outfile, O_RDWR | O_TRUNC, 0644);
-			else if (is_append_out && fd[1] >= 0)
-				fd[1] = open(outfile, O_RDWR | O_APPEND, 0644);
-			if (fd[1] < 0)
+			if (outfile)
 			{
-				ft_putstr_fd("minishell: ", 2);
-				ft_putstr_fd(outfile, 2);
-				ft_putendl_fd(": Permission denied", 2);
-				//NEW REDIR LOGIC
-				//return (127);
+				if (!is_append_out)
+					fd[1] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
+				else
+					fd[1] = open(outfile, O_WRONLY | O_APPEND);
+				if (fd[1] < 0)
+				{
+					ft_putstr_fd("minishell: permission denied: ", 2);
+					ft_putendl_fd(outfile, 2);
+					// dup2(savestdio[0], STDIN_FILENO);
+					// dup2(savestdio[1], STDOUT_FILENO);
+					// close(savestdio[0]);
+					// close(savestdio[1]);
+					return (127);
+				}
 			}
+			else
+				fd[1] = dup(savestdio[1]);
 		}
 		else
-			fd[1] = dup(savestdio[1]);
-
-
-		//PIPING
-		//I have no idea why but deleting the condition for
-		// //if (!infile && i != 0) made it all work... I thought fd[0] = pipefd[0] would overwrite
-		// the infile but it didnt. Why?
-		//	fd[0] = pipefd[0];
-		pipe(pipefd);
-		// if its the first then only stdin or infile
-		// if there is a redirection then take if from infile
-
-		fd[0] = pipefd[0];
-		// else
-		// 	close(pipefd[0]);
-		// else if (i != num_of_pipes - 1)
-		// 	close(pipefd[0]);
-		// if (i != num_of_pipes - 1 && !outfile)
-		// {
-		// 	//fd[0] = pipefd[0];
-		// 	// pipe(pipefd);
-		// 	// fd[0] = pipefd[0];
-		// 	// //NEW REDIR LOGIC
-		// 	//if (!outfile)
-		// 	//SOMEHOW i gotta add the information to the file and pass it to the pipe as well
-		// 	//it needs fd[1] being the outfile and the pipe at the same iteration
-		// 	fd[1] = pipefd[1];
-		// }
-		// dup2(fd[1], STDOUT_FILENO);
-		// close(fd[1]);
-
-		if (!outfile && i != num_of_pipes - 1)
+		{
+			pipe(pipefd);
+			fd[0] = pipefd[0];
 			fd[1] = pipefd[1];
+		}
 		dup2(fd[1], STDOUT_FILENO);
 		close(fd[1]);
 		if (tokens && tokens[0] != BUILTIN)
@@ -224,17 +139,13 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			{
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
-					// fprintf(stderr, "we're here the i is %d\n", i);
-					// fprintf(stderr, "fd[0] is %d fd[1] is %d\n", fd[0], fd[1]);
 					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, utils->envp);
 					child_exit_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
 				}
 				else
 					child_exit_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
-				if (i != num_of_pipes - 1)
+				if (i != num_of_cmds - 1)
 					child_exit_code = 127;
-
-
 				i = 0;
 				while (_pipe[i])
 				{
@@ -254,7 +165,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		}
 		else
 		{
-			//close(pipefd[0]);
 			utils->err_code = exec_builtin(_pipe, utils, i);
 		}
 		i ++;
@@ -265,17 +175,16 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	close(savestdio[1]);
 
 	i = 0;
-	while (i < num_of_pipes)
+	while (i < num_of_cmds)
 	{
 		if ((_pipe[i])->tokens && (_pipe[i])->tokens[0] == BUILTIN)
 			i ++;
-		if (i == num_of_pipes - 1 && pid[i] != -1)
+		if (i == num_of_cmds - 1 && pid[i] != -1)
 			waitpid(pid[i], &child_exit_code, 0);
 		else if (pid[i] != -1)
 			waitpid(pid[i], NULL, 0);
 		i ++;
 	}
-	// while (1);
 	//
 	if (WIFEXITED(child_exit_code))
 		return (WEXITSTATUS(child_exit_code));
