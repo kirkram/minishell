@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/15 16:16:05 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/18 17:23:24 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 {
 	int			fd[2];
 	int			savestdio[2];
-	pid_t		pid[42];
+	pid_t		pid[256]; //zsh limit descriptors = 256
 	int			pipefd[2];
 	int			i;
 	int			j;
@@ -69,7 +69,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 
 	//CREATE OUTFILES
 	i = 0;
-	while (i < num_of_pipes)
+	while (i < num_of_pipes && i < 256)
 	{
 		j = 0;
 		tokens = _pipe[i]->tokens;
@@ -82,7 +82,13 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			else if (tokens[j] == SKIP_OUT)
 				fd[0] = open(_pipe[i]->args[j], O_CREAT | O_RDWR);
 			if (tokens[j] == OUT || tokens[j] == OUT_AP || tokens[j] == SKIP_OUT)
+			{
+				//system couldnt create a file, abort everything
+				if (access(_pipe[i]->args[j], F_OK == -1))
+					return (127);
+				//we dont them opened right now so we close it instantly
 				close(fd[0]);
+			}
 			j ++;
 		}
 		i ++;
@@ -148,14 +154,14 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			//NEW REDIR LOGIC
 			else if (tokens[j] == SKIP_OUT)
 			{
-				fd[1] = open(outfile, O_RDWR);
-				if (fd[1] < 0)
+				//No wr/read rights kill the whole outfile even if its not the true outfile
+				if(!access(_pipe[i]->args[j], F_OK) && access(_pipe[i]->args[j], X_OK) == -1)
 				{
 					outfile = _pipe[i]->args[j];
 					break ;
 				}
 				//if it fails to open then dont pass anything to the other outfile
-				//make it go throush so the STDOUT wouldnt work
+				//we make it go through so the STDOUT wouldnt work
 			}
 			else if (tokens[j] == 0)
 				ft_putendl_fd("UNEQUAL TOKENS AND ARGS COUNT", 2);
@@ -180,24 +186,35 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 
 
 		//PIPING
+		//I have no idea why but deleting the condition for
+		// //if (!infile && i != 0) made it all work... I thought fd[0] = pipefd[0] would overwrite
+		// the infile but it didnt. Why?
+		//	fd[0] = pipefd[0];
+		pipe(pipefd);
+		// if its the first then only stdin or infile
+		// if there is a redirection then take if from infile
 
-		if (i != num_of_pipes - 1)
-			pipe(pipefd);
-		if (i != 0)
-			fd[0] = pipefd[0];
+		fd[0] = pipefd[0];
+		// else
+		// 	close(pipefd[0]);
 		// else if (i != num_of_pipes - 1)
 		// 	close(pipefd[0]);
-		if (i != num_of_pipes - 1)
-		{
-			//fd[0] = pipefd[0];
-			// pipe(pipefd);
-			// fd[0] = pipefd[0];
-			// //NEW REDIR LOGIC
-			//if (!outfile)
-			//SOMEHOW i gotta add the information to the file and pass it to the pipe as well
-			//it needs fd[1] being the outfile and the pipe at the same iteration
+		// if (i != num_of_pipes - 1 && !outfile)
+		// {
+		// 	//fd[0] = pipefd[0];
+		// 	// pipe(pipefd);
+		// 	// fd[0] = pipefd[0];
+		// 	// //NEW REDIR LOGIC
+		// 	//if (!outfile)
+		// 	//SOMEHOW i gotta add the information to the file and pass it to the pipe as well
+		// 	//it needs fd[1] being the outfile and the pipe at the same iteration
+		// 	fd[1] = pipefd[1];
+		// }
+		// dup2(fd[1], STDOUT_FILENO);
+		// close(fd[1]);
+
+		if (!outfile && i != num_of_pipes - 1)
 			fd[1] = pipefd[1];
-		}
 		dup2(fd[1], STDOUT_FILENO);
 		close(fd[1]);
 		if (tokens && tokens[0] != BUILTIN)
@@ -205,9 +222,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			pid[i] = fork();
 			if (pid[i] == 0)
 			{
-				if (outfile)
-					dup2(fd[0], STDIN_FILENO);
-
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
 					// fprintf(stderr, "we're here the i is %d\n", i);
@@ -219,6 +233,8 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 					child_exit_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
 				if (i != num_of_pipes - 1)
 					child_exit_code = 127;
+
+
 				i = 0;
 				while (_pipe[i])
 				{
@@ -238,6 +254,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		}
 		else
 		{
+			//close(pipefd[0]);
 			utils->err_code = exec_builtin(_pipe, utils, i);
 		}
 		i ++;
