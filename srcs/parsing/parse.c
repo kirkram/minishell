@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/18 16:58:05 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/19 14:46:06 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	init_token(t_pipe *pipe)
 	pipe->tokens[i] = 0;
 }
 
-int	syntax_err(t_pipe *pipe, int *err_code, int i)
+/* int	syntax_err(t_pipe *pipe, int *err_code, int i)
 {
 	*err_code = 258;
 	ft_putstr_fd("syntax error near unexpected token `", 2);
@@ -44,7 +44,7 @@ int	syntax_err(t_pipe *pipe, int *err_code, int i)
 		ft_putstr_fd(pipe->args[i +1], 2);
 	ft_putendl_fd("\'", 2);
 	return (1);
-}
+} */
 
 int	make_tokens(t_pipe *pipe, int *err_code)
 {

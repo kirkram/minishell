@@ -6,14 +6,13 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/18 16:51:17 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/19 14:46:05 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 char	**array_copy(char **array)
-
 {
 	char	**new_array;
 	int		i;
@@ -41,7 +40,6 @@ char	**array_copy(char **array)
 }
 
 char	**get_cmd(char **cmds, int start, int end)
-
 {
 	char	**temp_arr;
 	int		i;
@@ -91,7 +89,6 @@ void	pipeline_init(char **array, t_pipe ***pipe)
 }
 
 void	pre_parse(char **array, t_pipe ***pipe)
-
 {
 	int	i;
 	int	x;
@@ -118,7 +115,6 @@ void	pre_parse(char **array, t_pipe ***pipe)
 }
 
 void	malloc_error(int err)
-
 {
 	ft_putendl_fd("Malloc failed\n", 2);
 	exit(err);
@@ -140,29 +136,105 @@ int	line_checker(char **str, int *err_code)
 	return (0);
 }
 
+void	init_tokenarr(int **tokens, char **array)
+{
+	int	i;
+
+	i = 0;
+	while (array[i])
+		i++;
+	(*tokens) = malloc (sizeof(int *) * (i +2));
+	if (!(*tokens))
+		malloc_error(1);
+	i = 0;
+	while (array[i])
+	{
+		(*tokens)[i] = get_token(array[i]);
+		i++;
+	}
+	(*tokens)[i] = 0;
+}
+
+int	syntax_err(char **array, int *err_code, int i)
+{
+	*err_code = 258;
+	ft_putstr_fd("syntax error near unexpected token `", 2);
+	if (!array[i+1] || !array[i+1][0])
+		ft_putstr_fd("newline", 2);
+	else
+		ft_putstr_fd(array[i +1], 2);
+	ft_putendl_fd("\'", 2);
+	return (1);
+}
+
+int	syntax_check(int *tokens, int *err_code, char **array)
+{
+	int	i;
+
+	i = 0;
+	while (tokens[i] != 0)
+	{
+		if (tokens[i] == PIPE)
+		{
+			if (i == 0 || (i > 0 && tokens[i -1] == PIPE) || tokens[i +1] == PIPE)
+			{
+				ft_putendl_fd("syntax error near unexpected token `|'", 2);
+				*err_code = 258;
+				return (1);
+			}
+			if (tokens[i +1] == 0)
+			{
+				ft_putendl_fd("empty pipe", 2);
+				*err_code = 258;
+				return (1);
+			}
+		}
+		if (tokens[i] == IN_FD)
+		{
+			if (tokens[i+1] != CMD)
+				return (syntax_err(array, err_code, i));
+		}
+
+	}
+
+
+}
 
 int	lexer(char *line_read, t_pipe ***pipe, t_utils *utils)
 {
 	char	**array;
+	int		*tokens;
 
 	array = NULL;
 	if (var_substitution(&line_read, utils->envp, utils->err_code) == 1)
 		return (1);
 	if (!line_read || !line_read[0])
 		return(1);
-	if (line_checker(&line_read, &utils->err_code) == 1)
-		return (1);
+	printf("string is = %s\n", line_read);
+	//if (line_checker(&line_read, &utils->err_code) == 1)
+	//	return (1);
 	array = ms_split(line_read);
 	free(line_read);
 	if (!array)
 		return (1); // or  something else if malloc failed
-/*  	int	i = 0;
+	
+/*   	int	i = 0;
 	while (array[i])
 	{
 		printf("array = %s\n", array[i]);
 	 	i++;
 	}   
-	printf("------------\n"); */
+	printf("------------\n");  */
+	init_tokenarr(&tokens, array);
+/*   	i = 0;
+	while (tokens[i])
+	{
+		printf("tokens = %d\n", tokens[i]);
+	 	i++;
+	}   
+	printf("------------\n");  */
+	if (syntax_check(tokens, utils->err_code, array) == 1);
+		return (1);
 	pipeline_init(array, pipe); 
 	if (parser(array, pipe, &utils->err_code) == 1)
 		return (1); // free all first
