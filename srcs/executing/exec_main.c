@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/18 17:23:24 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/19 17:47:39 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	char		*outfile;
 	int			*tokens;
 	int			is_append_out;
+	int			is_fd_failed;
 
 	savestdio[0] = dup(STDIN_FILENO);
 	savestdio[1] = dup(STDOUT_FILENO);
@@ -66,6 +67,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	ft_memset(pid, -1, sizeof(pid));
 	fd[0] = 0;
 	fd[1] = 0;
+
 
 	//CREATE OUTFILES
 	i = 0;
@@ -100,6 +102,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	{
 
 		//OPEN INFILE AND TRY TO ACCESS
+		is_fd_failed = 0;
 		infile = NULL;
 		j = 0;
 		while(_pipe[i]->args[j])
@@ -116,12 +119,13 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 						ft_putendl_fd(": No such file or directory", 2);
 					else if (access(infile, R_OK) == -1)
 						ft_putendl_fd(": Permission denied", 2);
+					is_fd_failed = 1;
 					//STDIN should not work if the open failed anyway (?)
 				}
 			}
 			else if (_pipe[i]->tokens[j] == SKIP_IN)
 			{
-				if (access(_pipe[i]->args[j], F_OK) == -1 || access(_pipe[i]->args[j], X_OK) == -1)
+				if (access(_pipe[i]->args[j], F_OK) == -1 || access(_pipe[i]->args[j], R_OK) == -1)
 				{
 					ft_putstr_fd("minishell: ", 2);
 					ft_putstr_fd(_pipe[i]->args[j], 2);
@@ -129,14 +133,15 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 						ft_putendl_fd(": No such file or directory", 2);
 					else if (access(_pipe[i]->args[j], R_OK) == -1)
 						ft_putendl_fd(": Permission denied", 2);
+					is_fd_failed = 1;
 					//STDIN should not work if the open failed anyway (?)
 				}
 			}
 			j ++;
 		}
+		if (!infile && i == 0)
+			fd[0] = dup(savestdio[0]);
 
-		dup2(fd[0], STDIN_FILENO);
-		close(fd[0]);
 
 		//LOOK FOR AN OUTFILE
 		tokens = _pipe[i]->tokens;
@@ -155,7 +160,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			else if (tokens[j] == SKIP_OUT)
 			{
 				//No wr/read rights kill the whole outfile even if its not the true outfile
-				if(!access(_pipe[i]->args[j], F_OK) && access(_pipe[i]->args[j], X_OK) == -1)
+				if(!access(_pipe[i]->args[j], F_OK) && access(_pipe[i]->args[j], W_OK) == -1)
 				{
 					outfile = _pipe[i]->args[j];
 					break ;
@@ -177,55 +182,41 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				ft_putstr_fd("minishell: ", 2);
 				ft_putstr_fd(outfile, 2);
 				ft_putendl_fd(": Permission denied", 2);
+				is_fd_failed = 1;
 				//NEW REDIR LOGIC
 				//return (127);
 			}
 		}
-		else
+		else if (i == num_of_pipes - 1)
 			fd[1] = dup(savestdio[1]);
 
-
 		//PIPING
-		//I have no idea why but deleting the condition for
-		// //if (!infile && i != 0) made it all work... I thought fd[0] = pipefd[0] would overwrite
-		// the infile but it didnt. Why?
-		//	fd[0] = pipefd[0];
-		pipe(pipefd);
-		// if its the first then only stdin or infile
-		// if there is a redirection then take if from infile
 
-		fd[0] = pipefd[0];
-		// else
-		// 	close(pipefd[0]);
-		// else if (i != num_of_pipes - 1)
-		// 	close(pipefd[0]);
-		// if (i != num_of_pipes - 1 && !outfile)
-		// {
-		// 	//fd[0] = pipefd[0];
-		// 	// pipe(pipefd);
-		// 	// fd[0] = pipefd[0];
-		// 	// //NEW REDIR LOGIC
-		// 	//if (!outfile)
-		// 	//SOMEHOW i gotta add the information to the file and pass it to the pipe as well
-		// 	//it needs fd[1] being the outfile and the pipe at the same iteration
-		// 	fd[1] = pipefd[1];
-		// }
-		// dup2(fd[1], STDOUT_FILENO);
-		// close(fd[1]);
-
-		if (!outfile && i != num_of_pipes - 1)
-			fd[1] = pipefd[1];
+		// dup2(fd[0], STDIN_FILENO);
+		// close(fd[0]);
+		dup2(fd[0], STDIN_FILENO);
+		close(fd[0]);
+		if (i != num_of_pipes - 1)
+		{
+			pipe(pipefd);
+			//if (!infile)
+				fd[0] = pipefd[0];
+			// else
+			// 	close(pipefd[0]);
+			if (!outfile)
+				fd[1] = pipefd[1];
+			else
+				close(pipefd[1]);
+		}
 		dup2(fd[1], STDOUT_FILENO);
 		close(fd[1]);
-		if (tokens && tokens[0] != BUILTIN)
+		if (tokens && tokens[0] != BUILTIN && !is_fd_failed)
 		{
 			pid[i] = fork();
 			if (pid[i] == 0)
 			{
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
-					// fprintf(stderr, "we're here the i is %d\n", i);
-					// fprintf(stderr, "fd[0] is %d fd[1] is %d\n", fd[0], fd[1]);
 					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, utils->envp);
 					child_exit_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
 				}
@@ -233,7 +224,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 					child_exit_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
 				if (i != num_of_pipes - 1)
 					child_exit_code = 127;
-
 
 				i = 0;
 				while (_pipe[i])
@@ -252,7 +242,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				exit (child_exit_code);
 			}
 		}
-		else
+		else if (!is_fd_failed)
 		{
 			//close(pipefd[0]);
 			utils->err_code = exec_builtin(_pipe, utils, i);
@@ -265,6 +255,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	close(savestdio[1]);
 
 	i = 0;
+
 	while (i < num_of_pipes)
 	{
 		if ((_pipe[i])->tokens && (_pipe[i])->tokens[0] == BUILTIN)
