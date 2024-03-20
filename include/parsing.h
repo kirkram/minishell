@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/18 12:29:26 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/20 17:33:39 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,26 +55,36 @@ int		open_history_file(int hist_fd);
 int		interactive_mode_loop(int hist_fd, char **envp);
 void	intialize_utils(char **sys_envp, t_utils **utils);
 
+int			parsing(char *line_read, t_pipe ***pipe, t_utils *utils);
 // LEXER
 
-int			lexer(char *argv, t_pipe ***pipe, t_utils *utils);
-void		malloc_error(int err);
-int			var_substitution(char **array, char *envp[], int err_code);
-char		*env_variable(char *str, char **envp, int err_code, bool quote, bool dquote);
+int			check_quote(char **str, bool quote, bool dquote, int *err_code);
+//int			lexer(char **array, char *envp[], int *err_code);
+int			lexer(char **str, t_utils *utils);
+void	env_variable(char **str, t_utils *utils, bool quote, bool dquote, int i);
+//char		*env_variable(char *str, char **envp, int err_code, bool quote, bool dquote);
 char		**array_copy(char **array);
 char		*get_variable(char *temp, char **envp, int err_code);
 int			*tokenizer(char **array);
 int			get_token(char *str);
-void		quote_status(bool *quote);
+
 char		*separator(char *str, bool quote, bool dquote);
+void		remove_space(char **str, int i);
 
 // PARSER
 
 char		**get_cmd(char **cmds, int start, int end);
 void		pre_parse(char **array, t_pipe ***pipe);
 int			parser(char **array, t_pipe ***pipe, int *err_code);
-int			syntax_err(t_pipe *pipe, int *err_code, int i);
-int			remove_space(char **str, bool quote, bool dquote);
+int			syntax_check(int *tokens, int *err_code, char **array);
+
+// LEXER/PARSER UTILS
+
+int			is_builtin(char *str);
+int			syntax_err(char **array, int *err_code, int i);
+void		malloc_error(int err);
+void		quote_status2(bool *quote, bool *dquote, char c);
+void		quote_status(bool *quote);
 //EXECUTE
 
 char	*assign_scmd_path(char *scmd, char **envp);
@@ -130,5 +140,6 @@ int			is_only_digits_and_signs(char *str);
 # define REMOVE 9
 # define SKIP_OUT 10 // should be created, but no information written to it
 # define SKIP_HD 11 // should activate Here_doc, but information should not be passed on
+# define NOT_MS 12 // operator that is not implemented in minishell
 
 #endif
