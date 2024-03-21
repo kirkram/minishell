@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/21 12:43:17 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/21 15:00:40 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ char	*assign_scmd_path(char *scmd, char **envp)
 	char	*cmd_path;
 	int		i;
 
-	env_paths = find_path_and_pwd(envp);
+	//should move it function up so that it doesnt waste resources every time
+	env_paths = find_path_and_pwd(envp, scmd);
 	if (!env_paths)
 		return (NULL);
 	i = 0;
@@ -47,6 +48,36 @@ char	*assign_scmd_path(char *scmd, char **envp)
 	}
 	free_and_1(env_paths, NULL);
 	return (NULL);
+}
+
+char	**find_path_and_pwd(char **envp, char *scmd)
+{
+	t_paths	vars;
+
+	vars.paths = NULL;
+	vars.i = 0;
+	vars.path = NULL;
+	vars.pwd = NULL;
+	vars.should_skip_pwd = false;
+	if (!ft_strnstr(scmd, "./", -1))
+		vars.should_skip_pwd = true;
+	while (envp[vars.i])
+	{
+		if (ft_strncmp(envp[vars.i], "PATH=", 5) == 0)
+			vars.path = envp[vars.i] + 5;
+		else if (ft_strncmp(envp[vars.i], "PWD=", 4) == 0)
+			vars.pwd = envp[vars.i] + 4;
+		vars.i ++;
+	}
+	vars.bigpath = jointhree(vars.path, ":", vars.pwd);
+	if (vars.bigpath && !vars.should_skip_pwd)
+		vars.paths = ft_split(vars.bigpath, ':');
+	else if (vars.path)
+		vars.paths = ft_split(vars.path, ':');
+	else if (!vars.should_skip_pwd)
+		vars.paths = ft_split(vars.pwd, ':');
+	free (vars.bigpath);
+	return (vars.paths);
 }
 
 int	execute(t_utils *utils, t_pipe **_pipe)
@@ -279,7 +310,8 @@ int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
 
 int		handle_execve_errors(char *failed_cmd)
 {
-	//is access command slow?
+	DIR	*dir;
+	//ACCESS() looks for a command as if it is ./
 	if (failed_cmd[0] == 0)
 		return (msg_stderr("minishell: permission denied: ", failed_cmd, 126));
 	else if (failed_cmd[0] == '.' && failed_cmd[1] == 0)
@@ -291,8 +323,11 @@ int		handle_execve_errors(char *failed_cmd)
 	else if (access(failed_cmd, X_OK) == -1 || access(failed_cmd, R_OK) == -1 || \
 	ft_strncmp(failed_cmd, "./", 3) == 0)
 		return (msg_stderr("minishell: permission denied: ", failed_cmd, 126));
-	else if (!closedir(opendir(failed_cmd)))
+	// else if (!closedir(opendir(failed_cmd)))
+	dir = opendir(failed_cmd);
+	if (dir)
 	{
+		closedir(dir);
 		if (ft_strnstr(failed_cmd, "../", -1))
 			return (msg_stderr("minishell: is a directory: ", ft_strnstr(failed_cmd, "../", -1), 126));
 		else if (ft_strnstr(failed_cmd, "./", -1))
@@ -313,34 +348,6 @@ int	msg_stderr(char *message, char *cmd, int err_code)
 		ft_putstr_fd(cmd, 2);
 	ft_putstr_fd("\n", 2);
 	return (err_code);
-}
-
-
-char	**find_path_and_pwd(char **envp)
-{
-	t_paths	vars;
-
-	vars.paths = NULL;
-	vars.i = 0;
-	vars.path = NULL;
-	vars.pwd = NULL;
-	while (envp[vars.i])
-	{
-		if (ft_strncmp(envp[vars.i], "PATH=", 5) == 0)
-			vars.path = envp[vars.i] + 5;
-		else if (ft_strncmp(envp[vars.i], "PWD=", 4) == 0)
-			vars.pwd = envp[vars.i] + 4;
-		vars.i ++;
-	}
-	vars.bigpath = jointhree(vars.path, ":", vars.pwd);
-	if (vars.pwd && vars.path)
-		vars.paths = ft_split(vars.bigpath, ':');
-	else if (vars.path)
-		vars.paths = ft_split(vars.path, ':');
-	else
-		vars.paths = ft_split(vars.pwd, ':');
-	free (vars.bigpath);
-	return (vars.paths);
 }
 
 char	*jointhree(char const *s1, char const *s2, char const *s3)
