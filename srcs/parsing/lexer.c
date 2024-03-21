@@ -200,7 +200,6 @@ int	check_quote(char **str, bool quote, bool dquote, int *err_code)
 	return (0);
 }
 
-
 int	lexer(char **str, t_utils *utils)
 {
 	bool	quote;

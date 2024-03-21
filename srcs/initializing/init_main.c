@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
 /*   Updated: 2024/03/20 14:31:58 by clundber         ###   ########.fr       */
@@ -105,6 +105,7 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	}
 	free (utils);
 	free (line_read);
+	close(hist_fd);
 	return (0);
 }
 
