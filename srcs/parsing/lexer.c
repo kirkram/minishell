@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:21:44 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/20 17:47:47 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/21 14:19:34 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ char	*get_variable(char *temp, char **envp, int err_code)
 
 	env_var = NULL;
 	i = 0;
+	temp = ft_strjoin(temp, "=");
 	if (ft_strnstr("?=", temp, ft_strlen(temp)))
 		return (ft_itoa(err_code));
 	while (envp[i])
@@ -35,11 +36,11 @@ char	*get_variable(char *temp, char **envp, int err_code)
 	if (temp)
 		free (temp);
 	if (!env_var)
-		return ("");
+		return (ft_strdup(""));
 	return (env_var);
 }
-
-/* char	*env_variable(char *str, char **envp, int err_code, bool quote, bool dquote)
+/* 
+ char	*env_variable(char *str, char **envp, int err_code, bool quote, bool dquote)
 {
 	int		i;
 	int		start;
@@ -98,7 +99,7 @@ char	*get_variable(char *temp, char **envp, int err_code)
 	//	return (str);
 	//free (str); //hmm
 	return (new_str);
-} */
+}  */
 
 void	combine_str(char **new_str, char *temp)
 {
@@ -106,52 +107,51 @@ void	combine_str(char **new_str, char *temp)
 
 	ptr = NULL;
 	ptr = *new_str;
-	(*new_str) = ft_strjoin((*new_str), temp);
+	if ((*new_str) && temp)
+		(*new_str) = ft_strjoin((*new_str), temp);
+	else
+		(*new_str) = NULL;
+	if (!(*new_str))
+		malloc_error(1);
 	free (temp);
 	free (ptr);
 }
 
-void	env_variable(char **str, t_utils *utils, bool quote, bool dquote, int i)
+void	env_variable(char **str, t_utils *utils, bool quote, bool dquote)
 {
 	int		start;
 	char	*new_str;
 	char	*temp;
-	char	*ptr;
+	int		i;
 
+	i = 0;
 	temp = NULL;
 	new_str = NULL;
-	ptr = NULL;
 	start = 0;
 	while ((*str) && (*str)[i])
 	{
 		quote_status2(&quote, &dquote, (*str)[i]);
-		if ((*str)[i] == '$' && quote == false)
+		if ((*str)[i] == '$' && quote == false && (*str)[i +1] && (*str)[i +1] != ' ' && (*str)[i +1] != '$')
 		{
-/* 			if ((*str)[i +1] == '\0')
-				i++; */
 			if (!new_str)
 				new_str = ft_substr((*str), start, i);
 			else
 				combine_str(&new_str, ft_substr((*str), start, i - start));
-/* 			if (str[i] == '\0')
-				break ; */
 			i++;
 			start = i;
-			while ((*str)[i] != ' ' && (*str)[i] != '\0' && (*str)[i] != '$' &&(*str)[i] != '\'' && (*str)[i] != '\"' && (*str)[i -1] != '?')
+			while ((*str)[i] && (*str)[i] != ' ' && (*str)[i] != '\0' && (*str)[i] != '$' &&(*str)[i] != '\'' && (*str)[i] != '\"' && (*str)[i -1] != '?')
 				i++;
 			temp = ft_substr((*str), start, i - start);
-			ptr = ft_strjoin(temp, "=");
-			combine_str(&new_str, get_variable(ptr, utils->envp, utils->err_code));
-			//free (temp);
-			//free (ptr);
+			combine_str(&new_str, get_variable(temp, utils->envp, utils->err_code));
 			start = i;
-			if (str[i] == '\0')
-				break ;
 		}
 		else
 			i++;
-		if (str[i] == '\0')
-			combine_str(&new_str, ft_substr((*str), start, i - start));
+	}
+	if (new_str)
+	{
+		combine_str(&new_str, ft_substr((*str), start, i - start));
+		(*str) = new_str;
 	}
 }
 
@@ -168,7 +168,7 @@ void	remove_space(char **str, int i)
 	end = i;
 	while ((*str)[i] == ' ')
 		i--;
-	if (i != end)
+	if (i != end && i > 0)
 	{
 		temp = ft_substr((*str), 0, i +1);
 		if (!temp)
@@ -217,7 +217,7 @@ int	lexer(char **str, t_utils *utils)
 	{
 		if ((*str)[i] == '$')
 		{
-			env_variable(str, utils, quote, dquote, i);
+			env_variable(str, utils, quote, dquote);
 			break ;
 		}
 		i++;

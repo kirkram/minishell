@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/20 17:32:31 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/21 14:17:27 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,7 +195,7 @@ int	parsing(char *line_read, t_pipe ***pipe, t_utils *utils)
 	int		*tokens;
 
 	array = NULL;
-	if (lexer(&line_read, utils) == 1)//utils->envp, &utils->err_code) == 1)
+	if (lexer(&line_read, utils) == 1)
 		return (1);
 	if (!line_read || !line_read[0])
 		return(1);
@@ -215,6 +215,7 @@ int	parsing(char *line_read, t_pipe ***pipe, t_utils *utils)
 	 	i++;
 	}    
 	printf("------------\n");   */
+
 	init_tokenarr(&tokens, array);
 /*   	i = 0;
 	while (tokens[i])

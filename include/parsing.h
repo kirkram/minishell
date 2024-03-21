@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/20 17:33:39 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/21 14:26:23 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int			parsing(char *line_read, t_pipe ***pipe, t_utils *utils);
 int			check_quote(char **str, bool quote, bool dquote, int *err_code);
 //int			lexer(char **array, char *envp[], int *err_code);
 int			lexer(char **str, t_utils *utils);
-void	env_variable(char **str, t_utils *utils, bool quote, bool dquote, int i);
+void		env_variable(char **str, t_utils *utils, bool quote, bool dquote);
 //char		*env_variable(char *str, char **envp, int err_code, bool quote, bool dquote);
 char		**array_copy(char **array);
 char		*get_variable(char *temp, char **envp, int err_code);
@@ -119,7 +119,7 @@ int			update_pwd_oldpwd_env(t_utils *utils, char *cwd);
 //MS SPLIT
 
 int		str_count(char *str);
-char	**ms_splitter(char *str, char **array);
+char	**ms_splitter(char *str, char **array, bool quote, bool dquote);
 char	**ms_split(char *str);
 char	**free_reverse(int i, char **array);
 char	*remove_quote(char *str);
