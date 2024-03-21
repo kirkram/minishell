@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/13 11:18:05 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/14 12:40:55 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/21 15:14:58 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,11 @@
 char	**ms_split(char *str)
 {
 	char	**array;
+	bool	quote;
+	bool	dquote;
 
+	quote = false;
+	dquote = false;
 	array = NULL;
 	if (!str)
 		return (0);
@@ -28,7 +32,7 @@ char	**ms_split(char *str)
 		array = malloc((str_count(str) + 1) * sizeof(char *));
 		if (!array)
 			return (0);
-		ms_splitter(str, array);
+		ms_splitter(str, array, quote, dquote);
 		return (array);
 	}
 	return (0);
@@ -51,20 +55,13 @@ char	*remove_quote(char *str)
 		return (NULL);
 	while (str[i])
 	{
-		if (str[i] == '\'' && dquote == false)
-			quote_status(&quote);
-		else if (str[i] == '\"' && quote == false)
-			quote_status(&dquote);
+		quote_status2(&quote, &dquote, str[i]);
 		if (str[i] == '\'' && dquote == false)
 			i++;
 		else if (str[i] == '\"' && quote == false)
 			i++;
 		else
-		{
-			temp[x] = str[i];
-			i++;
-			x++;
-		}
+			temp[x++] = str[i++];
 	}
 	temp[x] = '\0';
 	free (str);
@@ -99,19 +96,15 @@ int	quote_count(char *str)
 	return (count);
 }
 
-char	**ms_splitter(char *str, char **array)
+char	**ms_splitter(char *str, char **array, bool quote, bool dquote)
 {
 	int		i;
 	int		x;
 	int		start;
-	bool	quote;
-	bool	dquote;
 
 	i = 0;
 	x = 0;
 	start = 0;
-	quote = false;
-	dquote = false;
 	while (str[x])
 	{
 		while (str[x] == ' ')
@@ -119,10 +112,7 @@ char	**ms_splitter(char *str, char **array)
 		start = x;
 		while (str[x] && (str[x] != ' ' || quote == true || dquote == true))
 		{
-			if (str[x] == '\'' && dquote == false)
-				quote_status(&quote);
-			else if (str[x] == '\"' && quote == false)
-				quote_status(&dquote);
+			quote_status2(&quote, &dquote, str[x]);
 			x++;
 		}
 		array[i] = remove_quote(ft_substr(str, start, (x - start)));
@@ -171,5 +161,5 @@ int	str_count(char *str)
 			x++;
 		}
 	}
-	return(count);
+	return (count);
 }

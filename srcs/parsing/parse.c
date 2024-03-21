@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/18 16:58:05 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/20 15:03:22 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,19 +34,7 @@ void	init_token(t_pipe *pipe)
 	pipe->tokens[i] = 0;
 }
 
-int	syntax_err(t_pipe *pipe, int *err_code, int i)
-{
-	*err_code = 258;
-	ft_putstr_fd("syntax error near unexpected token `", 2);
-	if (!pipe->args[i+1] || !pipe->args[i+1][0])
-		ft_putstr_fd("newline", 2);
-	else
-		ft_putstr_fd(pipe->args[i +1], 2);
-	ft_putendl_fd("\'", 2);
-	return (1);
-}
-
-int	make_tokens(t_pipe *pipe, int *err_code)
+int	make_tokens(t_pipe *pipe)
 {
 	int	i;
 	int	x;
@@ -58,10 +46,8 @@ int	make_tokens(t_pipe *pipe, int *err_code)
 		if (ft_strncmp(pipe->args[i],"<", 2) == 0)
 		{
 			pipe->tokens[i] = REMOVE;
-			if (pipe->tokens[i +1] == CMD || ft_strncmp(pipe->args[i +1], ">", 2) == 0)
+			if (pipe->tokens[i +1] == CMD)
 				pipe->tokens[i +1] = IN_FD;
-			else
-				return (syntax_err(pipe, err_code, i));
 			x = (i -1);
 			while (x >= 0)
 			{
@@ -77,8 +63,6 @@ int	make_tokens(t_pipe *pipe, int *err_code)
 			pipe->tokens[i] = REMOVE;
 			if (pipe->tokens[i +1] == CMD)
 				pipe->tokens[i +1] = IN_HD;
-			else
-				return (syntax_err(pipe, err_code, i));
 			while (x >= 0)
 			{
 				if (pipe->tokens[x] == IN_FD)
@@ -93,8 +77,6 @@ int	make_tokens(t_pipe *pipe, int *err_code)
 			pipe->tokens[i] = REMOVE;
 			if (pipe->tokens[i +1] == CMD)
 				pipe->tokens[i +1] = OUT;
-			else
-				return (syntax_err(pipe, err_code, i));
 			x = (i -1);
 			while (x >= 0)
 			{
@@ -108,8 +90,6 @@ int	make_tokens(t_pipe *pipe, int *err_code)
 			pipe->tokens[i] = REMOVE;
 			if (pipe->tokens[i +1] == CMD)
 				pipe->tokens[i +1] = OUT_AP;
-			else
-				return (syntax_err(pipe, err_code, i));
 			x = (i -1);
 			while (x >= 0)
 			{
@@ -160,25 +140,6 @@ void	remove_red(t_pipe *pipe)
 	free(pipe->tokens);
 	pipe->args = temp;
 	pipe->tokens = i_temp;
-}
-
-int	is_builtin(char *str)
-{
-	if (ft_strncmp(str, "echo", 5) == 0)
-		return (8);
-	else if (ft_strncmp(str, "cd", 3) == 0)
-		return (8);
-	else if (ft_strncmp(str, "pwd", 4) == 0)
-		return (8);
-	else if (ft_strncmp(str, "export", 7) == 0)
-		return (8);
-	else if (ft_strncmp(str, "unset", 6) == 0)
-		return (8);
-	else if (ft_strncmp(str, "env", 4) == 0)
-		return (8);
-	else if (ft_strncmp(str, "exit", 5) == 0)
-		return (8);
-	return (0);
 }
 
 int	final_args(t_pipe *pipe)
@@ -232,11 +193,14 @@ int	parser(char **array, t_pipe ***pipe, int *err_code)
 	while ((*pipe)[x])
 	{
 		init_token((*pipe)[x]);
-		if (make_tokens((*pipe)[x], err_code) == 1)
+		if (make_tokens((*pipe)[x]) == 1)
 			return (1);
 		remove_red((*pipe)[x]);
 		if (final_args((*pipe)[x]) == 1)
+		{
+			*err_code = 1;
 			return (1);
+		}
 		x++;
 	}
 	return (0);
