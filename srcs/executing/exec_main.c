@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/20 18:18:26 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/21 12:43:17 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,17 @@ char	*assign_scmd_path(char *scmd, char **envp)
 	i = 0;
 	while (env_paths[i])
 	{
-		cmd_path = jointhree(env_paths[i], "/", scmd);
+		if (scmd && scmd[0] == '/')
+		{
+			cmd_path = ft_strdup(scmd);
+			free_and_1(env_paths, NULL);
+			if (access(cmd_path, F_OK) == 0 && access(cmd_path, X_OK) == 0)
+				return (cmd_path);
+			else
+				return (NULL);
+		}
+		else
+			cmd_path = jointhree(env_paths[i], "/", scmd);
 		if (access(cmd_path, F_OK) == 0 && access(cmd_path, X_OK) == 0)
 		{
 			free_and_1(env_paths, NULL);
