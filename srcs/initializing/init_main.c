@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/22 13:23:56 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/22 14:01:51 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,7 @@ void	intialize_utils(char **sys_envp, t_utils **utils)
 	(*utils)->envp[i] = NULL;
 	(*utils)->export[i] = NULL;
 	(*utils)->err_code = 0;
+	(*utils)->syntax_err = false;
 	sort_export(*utils);
 }
 

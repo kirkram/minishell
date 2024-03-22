@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/22 13:29:06 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/22 14:32:14 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,6 +229,9 @@ int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
 	pipeline_init(array, pipe);
 	if (parser(array, pipe, &utils->err_code) == 1)
 		return (1); // free all first
+
+	here_doc_open(eof, _pipe);
+
 	ft_arrfree(array);
 /* 	int i = 0;
 	int x = 0;
@@ -247,3 +250,26 @@ int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
 
 	return (0);
 }
+
+void	here_doc(t_pipe ***pipe, )
+
+void	here_doc_open(char *eof, t_pipe *_pipe)
+{
+	char	*buff;
+	//int		fd[2];
+
+	pipe(_pipe->hd_fd);
+	while (1)
+	{
+		buff = readline("> ");
+		if (ft_strncmp(eof, buff, -1) == 0)
+			break;
+		ft_putendl_fd(buff, (_pipe->hd_fd)[1]);
+		free (buff);
+	}
+	close(_pipe->hd_fd[1]);
+	dup2(_pipe->hd_fd[0], STDIN_FILENO);
+	close(_pipe->hd_fd[0]);
+	free(buff);
+}
+

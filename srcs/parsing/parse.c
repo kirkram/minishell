@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/20 15:03:22 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/22 14:06:37 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,6 +192,7 @@ int	parser(char **array, t_pipe ***pipe, int *err_code)
 	pre_parse(array, pipe);
 	while ((*pipe)[x])
 	{
+		(*pipe)[x]->hd_fd = 0;
 		init_token((*pipe)[x]);
 		if (make_tokens((*pipe)[x]) == 1)
 			return (1);

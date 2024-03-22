@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/22 12:54:46 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/22 13:38:35 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,7 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 			return (2); //err handle
 		getcwd(cwd, 4095);
 		//ft_putstr_fd("1Arg. the cwd is now ", 2);
-		ft_putendl_fd(cwd, 2);
+		//ft_putendl_fd(cwd, 2);
 	}
 	else
 	{
@@ -200,7 +200,7 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 			return (2); //err handle
 		getcwd(cwd, 4095);
 		//ft_putstr_fd("MoreThan1Arg. the cwd is now ", 2);
-		ft_putendl_fd(cwd, 2);
+		//ft_putendl_fd(cwd, 2);
 	}
 	//chdir
 	//opendir, readdir, closedir:
