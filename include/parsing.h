@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/21 14:26:23 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/21 14:27:57 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ typedef struct s_paths
 	char	*pwd;
 	char	*bigpath;
 	char	**paths;
-
+	bool	should_skip_pwd;
 }	t_paths;
 
 typedef struct s_pipe
@@ -92,7 +92,7 @@ int		execute(t_utils *utils, t_pipe **_pipe);
 char	*jointhree(char const *s1, char const *s2, char const *s3);
 int		handle_execve_errors(char *failed_cmd);
 int		msg_stderr(char *message, char *cmd, int err_code);
-char	**find_path_and_pwd(char **envp);
+char	**find_path_and_pwd(char **envp, char *scmd);
 int		user_cmd_path(char **args, char *arg_cmd, char **paths);
 void	delete_pwd_path(char **paths);
 int		free_and_1(char **paths, int **end);

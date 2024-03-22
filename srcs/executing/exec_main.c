@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/18 17:55:06 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/21 15:00:40 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,24 @@ char	*assign_scmd_path(char *scmd, char **envp)
 	char	*cmd_path;
 	int		i;
 
-	env_paths = find_path_and_pwd(envp);
+	//should move it function up so that it doesnt waste resources every time
+	env_paths = find_path_and_pwd(envp, scmd);
 	if (!env_paths)
 		return (NULL);
 	i = 0;
 	while (env_paths[i])
 	{
-		cmd_path = jointhree(env_paths[i], "/", scmd);
+		if (scmd && scmd[0] == '/')
+		{
+			cmd_path = ft_strdup(scmd);
+			free_and_1(env_paths, NULL);
+			if (access(cmd_path, F_OK) == 0 && access(cmd_path, X_OK) == 0)
+				return (cmd_path);
+			else
+				return (NULL);
+		}
+		else
+			cmd_path = jointhree(env_paths[i], "/", scmd);
 		if (access(cmd_path, F_OK) == 0 && access(cmd_path, X_OK) == 0)
 		{
 			free_and_1(env_paths, NULL);
@@ -39,100 +50,170 @@ char	*assign_scmd_path(char *scmd, char **envp)
 	return (NULL);
 }
 
+char	**find_path_and_pwd(char **envp, char *scmd)
+{
+	t_paths	vars;
+
+	vars.paths = NULL;
+	vars.i = 0;
+	vars.path = NULL;
+	vars.pwd = NULL;
+	vars.should_skip_pwd = false;
+	if (!ft_strnstr(scmd, "./", -1))
+		vars.should_skip_pwd = true;
+	while (envp[vars.i])
+	{
+		if (ft_strncmp(envp[vars.i], "PATH=", 5) == 0)
+			vars.path = envp[vars.i] + 5;
+		else if (ft_strncmp(envp[vars.i], "PWD=", 4) == 0)
+			vars.pwd = envp[vars.i] + 4;
+		vars.i ++;
+	}
+	vars.bigpath = jointhree(vars.path, ":", vars.pwd);
+	if (vars.bigpath && !vars.should_skip_pwd)
+		vars.paths = ft_split(vars.bigpath, ':');
+	else if (vars.path)
+		vars.paths = ft_split(vars.path, ':');
+	else if (!vars.should_skip_pwd)
+		vars.paths = ft_split(vars.pwd, ':');
+	free (vars.bigpath);
+	return (vars.paths);
+}
+
 int	execute(t_utils *utils, t_pipe **_pipe)
 {
 	int			fd[2];
 	int			savestdio[2];
-	pid_t		pid[42];
+	pid_t		pid[256]; //zsh limit descriptors = 256
 	int			pipefd[2];
 	int			i;
 	int			j;
 
 	int			child_exit_code;
 	char		*infile;
-	int			num_of_cmds;
+	int			num_of_pipes;
 	char		*outfile;
 	int			*tokens;
-	char		**all_args;
-	int			is_append_out;
+	int			has_fd_failed;
 
 	savestdio[0] = dup(STDIN_FILENO);
 	savestdio[1] = dup(STDOUT_FILENO);
-	outfile = NULL;
-	infile = NULL;
-	if (infile)
-	{
-		fd[0] = open (infile, O_RDONLY);
-		if (fd[0] < 0)
-		{
-			ft_putstr_fd("minishell: no such file or directory: ", 2);
-			ft_putendl_fd(infile, 2);
-		}
-	}
-	else
-		fd[0] = dup(savestdio[0]);
 
+	//PREP
 	i = 0;
 	while (_pipe[i])
 		i ++;
-	num_of_cmds = i;
-
+	num_of_pipes = i;
 	ft_memset(pid, -1, sizeof(pid));
+	fd[0] = 0;
+	fd[1] = 0;
 
+
+	//CREATE OUTFILES
+	// i = 0;
+	// while (i < num_of_pipes && i < 256)
+	// {
+	// 	j = 0;
+	// 	tokens = _pipe[i]->tokens;
+	// 	while (_pipe[i]->args[j] && tokens[j] != 0)
+	// 	{
+	// 		if (tokens[j] == OUT)
+	// 			fd[0] = open(_pipe[i]->args[j], O_CREAT | O_RDWR | O_TRUNC, 0644);
+	// 		else if (tokens[j] == OUT_AP)
+	// 			fd[0] = open(_pipe[i]->args[j], O_CREAT | O_RDWR | O_APPEND, 0644);
+	// 		else if (tokens[j] == SKIP_OUT)
+	// 			fd[0] = open(_pipe[i]->args[j], O_CREAT | O_RDWR);
+	// 		if (tokens[j] == OUT || tokens[j] == OUT_AP || tokens[j] == SKIP_OUT)
+	// 		{
+	// 			//system couldnt create a file, abort everything
+	// 			if (access(_pipe[i]->args[j], F_OK == -1))
+	// 				return (127);
+	// 			//we dont them opened right now so we close it instantly
+	// 			close(fd[0]);
+	// 		}
+	// 		j ++;
+	// 	}
+	// 	i ++;
+	// }
+
+	//MAIN LOOP
 	i = 0;
-	is_append_out = 0;
-	while (i < num_of_cmds)
+	while (i < num_of_pipes)
 	{
-		dup2(fd[0], STDIN_FILENO);
-		close(fd[0]);
-
-		// I need outfile otherwise I have to look for it every time there is a new _pipe
+		//OPEN INFILE, OPEN/CREATE OUTFILE AND TRY TO ACCESS
+		infile = NULL;
+		outfile = NULL;
 		tokens = _pipe[i]->tokens;
-		all_args = _pipe[i]->args;
-		j = -1;
-		//must be really careful that the amount of tokens equals amount of args
-		while (all_args[++j] && tokens[j] != 0)
+		has_fd_failed = 0;
+		j = 0;
+		while(_pipe[i]->args[j] && tokens[j] != 0)
 		{
-			if (tokens[j] == OUT || tokens[j] == OUT_AP)
+			if (_pipe[i]->tokens[j] == SKIP_IN || _pipe[i]->tokens[j] == IN_FD)
 			{
-				if (tokens[j] == OUT_AP)
-					is_append_out = 1;
-				outfile = all_args[j];
+				if (_pipe[i]->tokens[j] == IN_FD)
+					fd[0] = open (_pipe[i]->args[j], O_RDONLY);
+				if (access(_pipe[i]->args[j], F_OK) == -1 || access(_pipe[i]->args[j], R_OK) == -1)
+				{
+					ft_putstr_fd("minishell: ", 2);
+					ft_putstr_fd(_pipe[i]->args[j], 2);
+					if (access(_pipe[i]->args[j], F_OK) == -1)
+						ft_putendl_fd(": No such file or directory", 2);
+					else if (access(_pipe[i]->args[j], R_OK) == -1)
+						ft_putendl_fd(": Permission denied", 2);
+					has_fd_failed = 1;
+					break ;
+				}
+				else if (_pipe[i]->tokens[j] == IN_FD)
+					infile = _pipe[i]->args[j];
 			}
-			if (tokens[j] == 0)
-				ft_putendl_fd("UNEQUAL TOKENS AND ARGS COUNT", 2);
-		}
-		if (i == num_of_cmds - 1)
-		{
-			if (outfile)
+			else if (tokens[j] == SKIP_OUT || tokens[j] == OUT || tokens[j] == OUT_AP)
 			{
-				if (!is_append_out)
-					fd[1] = open(outfile, O_CREAT | O_RDWR | O_TRUNC, 0644);
-				else
-					fd[1] = open(outfile, O_WRONLY | O_APPEND);
+				if (tokens[j] == SKIP_OUT)
+					fd[1] = open(_pipe[i]->args[j], O_CREAT | O_WRONLY, 0644);
+				else if (tokens[j] == OUT)
+					fd[1] = open(_pipe[i]->args[j], O_CREAT | O_WRONLY | O_TRUNC, 0644);
+				else if (tokens[j] == OUT_AP)
+					fd[1] = open(_pipe[i]->args[j], O_CREAT | O_WRONLY | O_APPEND, 0644);
 				if (fd[1] < 0)
 				{
-					ft_putstr_fd("minishell: permission denied: ", 2);
-					ft_putendl_fd(outfile, 2);
-					// dup2(savestdio[0], STDIN_FILENO);
-					// dup2(savestdio[1], STDOUT_FILENO);
-					// close(savestdio[0]);
-					// close(savestdio[1]);
-					return (127);
+					ft_putstr_fd("minishell: ", 2);
+					ft_putstr_fd(_pipe[i]->args[j], 2);
+					ft_putendl_fd(": Permission denied", 2);
+					has_fd_failed = 1;
+					break ;
 				}
+				else if (tokens[j] != SKIP_OUT)
+					outfile = _pipe[i]->args[j];
 			}
-			else
-				fd[1] = dup(savestdio[1]);
+			else if (tokens[j] == 0)
+				ft_putendl_fd("UNEQUAL TOKENS AND ARGS COUNT", 2);
+			j ++;
 		}
-		else
+
+
+		if (!infile && i == 0)
+			fd[0] = dup(savestdio[0]);
+		if (!outfile && i == num_of_pipes - 1)
+			fd[1] = dup(savestdio[1]);
+		if (has_fd_failed)
+			utils->err_code = 1;
+
+		//PIPING
+		dup2(fd[0], STDIN_FILENO);
+		close(fd[0]);
+		if (i != num_of_pipes - 1)
 		{
 			pipe(pipefd);
 			fd[0] = pipefd[0];
-			fd[1] = pipefd[1];
+			if (!outfile)
+				fd[1] = pipefd[1];
+			else
+				close(pipefd[1]);
 		}
 		dup2(fd[1], STDOUT_FILENO);
 		close(fd[1]);
-		if (tokens && tokens[0] != BUILTIN)
+
+		if (!has_fd_failed && tokens && tokens[0] != BUILTIN)
 		{
 			pid[i] = fork();
 			if (pid[i] == 0)
@@ -144,8 +225,9 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				}
 				else
 					child_exit_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
-				if (i != num_of_cmds - 1)
+				if (i != num_of_pipes - 1)
 					child_exit_code = 127;
+
 				i = 0;
 				while (_pipe[i])
 				{
@@ -163,7 +245,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				exit (child_exit_code);
 			}
 		}
-		else
+		else if (!has_fd_failed)
 		{
 			utils->err_code = exec_builtin(_pipe, utils, i);
 		}
@@ -175,21 +257,22 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	close(savestdio[1]);
 
 	i = 0;
-	while (i < num_of_cmds)
+	while (i < num_of_pipes)
 	{
 		if ((_pipe[i])->tokens && (_pipe[i])->tokens[0] == BUILTIN)
 			i ++;
-		if (i == num_of_cmds - 1 && pid[i] != -1)
+		if (i == num_of_pipes - 1 && pid[i] != -1)
 			waitpid(pid[i], &child_exit_code, 0);
 		else if (pid[i] != -1)
 			waitpid(pid[i], NULL, 0);
 		i ++;
 	}
-	//
+	// while (1);
+
 	if (WIFEXITED(child_exit_code))
 		return (WEXITSTATUS(child_exit_code));
 	else
-		return (child_exit_code);
+		return (utils->err_code);
 }
 
 /*
@@ -227,7 +310,8 @@ int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
 
 int		handle_execve_errors(char *failed_cmd)
 {
-	//is access command slow?
+	DIR	*dir;
+	//ACCESS() looks for a command as if it is ./
 	if (failed_cmd[0] == 0)
 		return (msg_stderr("minishell: permission denied: ", failed_cmd, 126));
 	else if (failed_cmd[0] == '.' && failed_cmd[1] == 0)
@@ -239,8 +323,11 @@ int		handle_execve_errors(char *failed_cmd)
 	else if (access(failed_cmd, X_OK) == -1 || access(failed_cmd, R_OK) == -1 || \
 	ft_strncmp(failed_cmd, "./", 3) == 0)
 		return (msg_stderr("minishell: permission denied: ", failed_cmd, 126));
-	else if (!closedir(opendir(failed_cmd)))
+	// else if (!closedir(opendir(failed_cmd)))
+	dir = opendir(failed_cmd);
+	if (dir)
 	{
+		closedir(dir);
 		if (ft_strnstr(failed_cmd, "../", -1))
 			return (msg_stderr("minishell: is a directory: ", ft_strnstr(failed_cmd, "../", -1), 126));
 		else if (ft_strnstr(failed_cmd, "./", -1))
@@ -261,34 +348,6 @@ int	msg_stderr(char *message, char *cmd, int err_code)
 		ft_putstr_fd(cmd, 2);
 	ft_putstr_fd("\n", 2);
 	return (err_code);
-}
-
-
-char	**find_path_and_pwd(char **envp)
-{
-	t_paths	vars;
-
-	vars.paths = NULL;
-	vars.i = 0;
-	vars.path = NULL;
-	vars.pwd = NULL;
-	while (envp[vars.i])
-	{
-		if (ft_strncmp(envp[vars.i], "PATH=", 5) == 0)
-			vars.path = envp[vars.i] + 5;
-		else if (ft_strncmp(envp[vars.i], "PWD=", 4) == 0)
-			vars.pwd = envp[vars.i] + 4;
-		vars.i ++;
-	}
-	vars.bigpath = jointhree(vars.path, ":", vars.pwd);
-	if (vars.pwd && vars.path)
-		vars.paths = ft_split(vars.bigpath, ':');
-	else if (vars.path)
-		vars.paths = ft_split(vars.path, ':');
-	else
-		vars.paths = ft_split(vars.pwd, ':');
-	free (vars.bigpath);
-	return (vars.paths);
 }
 
 char	*jointhree(char const *s1, char const *s2, char const *s3)
