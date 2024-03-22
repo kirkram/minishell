@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/22 14:32:14 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/22 15:43:49 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,77 +199,63 @@ int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
 		return (1);
 	if (*line_read == NULL || (*line_read)[0] == '\0')
 		return (1);
-	//printf("string is = %s\n", line_read);
-	//if (line_checker(&line_read, &utils->err_code) == 1)
-	//	return (1);
 	array = ms_split(*line_read);
 	free(*line_read);
 	*line_read = NULL;
 	if (!array)
 		return (1); // or  something else if malloc failed
-
-/*    	int	i = 0;
-	while (array[i])
-	{
-		printf("array = %s\n", array[i]);
-	 	i++;
-	}
-	printf("------------\n");   */
-
 	init_tokenarr(&tokens, array);
-/*   	i = 0;
-	while (tokens[i])
-	{
-		printf("tokens = %d\n", tokens[i]);
-	 	i++;
-	}
-	printf("------------\n");  */
 	if (syntax_check(tokens, &utils->err_code, array) == 1)
-		return (1);
+		utils->syntax_err = TRUE;
 	pipeline_init(array, pipe);
 	if (parser(array, pipe, &utils->err_code) == 1)
 		return (1); // free all first
-
-	here_doc_open(eof, _pipe);
-
+	here_doc(pipe);
 	ft_arrfree(array);
-/* 	int i = 0;
-	int x = 0;
-	while ((*pipe)[i])
-	{
-		x = 0;
-		while ((*pipe)[i]->args[x])
-		{
-			printf("args = %s\n", (*pipe)[i]->args[x]);
-			printf("token = %d\n", (*pipe)[i]->tokens[x]);
-			x++;
-		}
-		i++;
-	} */
-
-
+	if (utils->syntax_err == TRUE)
+		return (1); //free what is needed first
 	return (0);
 }
 
-void	here_doc(t_pipe ***pipe, )
+void	here_doc(t_pipe ***pipe)
+{
+	int	i;
+	int	x;
+
+	x = 0;
+	while ((*pipe)[x])
+	{
+		i = 0;
+		while ((*pipe)[x]->args[i])
+		{
+			if ((*pipe)[x]->tokens[i] == SKIP_HD)
+			{
+				here_doc_open((*pipe)[x]->args[i], (*pipe)[x]);
+				close ((*pipe)[x]->hd_fd[0]);
+			}
+			else if ((*pipe)[x]->tokens[i] == IN_HD)
+				here_doc_open((*pipe)[x]->args[i], (*pipe)[x]);
+			i++;
+		}
+		x++;
+	}
+}
+
 
 void	here_doc_open(char *eof, t_pipe *_pipe)
 {
 	char	*buff;
-	//int		fd[2];
 
 	pipe(_pipe->hd_fd);
 	while (1)
 	{
 		buff = readline("> ");
 		if (ft_strncmp(eof, buff, -1) == 0)
-			break;
-		ft_putendl_fd(buff, (_pipe->hd_fd)[1]);
+			break ;
+		ft_putendl_fd(buff, _pipe->hd_fd[1]);
 		free (buff);
 	}
 	close(_pipe->hd_fd[1]);
-	dup2(_pipe->hd_fd[0], STDIN_FILENO);
-	close(_pipe->hd_fd[0]);
 	free(buff);
 }
 

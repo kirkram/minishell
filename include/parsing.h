@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/22 14:32:16 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/22 15:28:03 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void		pre_parse(char **array, t_pipe ***pipe);
 int			parser(char **array, t_pipe ***pipe, int *err_code);
 int			syntax_check(int *tokens, int *err_code, char **array);
 void		here_doc_open(char *eof, t_pipe *_pipe);
-
+void		here_doc(t_pipe ***pipe);
 // LEXER/PARSER UTILS
 
 int			is_builtin(char *str);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/22 14:01:51 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/22 15:24:49 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 			i = 0;
 			while (_pipe[i])
 			{
-				(_pipe)[i]->cmd_with_path = assign_scmd_path((_pipe)[i]->args[0], utils->envp);
+				(_pipe)[i]->cmd_with_path = assign_scmd_path((_pipe)[i]->noio_args[0], utils->envp);
 				i ++;
 			}
 			//should we assign (duplicating) err code to the utils in the execute

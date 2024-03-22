@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/22 14:06:37 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/22 15:39:23 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ int	make_tokens(t_pipe *pipe)
 			pipe->tokens[i] = REMOVE;
 			if (pipe->tokens[i +1] == CMD)
 				pipe->tokens[i +1] = IN_HD;
+			x = (i -1);
 			while (x >= 0)
 			{
 				if (pipe->tokens[x] == IN_FD)
@@ -192,7 +193,6 @@ int	parser(char **array, t_pipe ***pipe, int *err_code)
 	pre_parse(array, pipe);
 	while ((*pipe)[x])
 	{
-		(*pipe)[x]->hd_fd = 0;
 		init_token((*pipe)[x]);
 		if (make_tokens((*pipe)[x]) == 1)
 			return (1);
