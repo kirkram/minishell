@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/21 15:00:40 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/22 16:10:25 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ char	*assign_scmd_path(char *scmd, char **envp)
 	int		i;
 
 	//should move it function up so that it doesnt waste resources every time
+	if (!scmd)
+		return (NULL);
 	env_paths = find_path_and_pwd(envp, scmd);
 	if (!env_paths)
 		return (NULL);
@@ -107,35 +109,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	ft_memset(pid, -1, sizeof(pid));
 	fd[0] = 0;
 	fd[1] = 0;
-
-
-	//CREATE OUTFILES
-	// i = 0;
-	// while (i < num_of_pipes && i < 256)
-	// {
-	// 	j = 0;
-	// 	tokens = _pipe[i]->tokens;
-	// 	while (_pipe[i]->args[j] && tokens[j] != 0)
-	// 	{
-	// 		if (tokens[j] == OUT)
-	// 			fd[0] = open(_pipe[i]->args[j], O_CREAT | O_RDWR | O_TRUNC, 0644);
-	// 		else if (tokens[j] == OUT_AP)
-	// 			fd[0] = open(_pipe[i]->args[j], O_CREAT | O_RDWR | O_APPEND, 0644);
-	// 		else if (tokens[j] == SKIP_OUT)
-	// 			fd[0] = open(_pipe[i]->args[j], O_CREAT | O_RDWR);
-	// 		if (tokens[j] == OUT || tokens[j] == OUT_AP || tokens[j] == SKIP_OUT)
-	// 		{
-	// 			//system couldnt create a file, abort everything
-	// 			if (access(_pipe[i]->args[j], F_OK == -1))
-	// 				return (127);
-	// 			//we dont them opened right now so we close it instantly
-	// 			close(fd[0]);
-	// 		}
-	// 		j ++;
-	// 	}
-	// 	i ++;
-	// }
-
 	//MAIN LOOP
 	i = 0;
 	while (i < num_of_pipes)
@@ -148,11 +121,20 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		j = 0;
 		while(_pipe[i]->args[j] && tokens[j] != 0)
 		{
-			if (_pipe[i]->tokens[j] == SKIP_IN || _pipe[i]->tokens[j] == IN_FD)
+			if (_pipe[i]->tokens[j] == SKIP_IN || _pipe[i]->tokens[j] == IN_FD || _pipe[i]->tokens[j] == IN_HD)
 			{
 				if (_pipe[i]->tokens[j] == IN_FD)
+				{
 					fd[0] = open (_pipe[i]->args[j], O_RDONLY);
-				if (access(_pipe[i]->args[j], F_OK) == -1 || access(_pipe[i]->args[j], R_OK) == -1)
+					infile = _pipe[i]->args[j];
+				}
+				else if (_pipe[i]->tokens[j] == IN_HD)
+				{
+					fd[0] = _pipe[i]->hd_fd[0];
+					infile = _pipe[i]->args[j];
+				}
+				if (_pipe[i]->tokens[j] != IN_HD && \
+				(access(_pipe[i]->args[j], F_OK) == -1 || access(_pipe[i]->args[j], R_OK) == -1))
 				{
 					ft_putstr_fd("minishell: ", 2);
 					ft_putstr_fd(_pipe[i]->args[j], 2);
@@ -163,8 +145,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 					has_fd_failed = 1;
 					break ;
 				}
-				else if (_pipe[i]->tokens[j] == IN_FD)
-					infile = _pipe[i]->args[j];
 			}
 			else if (tokens[j] == SKIP_OUT || tokens[j] == OUT || tokens[j] == OUT_AP)
 			{
@@ -189,8 +169,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				ft_putendl_fd("UNEQUAL TOKENS AND ARGS COUNT", 2);
 			j ++;
 		}
-
-
 		if (!infile && i == 0)
 			fd[0] = dup(savestdio[0]);
 		if (!outfile && i == num_of_pipes - 1)
@@ -212,7 +190,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		}
 		dup2(fd[1], STDOUT_FILENO);
 		close(fd[1]);
-
 		if (!has_fd_failed && tokens && tokens[0] != BUILTIN)
 		{
 			pid[i] = fork();
@@ -223,7 +200,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, utils->envp);
 					child_exit_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
 				}
-				else
+				else if ((_pipe)[i]->noio_args[0])
 					child_exit_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
 				if (i != num_of_pipes - 1)
 					child_exit_code = 127;
