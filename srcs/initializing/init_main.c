@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/22 15:24:49 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/22 18:10:07 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int	main(int ac, char **av, char **sys_envp)
 	(void)ac;
 	int		ret;
 
+	signal_handler();
 	ret = 0;
 	ret = rl_loop(ac, av, sys_envp);
 	return (ret);
@@ -36,19 +37,6 @@ int	rl_loop(int ac, char **av, char **sys_envp)
 		return (1);
 	return (interactive_mode_loop(hist_fd, sys_envp));
 }
-void	handle_sigint(int sig)
-{
-	(void)sig;
-	ft_putendl_fd("hehe", 1);
-	// ft_putstr_fd("minishell-0.5$ ", 1);
-}
-
-void	handle_sigquit(int sig)
-{
-	(void)sig;
-	ft_putendl_fd("wfeffefeffeefawa", 1);
-	// ft_putstr_fd("minishell-0.5$ ", 1);
-}
 
 int	interactive_mode_loop(int hist_fd, char **sys_envp)
 {
@@ -56,21 +44,6 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	t_pipe	**_pipe;
 	int		i;
 	t_utils	*utils;
-	//int		j;
-	// struct	sigaction sa1;
-	// struct	sigaction sa2;
-
-
-	// sa1.sa_flags = SA_RESTART;
-	// sa1.sa_handler = &handle_sigquit;
-	// sigemptyset(&sa1.sa_mask);
-	// sigaction(SIGQUIT, &sa1, NULL);
-
-	// sa2.sa_handler = &handle_sigint;
-	// sa2.sa_flags = SA_RESTART;
-	// sigemptyset(&sa2.sa_mask);
-	// sigaction(SIGINT, &sa2, NULL);
-
 
 	intialize_utils(sys_envp, &utils);
 	line_read = NULL;
