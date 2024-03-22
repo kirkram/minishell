@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/21 14:17:27 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/22 13:29:06 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,31 +189,31 @@ int	syntax_check(int *tokens, int *err_code, char **array)
 	return (0);
 }
 
-int	parsing(char *line_read, t_pipe ***pipe, t_utils *utils)
+int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
 {
 	char	**array;
 	int		*tokens;
 
 	array = NULL;
-	if (lexer(&line_read, utils) == 1)
+	if (lexer(line_read, utils) == 1)
 		return (1);
-	if (!line_read || !line_read[0])
-		return(1);
+	if (*line_read == NULL || (*line_read)[0] == '\0')
+		return (1);
 	//printf("string is = %s\n", line_read);
 	//if (line_checker(&line_read, &utils->err_code) == 1)
 	//	return (1);
-	array = ms_split(line_read);
-	free(line_read);
-	line_read = NULL;
+	array = ms_split(*line_read);
+	free(*line_read);
+	*line_read = NULL;
 	if (!array)
 		return (1); // or  something else if malloc failed
-	
+
 /*    	int	i = 0;
 	while (array[i])
 	{
 		printf("array = %s\n", array[i]);
 	 	i++;
-	}    
+	}
 	printf("------------\n");   */
 
 	init_tokenarr(&tokens, array);
@@ -222,11 +222,11 @@ int	parsing(char *line_read, t_pipe ***pipe, t_utils *utils)
 	{
 		printf("tokens = %d\n", tokens[i]);
 	 	i++;
-	}   
+	}
 	printf("------------\n");  */
 	if (syntax_check(tokens, &utils->err_code, array) == 1)
 		return (1);
-	pipeline_init(array, pipe); 
+	pipeline_init(array, pipe);
 	if (parser(array, pipe, &utils->err_code) == 1)
 		return (1); // free all first
 	ft_arrfree(array);
@@ -243,7 +243,7 @@ int	parsing(char *line_read, t_pipe ***pipe, t_utils *utils)
 		}
 		i++;
 	} */
-	
+
 
 	return (0);
 }

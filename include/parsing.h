@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/21 14:27:57 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/22 13:22:55 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int		open_history_file(int hist_fd);
 int		interactive_mode_loop(int hist_fd, char **envp);
 void	intialize_utils(char **sys_envp, t_utils **utils);
 
-int			parsing(char *line_read, t_pipe ***pipe, t_utils *utils);
+int			parsing(char **line_read, t_pipe ***pipe, t_utils *utils);
 // LEXER
 
 int			check_quote(char **str, bool quote, bool dquote, int *err_code);
