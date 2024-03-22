@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/18 17:58:52 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/20 14:31:58 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	while (1)
 	{
 		line_read = rl_gets(line_read, hist_fd);
-		if (line_read && lexer(line_read, &_pipe, utils) != 1)
+		if (line_read && parsing(line_read, &_pipe, utils) != 1)
 		{
 			i = 0;
 			while (_pipe[i])
