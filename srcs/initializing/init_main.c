@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/22 15:24:49 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/24 14:10:37 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,14 +57,14 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	int		i;
 	t_utils	*utils;
 	//int		j;
-	// struct	sigaction sa1;
-	// struct	sigaction sa2;
+	//struct	sigaction sa1;
+	//struct	sigaction sa2;
 
 
 	// sa1.sa_flags = SA_RESTART;
 	// sa1.sa_handler = &handle_sigquit;
 	// sigemptyset(&sa1.sa_mask);
-	// sigaction(SIGQUIT, &sa1, NULL);
+	// sigaction(SIGQUIT, &sa1, NULL); // ctrl + \
 
 	// sa2.sa_handler = &handle_sigint;
 	// sa2.sa_flags = SA_RESTART;
@@ -215,7 +215,7 @@ char *rl_gets(char *line_read, int hist_file)
 		free (line_read);
 		line_read = NULL;
 	}
-	line_read = readline("minishell-0.5$ ");
+	line_read = readline("MINISHELL-0.7$ ");
 	if (line_read && *line_read)
 	{
 		add_history(line_read);

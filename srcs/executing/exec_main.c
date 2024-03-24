@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/22 16:10:25 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/24 14:26:27 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,78 @@ char	**find_path_and_pwd(char **envp, char *scmd)
 	return (vars.paths);
 }
 
+//handles skip in error also
+int open_create_redir_in(t_pipe *_pipe, int (*fd)[2], char **infile, int j)
+{
+	if (_pipe->tokens[j] == IN_FD)
+	{
+		(*fd)[0] = open (_pipe->args[j], O_RDONLY);
+		*infile = _pipe->args[j];
+	}
+	else if (_pipe->tokens[j] == IN_HD)
+	{
+		(*fd)[0] = _pipe->hd_fd[0];
+		*infile = _pipe->args[j];
+	}
+	if (_pipe->tokens[j] != IN_HD && \
+	(access(_pipe->args[j], F_OK) == -1 || access(_pipe->args[j], R_OK) == -1))
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(_pipe->args[j], 2);
+		if (access(_pipe->args[j], F_OK) == -1)
+			ft_putendl_fd(": No such file or directory", 2);
+		else if (access(_pipe->args[j], R_OK) == -1)
+			ft_putendl_fd(": Permission denied", 2);
+		return (1);
+	}
+	return (0);
+}
+
+int	open_create_redir_out(t_pipe *_pipe, int (*fd)[2], char **outfile, int j)
+{
+	if (_pipe->tokens[j] == SKIP_OUT)
+		(*fd)[1] = open(_pipe->args[j], O_CREAT | O_WRONLY, 0644);
+	else if (_pipe->tokens[j] == OUT)
+		(*fd)[1] = open(_pipe->args[j], O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	else if (_pipe->tokens[j] == OUT_AP)
+		(*fd)[1] = open(_pipe->args[j], O_CREAT | O_WRONLY | O_APPEND, 0644);
+	if ((*fd)[1] < 0)
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(_pipe->args[j], 2);
+		ft_putendl_fd(": Permission denied", 2);
+		return (1);
+	}
+	else if (_pipe->tokens[j] != SKIP_OUT)
+		*outfile = _pipe->args[j];
+	return (0);
+}
+int	open_create_redir(t_pipe *_pipe, int (*fd)[2], char **infile, char **outfile)
+{
+	int	j;
+	int	*tokens;
+
+	j = 0;
+	tokens = _pipe->tokens;
+	while(_pipe->args[j] && tokens[j] != 0)
+	{
+		if (_pipe->tokens[j] == SKIP_IN || _pipe->tokens[j] == IN_FD || _pipe->tokens[j] == IN_HD)
+		{
+			if (open_create_redir_in(_pipe, fd, infile, j) == 1)
+				return (1);
+		}
+		else if (tokens[j] == SKIP_OUT || tokens[j] == OUT || tokens[j] == OUT_AP)
+		{
+			if (open_create_redir_out(_pipe, fd, outfile, j) == 1)
+				return (1);
+		}
+		else if (tokens[j] == 0)
+			ft_putendl_fd("UNEQUAL TOKENS AND ARGS COUNT", 2);
+		j ++;
+	}
+	return (0);
+}
+
 int	execute(t_utils *utils, t_pipe **_pipe)
 {
 	int			fd[2];
@@ -95,7 +167,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	char		*infile;
 	int			num_of_pipes;
 	char		*outfile;
-	int			*tokens;
 	int			has_fd_failed;
 
 	savestdio[0] = dup(STDIN_FILENO);
@@ -116,59 +187,10 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		//OPEN INFILE, OPEN/CREATE OUTFILE AND TRY TO ACCESS
 		infile = NULL;
 		outfile = NULL;
-		tokens = _pipe[i]->tokens;
 		has_fd_failed = 0;
 		j = 0;
-		while(_pipe[i]->args[j] && tokens[j] != 0)
-		{
-			if (_pipe[i]->tokens[j] == SKIP_IN || _pipe[i]->tokens[j] == IN_FD || _pipe[i]->tokens[j] == IN_HD)
-			{
-				if (_pipe[i]->tokens[j] == IN_FD)
-				{
-					fd[0] = open (_pipe[i]->args[j], O_RDONLY);
-					infile = _pipe[i]->args[j];
-				}
-				else if (_pipe[i]->tokens[j] == IN_HD)
-				{
-					fd[0] = _pipe[i]->hd_fd[0];
-					infile = _pipe[i]->args[j];
-				}
-				if (_pipe[i]->tokens[j] != IN_HD && \
-				(access(_pipe[i]->args[j], F_OK) == -1 || access(_pipe[i]->args[j], R_OK) == -1))
-				{
-					ft_putstr_fd("minishell: ", 2);
-					ft_putstr_fd(_pipe[i]->args[j], 2);
-					if (access(_pipe[i]->args[j], F_OK) == -1)
-						ft_putendl_fd(": No such file or directory", 2);
-					else if (access(_pipe[i]->args[j], R_OK) == -1)
-						ft_putendl_fd(": Permission denied", 2);
-					has_fd_failed = 1;
-					break ;
-				}
-			}
-			else if (tokens[j] == SKIP_OUT || tokens[j] == OUT || tokens[j] == OUT_AP)
-			{
-				if (tokens[j] == SKIP_OUT)
-					fd[1] = open(_pipe[i]->args[j], O_CREAT | O_WRONLY, 0644);
-				else if (tokens[j] == OUT)
-					fd[1] = open(_pipe[i]->args[j], O_CREAT | O_WRONLY | O_TRUNC, 0644);
-				else if (tokens[j] == OUT_AP)
-					fd[1] = open(_pipe[i]->args[j], O_CREAT | O_WRONLY | O_APPEND, 0644);
-				if (fd[1] < 0)
-				{
-					ft_putstr_fd("minishell: ", 2);
-					ft_putstr_fd(_pipe[i]->args[j], 2);
-					ft_putendl_fd(": Permission denied", 2);
-					has_fd_failed = 1;
-					break ;
-				}
-				else if (tokens[j] != SKIP_OUT)
-					outfile = _pipe[i]->args[j];
-			}
-			else if (tokens[j] == 0)
-				ft_putendl_fd("UNEQUAL TOKENS AND ARGS COUNT", 2);
-			j ++;
-		}
+		has_fd_failed = open_create_redir(_pipe[i], &fd, &infile, &outfile);
+
 		if (!infile && i == 0)
 			fd[0] = dup(savestdio[0]);
 		if (!outfile && i == num_of_pipes - 1)
@@ -190,7 +212,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		}
 		dup2(fd[1], STDOUT_FILENO);
 		close(fd[1]);
-		if (!has_fd_failed && tokens && tokens[0] != BUILTIN)
+		if (!has_fd_failed && _pipe[i]->tokens && _pipe[i]->tokens[0] != BUILTIN)
 		{
 			pid[i] = fork();
 			if (pid[i] == 0)
