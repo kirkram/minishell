@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/22 15:28:03 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/25 15:48:46 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,11 @@
 # define PARSING_H
 
 # include "./minishell.h"
-# include <readline/readline.h>
-# include <readline/history.h>
 # include <signal.h>
 # include <dirent.h>
+# include "readline/history.h"
+# include "readline/rlstdc.h"
+# include "readline/readline.h"
 
 //# include </usr/include/readline/readline.h> //needed for Linux
 //# include </usr/include/readline/history.h> // needed for Linux

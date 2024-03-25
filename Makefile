@@ -2,7 +2,8 @@ NAME = m_shell
 LIBFT_PATH = ./lib/libft
 LIBFT = $(LIBFT_PATH)/libft.a
 CFLAGS = -Wall -Wextra -Werror
-HEADERS	= -I ./include -L/usr/local/lib -I/usr/local/include #-lreadline
+RL_LIBS = -L/usr/local/lib -L${HOME}/.brew/opt/readline/lib
+HEADERS	= -I${HOME}/.brew/Cellar/readline/8.2.10/include/readline -I/usr/local/include -I./include 
 DEBUGFLAGS = -g -fsanitize=address,undefined,integer
 SRCS = \
  ./srcs/parsing/lexer.c ./srcs/parsing/lexer2.c ./srcs/parsing/parse.c \
@@ -17,7 +18,7 @@ RM = rm -f
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(SRCS)
-	cc $(CFLAGS) $(HEADERS) $(SRCS)  $(LIBFT) -lreadline -o $(NAME)
+	cc $(CFLAGS) $(HEADERS) $(RL_LIBS) $(SRCS) $(LIBFT) -lreadline -o $(NAME)
 
 $(LIBFT):
 	make -C $(LIBFT_PATH)
@@ -25,7 +26,7 @@ $(LIBFT):
 debug: .debug
 
 .debug: $(LIBFT) $(SRCS) 
-	cc $(DEBUGFLAGS) $(HEADERS) -lreadline $(SRCS) $(LIBFT) -o debug.out
+	cc $(DEBUGFLAGS) $(HEADERS) $(RL_LIBS) -lreadline $(SRCS) $(LIBFT) -o debug.out
 	touch .debug
 
 %.o: %.c

@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/24 14:26:27 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/25 15:49:51 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,6 +191,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		j = 0;
 		has_fd_failed = open_create_redir(_pipe[i], &fd, &infile, &outfile);
 
+		//rl_replace_line("123", 'x');
 		if (!infile && i == 0)
 			fd[0] = dup(savestdio[0]);
 		if (!outfile && i == num_of_pipes - 1)
