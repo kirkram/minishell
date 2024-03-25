@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/22 15:43:49 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/25 17:52:34 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,7 @@ void	init_tokenarr(int **tokens, char **array)
 	(*tokens)[i] = 0;
 }
 
-
+//int	pipe_syntax(int *tokens, char **array, int *i)
 
 int	syntax_check(int *tokens, int *err_code, char **array)
 {
@@ -152,35 +152,23 @@ int	syntax_check(int *tokens, int *err_code, char **array)
 			}
 			if (tokens[i +1] == 0)
 			{
-				ft_putendl_fd("empty pipe", 2);
+				ft_putendl_fd("empty pipe", 2); // does it need different implementation?
 				*err_code = 258;
 				return (1);
 			}
 		}
-		else if (tokens[i] == IN_FD)
-		{
-			if (tokens[i +1] != CMD)
-				return (syntax_err(array, err_code, i));
-		}
-		else if (tokens[i] == IN_HD)
-		{
-			if (tokens[i +1] != CMD)
-				return (syntax_err(array, err_code, i));
-		}
-		else if (tokens[i] == OUT)
-		{
-			if (tokens[i +1] != CMD)
-				return (syntax_err(array, err_code, i));
-		}
-		else if (tokens[i] == OUT_AP)
-		{
-			if (tokens[i +1] != CMD)
-				return (syntax_err(array, err_code, i));
-		}
+		else if (tokens[i] == IN_FD && tokens[i +1] != CMD)
+			return (syntax_err(array, err_code, i));
+		else if (tokens[i] == IN_HD && tokens[i +1] != CMD)
+			return (syntax_err(array, err_code, i));
+		else if (tokens[i] == OUT && tokens[i +1] != CMD)
+			return (syntax_err(array, err_code, i));
+		else if (tokens[i] == OUT_AP && tokens[i +1] != CMD)
+			return (syntax_err(array, err_code, i));
 		else if (tokens[i] == NOT_MS)
 		{
 			ft_putstr_fd("minishell: syntax error: non implemented operator: ", 2);
-			ft_putendl_fd(array[i], 2);
+			ft_putendl_fd(array[i], 2); // maybe best to not implement at all
 			*err_code = 1;
 			return (1);
 		}
@@ -250,10 +238,13 @@ void	here_doc_open(char *eof, t_pipe *_pipe)
 	while (1)
 	{
 		buff = readline("> ");
+		if (!buff)
+			break ;
 		if (ft_strncmp(eof, buff, -1) == 0)
 			break ;
 		ft_putendl_fd(buff, _pipe->hd_fd[1]);
 		free (buff);
+		printf("ok\n");
 	}
 	close(_pipe->hd_fd[1]);
 	free(buff);

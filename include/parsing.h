@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/22 15:28:03 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/25 17:40:41 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,10 @@
 # define PARSING_H
 
 # include "./minishell.h"
-# include <readline/readline.h>
-# include <readline/history.h>
+# include "./readline/readline.h"
+# include "./readline/history.h"
+//# include <readline/readline.h>
+//# include <readline/history.h>
 # include <signal.h>
 # include <dirent.h>
 
@@ -49,14 +51,17 @@ typedef struct s_utils
 	char	**export;
 }	t_utils;
 
+// SIGNAL
+void	signal_handler(void);
+void	handle_sigint(int sig);
+void	handle_sigquit(int sig);
 // INIT
 
-char	*rl_gets(char *line_read, int hist_file);
+char	*rl_gets(char *line_read, int hist_file, int err_code);
 int		rl_loop(int ac, char **av, char **sys_envp);
 int		open_history_file(int hist_fd);
 int		interactive_mode_loop(int hist_fd, char **envp);
 void	intialize_utils(char **sys_envp, t_utils **utils);
-
 int			parsing(char **line_read, t_pipe ***pipe, t_utils *utils);
 // LEXER
 
@@ -130,7 +135,6 @@ int		quote_count(char *str);
 
 //HELPER
 int			is_only_digits_and_signs(char *str);
-
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2
