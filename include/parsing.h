@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/22 18:10:34 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/25 17:40:41 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,10 @@
 # define PARSING_H
 
 # include "./minishell.h"
-# include <readline/readline.h>
-# include <readline/history.h>
+# include "./readline/readline.h"
+# include "./readline/history.h"
+//# include <readline/readline.h>
+//# include <readline/history.h>
 # include <signal.h>
 # include <dirent.h>
 
@@ -55,7 +57,7 @@ void	handle_sigint(int sig);
 void	handle_sigquit(int sig);
 // INIT
 
-char	*rl_gets(char *line_read, int hist_file);
+char	*rl_gets(char *line_read, int hist_file, int err_code);
 int		rl_loop(int ac, char **av, char **sys_envp);
 int		open_history_file(int hist_fd);
 int		interactive_mode_loop(int hist_fd, char **envp);

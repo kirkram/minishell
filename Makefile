@@ -2,7 +2,7 @@ NAME = m_shell
 LIBFT_PATH = ./lib/libft
 LIBFT = $(LIBFT_PATH)/libft.a
 CFLAGS = -Wall -Wextra -Werror
-HEADERS	= -I ./include -L/usr/local/lib -I/usr/local/include #-lreadline
+HEADERS	= -I ./include -L/usr/local/lib -L${HOME}/.brew/opt/readline/lib -I/usr/local/include #-lreadline
 DEBUGFLAGS = -g -fsanitize=address,undefined,integer
 SRCS = \
  ./srcs/parsing/lexer.c ./srcs/parsing/lexer2.c ./srcs/parsing/parse.c \

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/22 18:10:07 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/25 17:41:35 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 
 	while (1)
 	{
-		line_read = rl_gets(line_read, hist_fd);
+		line_read = rl_gets(line_read, hist_fd, utils->err_code);
 		if (line_read && parsing(&line_read, &_pipe, utils) != 1)
 		{
 			i = 0;
@@ -181,7 +181,7 @@ int	open_history_file(int hist_fd)
 	return (hist_fd);
 }
 
-char *rl_gets(char *line_read, int hist_file)
+char *rl_gets(char *line_read, int hist_file, int err_code)
 {
 	if (line_read)
 	{
@@ -189,6 +189,8 @@ char *rl_gets(char *line_read, int hist_file)
 		line_read = NULL;
 	}
 	line_read = readline("minishell-0.5$ ");
+	if (!line_read)
+		exit (err_code);
 	if (line_read && *line_read)
 	{
 		add_history(line_read);
