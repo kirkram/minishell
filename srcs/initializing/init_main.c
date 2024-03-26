@@ -6,17 +6,20 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/26 14:51:44 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/26 17:00:09 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../lib/get_next_line/get_next_line.h"
 
+
+
 int	main(int ac, char **av, char **sys_envp)
 {
 	(void)ac;
 	int		ret;
+	g_signal = 0;
 
 	signal_handler();
 	ret = 0;
@@ -50,6 +53,7 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 
 	while (1)
 	{
+		g_signal = 0;
 		utils->syntax_err = false;
 		line_read = rl_gets(line_read, hist_fd, utils->err_code);
 		if (line_read && parsing(&line_read, &_pipe, utils) != 1)
@@ -191,18 +195,32 @@ int	open_history_file(int hist_fd)
 
 char *rl_gets(char *line_read, int hist_file, int err_code)
 {
+	int	savestdio;
+
+	savestdio = dup(STDIN_FILENO);
 	if (line_read)
 	{
 		free (line_read);
 		line_read = NULL;
 	}
+	g_signal = 0;
+	//ft_putendl_fd("g_signal = 0", 2);
 	line_read = readline("minishell-0.5$ ");
-	if (!line_read)
+	if (!line_read && g_signal != 130)
+	{
+		//only works with ctrl + d?
+		ft_putendl_fd("exit", 2);
 		exit (err_code);
+	}
+	else if (!line_read && g_signal == 130)
+	{
+		dup2 (savestdio, STDIN_FILENO);
+	}
 	if (line_read && *line_read)
 	{
 		add_history(line_read);
 		ft_putendl_fd(line_read, hist_file);
 	}
+	close (savestdio);
 	return (line_read);
 }

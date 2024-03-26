@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 13:52:15 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/26 15:31:19 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 //# include <readline/history.h>
 # include <signal.h>
 # include <dirent.h>
+
+int	g_signal;
 
 //# include </usr/include/readline/readline.h> //needed for Linux
 //# include </usr/include/readline/history.h> // needed for Linux
