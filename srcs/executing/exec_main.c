@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/22 16:10:25 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/26 14:45:13 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ char	*assign_scmd_path(char *scmd, char **envp)
 		if (scmd && scmd[0] == '/')
 		{
 			cmd_path = ft_strdup(scmd);
+			if (!cmd_path)
+				malloc_error(1);
 			free_and_1(env_paths, NULL);
 			if (access(cmd_path, F_OK) == 0 && access(cmd_path, X_OK) == 0)
 				return (cmd_path);
@@ -73,11 +75,23 @@ char	**find_path_and_pwd(char **envp, char *scmd)
 	}
 	vars.bigpath = jointhree(vars.path, ":", vars.pwd);
 	if (vars.bigpath && !vars.should_skip_pwd)
+	{
 		vars.paths = ft_split(vars.bigpath, ':');
+		if (!vars.paths)
+			malloc_error(1);
+	}
 	else if (vars.path)
+	{
 		vars.paths = ft_split(vars.path, ':');
+		if (!vars.paths)
+			malloc_error(1);
+	}
 	else if (!vars.should_skip_pwd)
+	{
 		vars.paths = ft_split(vars.pwd, ':');
+		if (!vars.paths)
+			malloc_error(1);
+	}
 	free (vars.bigpath);
 	return (vars.paths);
 }
@@ -336,7 +350,7 @@ char	*jointhree(char const *s1, char const *s2, char const *s3)
 		newstr = malloc(((ft_strlen(s1) + ft_strlen(s2) \
 		+ ft_strlen(s3)) + 1) * sizeof(char));
 		if (newstr == NULL)
-			return (NULL);
+			malloc_error(1);
 		ft_strlcpy(newstr, (char *)s1, -1);
 		ft_strlcpy(newstr + ft_strlen(newstr), (char *)s2, -1);
 		ft_strlcpy(newstr + ft_strlen(newstr), (char *)s3, -1);
@@ -356,7 +370,7 @@ int	user_cmd_path(char **args, char *arg_cmd, char **paths)
 	free (args[0]);
 	args[0] = malloc(ft_strlen(arg_cmd) + 1);
 	if (!args[0])
-		return (free_and_1(args + 1, NULL));
+		malloc_error(1);
 	while (arg_cmd[i])
 	{
 		args[0][i] = arg_cmd[i];

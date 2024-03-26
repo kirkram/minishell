@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/26 13:38:36 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/26 14:51:44 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ char *exp_init(char *str1, char *str2)
 	temp = NULL;
 	temp = malloc(sizeof(char) * (ft_strlen(str1) + ft_strlen(str2) + 3));
 	if (!temp)
-		return (NULL);
+		malloc_error(1);
 	while(str1[i])
 	{
 		temp[i] = str1[i];
@@ -131,17 +131,24 @@ void	intialize_utils(char **sys_envp, t_utils **utils)
 	int	i;
 
 	*(utils) = malloc(sizeof(t_utils));
+	if (*utils == NULL)
+		malloc_error(1);
 	i = 0;
 	while (sys_envp[i])
 		i ++;
 	(*utils)->envp = malloc((i + 1) * sizeof(char *));
+	if ((*utils)->envp == NULL)
+		malloc_error(1);
 	(*utils)->export = malloc((i + 1) * sizeof(char *));
+	if ((*utils)->export == NULL)
+		malloc_error(1);
 	i = 0;
 	while (sys_envp[i])
 	{
 		(*utils)->envp[i] = ft_strdup(sys_envp[i]);
+		if ((*utils)->envp[i] == NULL)
+			malloc_error(1);
 		(*utils)->export[i] = exp_init("declare -x ", sys_envp[i]);
-		//(*utils)->export[i] = ft_strjoin("declare -x ", ft_strdup(sys_envp[i]));
 		i ++;
 	}
 	(*utils)->envp[i] = NULL;
