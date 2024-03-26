@@ -21,23 +21,15 @@ void	signal_handler(void)
 	//signal(SIGINT, handle_sigint);  //ctrt + c should quit back to promt
 	//signal(SIGKILL, NULL); // ctrl + \ hould do nothing
 									// ctr + D should act as eof
+	struct sigaction	sa1;
+	struct sigaction	sa2;
 
- 	struct	sigaction sa1;
-
-
- 	sa1.sa_handler = SIG_IGN;
+	sa1.sa_handler = SIG_IGN;
 	sigaction(SIGQUIT, &sa1, NULL);
-
-	struct	sigaction sa2;
-
 	sa2.sa_handler = &handle_sigint;
 	sa2.sa_flags = SA_RESTART;
-	//sigemptyset(&sa2.sa_handler);
-	//sigemptyset(&sa2.sa_mask);
 	sigaction(SIGINT, &sa2, NULL);
-	// sa1.sa_flags = SA_RESTART;
-	// sigemptyset(&sa1.sa_mask);
-	// sigaction(SIGQUIT, &sa1, NULL);
+
 }
 
 void	handle_sigint(int sig)
