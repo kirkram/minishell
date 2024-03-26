@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:51:27 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/20 15:58:00 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/26 11:44:25 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,18 +37,6 @@ void	quote_status(bool *quote)
 		(*quote) = true;
 	else if ((*quote) == true)
 		(*quote) = false;
-}
-
-int	syntax_err(char **array, int *err_code, int i)
-{
-	*err_code = 258;
-	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
-	if (!array[i +1] || !array[i +1][0])
-		ft_putstr_fd("newline", 2);
-	else
-		ft_putstr_fd(array[i +1], 2);
-	ft_putendl_fd("\'", 2);
-	return (1);
 }
 
 void	malloc_error(int err)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/22 15:43:49 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/26 15:22:51 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,62 +133,6 @@ void	init_tokenarr(int **tokens, char **array)
 	(*tokens)[i] = 0;
 }
 
-
-
-int	syntax_check(int *tokens, int *err_code, char **array)
-{
-	int	i;
-
-	i = 0;
-	while (tokens[i] != 0)
-	{
-		if (tokens[i] == PIPE)
-		{
-			if (i == 0 || (i > 0 && tokens[i -1] == PIPE) || tokens[i +1] == PIPE)
-			{
-				ft_putendl_fd("minishell: syntax error near unexpected token `|'", 2);
-				*err_code = 258;
-				return (1);
-			}
-			if (tokens[i +1] == 0)
-			{
-				ft_putendl_fd("empty pipe", 2);
-				*err_code = 258;
-				return (1);
-			}
-		}
-		else if (tokens[i] == IN_FD)
-		{
-			if (tokens[i +1] != CMD)
-				return (syntax_err(array, err_code, i));
-		}
-		else if (tokens[i] == IN_HD)
-		{
-			if (tokens[i +1] != CMD)
-				return (syntax_err(array, err_code, i));
-		}
-		else if (tokens[i] == OUT)
-		{
-			if (tokens[i +1] != CMD)
-				return (syntax_err(array, err_code, i));
-		}
-		else if (tokens[i] == OUT_AP)
-		{
-			if (tokens[i +1] != CMD)
-				return (syntax_err(array, err_code, i));
-		}
-		else if (tokens[i] == NOT_MS)
-		{
-			ft_putstr_fd("minishell: syntax error: non implemented operator: ", 2);
-			ft_putendl_fd(array[i], 2);
-			*err_code = 1;
-			return (1);
-		}
-		i++;
-	}
-	return (0);
-}
-
 int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
 {
 	char	**array;
@@ -216,46 +160,3 @@ int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
 		return (1); //free what is needed first
 	return (0);
 }
-
-void	here_doc(t_pipe ***pipe)
-{
-	int	i;
-	int	x;
-
-	x = 0;
-	while ((*pipe)[x])
-	{
-		i = 0;
-		while ((*pipe)[x]->args[i])
-		{
-			if ((*pipe)[x]->tokens[i] == SKIP_HD)
-			{
-				here_doc_open((*pipe)[x]->args[i], (*pipe)[x]);
-				close ((*pipe)[x]->hd_fd[0]);
-			}
-			else if ((*pipe)[x]->tokens[i] == IN_HD)
-				here_doc_open((*pipe)[x]->args[i], (*pipe)[x]);
-			i++;
-		}
-		x++;
-	}
-}
-
-
-void	here_doc_open(char *eof, t_pipe *_pipe)
-{
-	char	*buff;
-
-	pipe(_pipe->hd_fd);
-	while (1)
-	{
-		buff = readline("> ");
-		if (ft_strncmp(eof, buff, -1) == 0)
-			break ;
-		ft_putendl_fd(buff, _pipe->hd_fd[1]);
-		free (buff);
-	}
-	close(_pipe->hd_fd[1]);
-	free(buff);
-}
-
