@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:21:44 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/22 13:52:01 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/26 16:36:34 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ char	*get_variable(char *temp, char **envp, int err_code)
 	env_var = NULL;
 	i = 0;
 	temp = ft_strjoin(temp, "=");
+	if (!temp)
+		malloc_error (1);
 	if (ft_strnstr("?=", temp, ft_strlen(temp)))
 		return (ft_itoa(err_code));
 	while (envp[i])
@@ -76,12 +78,18 @@ void	env_variable(char **str, t_utils *utils, bool quote, bool dquote)
 				new_str = ft_substr((*str), start, i);
 			else
 				combine_str(&new_str, ft_substr((*str), start, i - start));
+			if (!new_str)
+				malloc_error (1);
 			i++;
 			start = i;
 			while ((*str)[i] && (*str)[i] != ' ' && (*str)[i] != '\0' && (*str)[i] != '$' &&(*str)[i] != '\'' && (*str)[i] != '\"' && (*str)[i -1] != '?')
 				i++;
 			temp = ft_substr((*str), start, i - start);
+			if (!temp)
+				malloc_error (1);
 			combine_str(&new_str, get_variable(temp, utils->envp, utils->err_code));
+			if (!new_str)
+				malloc_error (1);
 			start = i;
 		}
 		else
@@ -90,6 +98,8 @@ void	env_variable(char **str, t_utils *utils, bool quote, bool dquote)
 	if (new_str)
 	{
 		combine_str(&new_str, ft_substr((*str), start, i - start));
+		if (!new_str)
+			malloc_error (1);
 		(*str) = new_str;
 	}
 }
