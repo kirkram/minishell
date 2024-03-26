@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/25 17:40:41 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/26 13:52:15 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,10 @@ int			parser(char **array, t_pipe ***pipe, int *err_code);
 int			syntax_check(int *tokens, int *err_code, char **array);
 void		here_doc_open(char *eof, t_pipe *_pipe);
 void		here_doc(t_pipe ***pipe);
+int			final_args(t_pipe *pipe, int i);
+void		remove_red(t_pipe *pipe, int i);
+int			make_tokens(t_pipe *pipe, int i);
+
 // LEXER/PARSER UTILS
 
 int			is_builtin(char *str);
@@ -93,6 +97,8 @@ int			syntax_err(char **array, int *err_code, int i);
 void		malloc_error(int err);
 void		quote_status2(bool *quote, bool *dquote, char c);
 void		quote_status(bool *quote);
+int			not_ms(char **array, int *err_code, int i);
+int			pipe_error(int *tokens, int *err_code, int i);
 //EXECUTE
 
 char	*assign_scmd_path(char *scmd, char **envp);

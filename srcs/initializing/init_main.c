@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/25 17:41:35 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/26 13:38:36 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 
 	while (1)
 	{
+		utils->syntax_err = false;
 		line_read = rl_gets(line_read, hist_fd, utils->err_code);
 		if (line_read && parsing(&line_read, &_pipe, utils) != 1)
 		{
@@ -127,7 +128,7 @@ char *exp_init(char *str1, char *str2)
 
 void	intialize_utils(char **sys_envp, t_utils **utils)
 {
-	int i;
+	int	i;
 
 	*(utils) = malloc(sizeof(t_utils));
 	i = 0;

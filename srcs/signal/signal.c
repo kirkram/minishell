@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:56:02 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/25 17:49:53 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/26 13:38:25 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,9 @@ void	signal_handler(void)
 									// ctr + D should act as eof
 
  	struct	sigaction sa1;
-	
+
 
  	sa1.sa_handler = SIG_IGN;
-	//sigemptyset(&sa1.sa_mask);
-	//sa1.sa_flags = SA_NODEFER;
 	sigaction(SIGQUIT, &sa1, NULL); 
 
 	struct	sigaction sa2;
@@ -49,15 +47,16 @@ void	signal_handler(void)
 void	handle_sigint(int sig)
 {
 	(void)sig;
-	int fd;
+ 	int fd;
 
-	// fd = dup(STDIN_FILENO);
-	// close (STDIN_FILENO);
-	// dup2 (fd, STDIN_FILENO);
+	fd = dup(STDIN_FILENO);
+	write(fd, NULL, 1);
+	close (STDIN_FILENO);
+	dup2 (fd, STDIN_FILENO);
+
 	ft_putstr_fd("\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
-	//rl_clear_history();
 	rl_redisplay();
 	//ft_putstr_fd("minishell-0.5$ ", 1);
 }
