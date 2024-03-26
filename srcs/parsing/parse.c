@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/22 15:39:23 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/26 14:31:05 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,17 @@ void	init_token(t_pipe *pipe)
 	pipe->tokens[i] = 0;
 }
 
-int	make_tokens(t_pipe *pipe)
+
+void	remove_in(t_pipe *pipe, int i, int hd)
 {
-	int	i;
+
+
+}
+
+int	make_tokens(t_pipe *pipe, int i)
+{
 	int	x;
 
-	i = 0;
 	// still need freeing function upon error
 	while (pipe->args[i])
 	{
@@ -104,12 +109,10 @@ int	make_tokens(t_pipe *pipe)
 	return (0);
 }
 
-void	remove_red(t_pipe *pipe)
+void	init_remove_red(t_pipe *pipe, char ***temp, int **i_temp)
 {
-	int		i;
-	int		x;
-	char	**temp;
-	int		*i_temp;
+	int	i;
+	int	x;
 
 	i = 0;
 	x = 1;
@@ -119,12 +122,21 @@ void	remove_red(t_pipe *pipe)
 			x++;
 		i++;
 	}
-	temp = malloc(sizeof(char *) * (x +1));
-	i_temp = malloc(sizeof(int *) * (x +1));
-	if (!temp || !i_temp)
+	(*temp) = malloc(sizeof(char *) * (x +1));
+	(*i_temp) = malloc(sizeof(int *) * (x +1));
+	if (!(*temp) || !(*i_temp))
 		malloc_error(1);
+}
+
+void	remove_red(t_pipe *pipe, int i)
+{
+	int		x;
+	char	**temp;
+	int		*i_temp;
+
 	x = 0;
 	i = 0;
+	init_remove_red(pipe, &temp, &i_temp);
 	while (pipe->args[i])
 	{
 		if (pipe->tokens[i] != REMOVE)
@@ -143,13 +155,13 @@ void	remove_red(t_pipe *pipe)
 	pipe->tokens = i_temp;
 }
 
-int	final_args(t_pipe *pipe)
+void	init_noio(t_pipe *pipe)
 {
 	int	i;
 	int	x;
 
-	x = 0;
 	i = 0;
+	x = 0;
 	while (pipe->args[i])
 	{
 		if (pipe->tokens[i] == CMD)
@@ -159,13 +171,17 @@ int	final_args(t_pipe *pipe)
 	pipe->noio_args = malloc (sizeof(char *) * (x +1));
 	if (!pipe->noio_args)
 		malloc_error(1);
-	i = 0;
+}
+
+int	final_args(t_pipe *pipe, int i)
+{
+	int	x;
+
 	x = 0;
+	init_noio(pipe);
 	while (pipe->args[i])
 	{
-		if (pipe->tokens[i] == IN_FD)
-			pipe->infile = ft_strdup(pipe->args[i]);
-		if (pipe->tokens[i] == IN_HD)
+		if (pipe->tokens[i] == IN_FD || pipe->tokens[i] == IN_HD)
 			pipe->infile = ft_strdup(pipe->args[i]);
 		if (pipe->tokens[i] == CMD)
 		{
@@ -188,16 +204,18 @@ int	final_args(t_pipe *pipe)
 int	parser(char **array, t_pipe ***pipe, int *err_code)
 {
 	int	x;
+	int	i;
 
+	i = 0;
 	x = 0;
 	pre_parse(array, pipe);
 	while ((*pipe)[x])
 	{
 		init_token((*pipe)[x]);
-		if (make_tokens((*pipe)[x]) == 1)
+		if (make_tokens((*pipe)[x], i) == 1)
 			return (1);
-		remove_red((*pipe)[x]);
-		if (final_args((*pipe)[x]) == 1)
+		remove_red((*pipe)[x], i);
+		if (final_args((*pipe)[x], i) == 1)
 		{
 			*err_code = 1;
 			return (1);
