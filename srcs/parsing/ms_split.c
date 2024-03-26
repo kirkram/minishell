@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/13 11:18:05 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/21 15:14:58 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/26 16:39:32 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,7 @@ char	**free_reverse(int i, char **array)
 		i --;
 	}
 	free (array);
+	malloc_error (1);
 	return (NULL);
 }
 
