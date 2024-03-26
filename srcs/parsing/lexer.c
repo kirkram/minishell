@@ -6,11 +6,29 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:21:44 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 16:36:34 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/26 18:24:20 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+
+int	env_error(char **temp)
+{
+	char	*ptr;
+
+	ptr = *temp;
+	(*temp) = ft_strjoin((*temp), "=");
+	if (!(*temp))
+		malloc_error (1);
+	if (ptr)
+		free (ptr);
+	if (ft_strnstr("?=", (*temp), ft_strlen((*temp))))
+	{
+		free ((*temp));
+		return (1);
+	}
+	return (0);
+}
 
 char	*get_variable(char *temp, char **envp, int err_code)
 {
@@ -19,16 +37,14 @@ char	*get_variable(char *temp, char **envp, int err_code)
 
 	env_var = NULL;
 	i = 0;
-	temp = ft_strjoin(temp, "=");
-	if (!temp)
-		malloc_error (1);
-	if (ft_strnstr("?=", temp, ft_strlen(temp)))
+	if (env_error(&temp) == 1)
 		return (ft_itoa(err_code));
 	while (envp[i])
 	{
 		if (ft_strnstr(envp[i], temp, ft_strlen(temp)))
 		{
-			env_var = ft_substr(envp[i], ft_strlen(temp), ft_strlen(envp[i]) - ft_strlen(temp));
+			env_var = ft_substr(envp[i], ft_strlen(temp),
+					ft_strlen(envp[i]) - ft_strlen(temp));
 			if (!env_var)
 				malloc_error(1);
 			break ;
@@ -58,6 +74,24 @@ void	combine_str(char **new_str, char *temp)
 	free (ptr);
 }
 
+void	env_loop(char **str, char **new_str, int *start, int *i)
+{
+	{
+		if (!(*new_str))
+			(*new_str) = ft_substr((*str), (*start), (*i));
+		else
+			combine_str(new_str, ft_substr((*str), (*start), (*i) - (*start)));
+		if (!(*new_str))
+			malloc_error (1);
+		(*i)++;
+		(*start) = (*i);
+		while ((*str)[(*i)] && (*str)[(*i)] != ' ' && (*str)[(*i)] != '\0'
+			&& (*str)[(*i)] != '$' && (*str)[(*i)] != '\''
+			&& (*str)[(*i)] != '\"' && (*str)[(*i) -1] != '?')
+			(*i)++;
+	}
+}
+
 void	env_variable(char **str, t_utils *utils, bool quote, bool dquote)
 {
 	int		start;
@@ -72,22 +106,15 @@ void	env_variable(char **str, t_utils *utils, bool quote, bool dquote)
 	while ((*str) && (*str)[i])
 	{
 		quote_status2(&quote, &dquote, (*str)[i]);
-		if ((*str)[i] == '$' && quote == false && (*str)[i +1] && (*str)[i +1] != ' ' && (*str)[i +1] != '$')
+		if ((*str)[i] == '$' && quote == false && (*str)[i +1]
+			&& (*str)[i +1] != ' ' && (*str)[i +1] != '$')
 		{
-			if (!new_str)
-				new_str = ft_substr((*str), start, i);
-			else
-				combine_str(&new_str, ft_substr((*str), start, i - start));
-			if (!new_str)
-				malloc_error (1);
-			i++;
-			start = i;
-			while ((*str)[i] && (*str)[i] != ' ' && (*str)[i] != '\0' && (*str)[i] != '$' &&(*str)[i] != '\'' && (*str)[i] != '\"' && (*str)[i -1] != '?')
-				i++;
+			env_loop(str, &new_str, &start, &i);
 			temp = ft_substr((*str), start, i - start);
 			if (!temp)
 				malloc_error (1);
-			combine_str(&new_str, get_variable(temp, utils->envp, utils->err_code));
+			combine_str(&new_str, get_variable(temp,
+					utils->envp, utils->err_code));
 			if (!new_str)
 				malloc_error (1);
 			start = i;

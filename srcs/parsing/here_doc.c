@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_doc.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:06:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 16:28:38 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/26 17:30:35 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	here_doc(t_pipe ***pipe)
 void	here_doc_open(char *eof, t_pipe *_pipe)
 {
 	char	*buff;
-	int save_stdin;
+	int		save_stdin;
 
 	save_stdin = dup(STDIN_FILENO);
 	pipe(_pipe->hd_fd);
@@ -52,7 +52,7 @@ void	here_doc_open(char *eof, t_pipe *_pipe)
 			dup2 (save_stdin, STDIN_FILENO);
 			close (save_stdin);
 			ft_putendl_fd("", 1);
-			break;
+			break ;
 		}
 		if (!buff)
 			break ;
