@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signal.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:56:02 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 13:38:25 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/26 16:58:52 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	signal_handler(void)
 
 
  	sa1.sa_handler = SIG_IGN;
-	sigaction(SIGQUIT, &sa1, NULL); 
+	sigaction(SIGQUIT, &sa1, NULL);
 
 	struct	sigaction sa2;
 
@@ -35,11 +35,7 @@ void	signal_handler(void)
 	//sigemptyset(&sa2.sa_handler);
 	//sigemptyset(&sa2.sa_mask);
 	sigaction(SIGINT, &sa2, NULL);
- 
 	// sa1.sa_flags = SA_RESTART;
-
-	
-
 	// sigemptyset(&sa1.sa_mask);
 	// sigaction(SIGQUIT, &sa1, NULL);
 }
@@ -47,27 +43,19 @@ void	signal_handler(void)
 void	handle_sigint(int sig)
 {
 	(void)sig;
- 	int fd;
+ 	int save_stdin;
 
-	fd = dup(STDIN_FILENO);
-	write(fd, NULL, 1);
+	g_signal = 130;
+	//ft_putendl_fd("g_signal = 130", 2);
+	//write(save_stdin, '\0', 1);
+	//dup2 (save_stdin, STDIN_FILENO);
+	// ft_putstr_fd("\n", 1);
+	// rl_on_new_line();
+	//rl_redisplay();
 	close (STDIN_FILENO);
-	dup2 (fd, STDIN_FILENO);
-
-	ft_putstr_fd("\n", 1);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
+	//ft_putendl_fd("", 1);
+	//rl_replace_line("", 0);
+	//dup2 (save_stdin, STDIN_FILENO);
 	//ft_putstr_fd("minishell-0.5$ ", 1);
 }
 
-/* readline, rl_clear_history, rl_on_new_line,
-rl_replace_line, rl_redisplay, add_history,
-printf, malloc, free, write, access, open, read,
-close, fork, wait, waitpid, wait3, wait4, signal,
-sigaction, sigemptyset, sigaddset, kill, exit,
-getcwd, chdir, stat, lstat, fstat, unlink, execve,
-dup, dup2, pipe, opendir, readdir, closedir,
-strerror, perror, isatty, ttyname, ttyslot, ioctl,
-getenv, tcsetattr, tcgetattr, tgetent, tgetflag,
-tgetnum, tgetstr, tgoto, tputs */

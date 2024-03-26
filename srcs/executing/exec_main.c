@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/26 14:45:13 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/26 16:58:11 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,9 +112,12 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	int			*tokens;
 	int			has_fd_failed;
 
+
+	if (g_signal == 130)
+		return (130);
+
 	savestdio[0] = dup(STDIN_FILENO);
 	savestdio[1] = dup(STDOUT_FILENO);
-
 	//PREP
 	i = 0;
 	while (_pipe[i])
@@ -218,7 +221,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 					child_exit_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
 				if (i != num_of_pipes - 1)
 					child_exit_code = 127;
-
 				i = 0;
 				while (_pipe[i])
 				{
@@ -242,10 +244,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		}
 		i ++;
 	}
-	dup2(savestdio[0], STDIN_FILENO);
-	dup2(savestdio[1], STDOUT_FILENO);
-	close(savestdio[0]);
-	close(savestdio[1]);
 
 	i = 0;
 	while (i < num_of_pipes)
@@ -258,8 +256,16 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			waitpid(pid[i], NULL, 0);
 		i ++;
 	}
+	dup2(savestdio[0], STDIN_FILENO);
+	dup2(savestdio[1], STDOUT_FILENO);
+	close(savestdio[0]);
+	close(savestdio[1]);
+	if (g_signal == 130)
+	{
+		ft_putendl_fd("", 1);
+		return (130);
+	}
 	// while (1);
-
 	if (WIFEXITED(child_exit_code))
 		return (WEXITSTATUS(child_exit_code));
 	else
