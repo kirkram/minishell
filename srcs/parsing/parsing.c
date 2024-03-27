@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 15:22:51 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/27 19:48:48 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,33 +61,6 @@ char	**get_cmd(char **cmds, int start, int end)
 	return (temp_arr);
 }
 
-void	pipeline_init(char **array, t_pipe ***pipe)
-{
-	int	i;
-	int	x;
-
-	i = 0;
-	x = 1;
-	while (array[i])
-	{
-		if (array[i][0] == '|')
-			x++;
-		i++;
-	}
-	*pipe = malloc(sizeof(t_pipe *) * (x +1));
-	if (!*pipe)
-		malloc_error(1);
-	i = 0;
-	while (i < x)
-	{
-		(*pipe)[i] = malloc(sizeof(t_pipe));
-		if (!(*pipe)[i])
-			malloc_error(1);
-		i++;
-	}
-	(*pipe)[x] = NULL;
-}
-
 void	pre_parse(char **array, t_pipe ***pipe)
 {
 	int	i;
@@ -114,25 +87,6 @@ void	pre_parse(char **array, t_pipe ***pipe)
 	}
 }
 
-void	init_tokenarr(int **tokens, char **array)
-{
-	int	i;
-
-	i = 0;
-	while (array[i])
-		i++;
-	(*tokens) = malloc (sizeof(int *) * (i +2));
-	if (!(*tokens))
-		malloc_error(1);
-	i = 0;
-	while (array[i])
-	{
-		(*tokens)[i] = get_token(array[i]);
-		i++;
-	}
-	(*tokens)[i] = 0;
-}
-
 int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
 {
 	char	**array;
@@ -147,7 +101,7 @@ int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
 	free(*line_read);
 	*line_read = NULL;
 	if (!array)
-		return (1); // or  something else if malloc failed
+		return (1);
 	init_tokenarr(&tokens, array);
 	if (syntax_check(tokens, &utils->err_code, array) == 1)
 		utils->syntax_err = TRUE;

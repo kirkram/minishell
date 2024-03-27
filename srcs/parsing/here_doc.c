@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:06:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 17:30:35 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/27 18:11:10 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ void	here_doc(t_pipe ***pipe)
 		x++;
 	}
 }
-
 
 void	here_doc_open(char *eof, t_pipe *_pipe)
 {

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:21:44 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 18:24:20 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/27 19:08:36 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,34 +30,6 @@ int	env_error(char **temp)
 	return (0);
 }
 
-char	*get_variable(char *temp, char **envp, int err_code)
-{
-	int		i;
-	char	*env_var;
-
-	env_var = NULL;
-	i = 0;
-	if (env_error(&temp) == 1)
-		return (ft_itoa(err_code));
-	while (envp[i])
-	{
-		if (ft_strnstr(envp[i], temp, ft_strlen(temp)))
-		{
-			env_var = ft_substr(envp[i], ft_strlen(temp),
-					ft_strlen(envp[i]) - ft_strlen(temp));
-			if (!env_var)
-				malloc_error(1);
-			break ;
-		}
-		i++;
-	}
-	if (temp)
-		free (temp);
-	if (!env_var)
-		return (ft_strdup(""));
-	return (env_var);
-}
-
 void	combine_str(char **new_str, char *temp)
 {
 	char	*ptr;
@@ -72,63 +44,6 @@ void	combine_str(char **new_str, char *temp)
 		malloc_error(1);
 	free (temp);
 	free (ptr);
-}
-
-void	env_loop(char **str, char **new_str, int *start, int *i)
-{
-	{
-		if (!(*new_str))
-			(*new_str) = ft_substr((*str), (*start), (*i));
-		else
-			combine_str(new_str, ft_substr((*str), (*start), (*i) - (*start)));
-		if (!(*new_str))
-			malloc_error (1);
-		(*i)++;
-		(*start) = (*i);
-		while ((*str)[(*i)] && (*str)[(*i)] != ' ' && (*str)[(*i)] != '\0'
-			&& (*str)[(*i)] != '$' && (*str)[(*i)] != '\''
-			&& (*str)[(*i)] != '\"' && (*str)[(*i) -1] != '?')
-			(*i)++;
-	}
-}
-
-void	env_variable(char **str, t_utils *utils, bool quote, bool dquote)
-{
-	int		start;
-	char	*new_str;
-	char	*temp;
-	int		i;
-
-	i = 0;
-	temp = NULL;
-	new_str = NULL;
-	start = 0;
-	while ((*str) && (*str)[i])
-	{
-		quote_status2(&quote, &dquote, (*str)[i]);
-		if ((*str)[i] == '$' && quote == false && (*str)[i +1]
-			&& (*str)[i +1] != ' ' && (*str)[i +1] != '$')
-		{
-			env_loop(str, &new_str, &start, &i);
-			temp = ft_substr((*str), start, i - start);
-			if (!temp)
-				malloc_error (1);
-			combine_str(&new_str, get_variable(temp,
-					utils->envp, utils->err_code));
-			if (!new_str)
-				malloc_error (1);
-			start = i;
-		}
-		else
-			i++;
-	}
-	if (new_str)
-	{
-		combine_str(&new_str, ft_substr((*str), start, i - start));
-		if (!new_str)
-			malloc_error (1);
-		(*str) = new_str;
-	}
 }
 
 void	remove_space(char **str, int i)
@@ -197,6 +112,7 @@ int	lexer(char **str, t_utils *utils)
 		}
 		i++;
 	}
-	*str = separator(*(str), quote, dquote);
+	i = 0;
+	*str = separator(*(str), quote, dquote, i);
 	return (0);
 }

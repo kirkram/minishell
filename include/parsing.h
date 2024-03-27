@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 15:31:19 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/27 19:48:50 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,6 @@ int			parsing(char **line_read, t_pipe ***pipe, t_utils *utils);
 // LEXER
 
 int			check_quote(char **str, bool quote, bool dquote, int *err_code);
-//int			lexer(char **array, char *envp[], int *err_code);
 int			lexer(char **str, t_utils *utils);
 void		env_variable(char **str, t_utils *utils, bool quote, bool dquote);
 //char		*env_variable(char *str, char **envp, int err_code, bool quote, bool dquote);
@@ -77,9 +76,18 @@ char		*get_variable(char *temp, char **envp, int err_code);
 int			*tokenizer(char **array);
 int			get_token(char *str);
 
-char		*separator(char *str, bool quote, bool dquote);
+char		*separator(char *str, bool quote, bool dquote, int i);
 void		remove_space(char **str, int i);
 
+void		init_token(t_pipe *pipe);
+void		remove_in(t_pipe *pipe, int i, int hd);
+void		remove_out(t_pipe *pipe, int i, int app);
+int			make_tokens(t_pipe *pipe, int i);
+int			env_error(char **temp);
+void		combine_str(char **new_str, char *temp);
+
+void		pipeline_init(char **array, t_pipe ***pipe);
+void		init_tokenarr(int **tokens, char **array);
 // PARSER
 
 char		**get_cmd(char **cmds, int start, int end);
@@ -90,7 +98,6 @@ void		here_doc_open(char *eof, t_pipe *_pipe);
 void		here_doc(t_pipe ***pipe);
 int			final_args(t_pipe *pipe, int i);
 void		remove_red(t_pipe *pipe, int i);
-int			make_tokens(t_pipe *pipe, int i);
 
 // LEXER/PARSER UTILS
 
@@ -138,7 +145,7 @@ int		str_count(char *str);
 char	**ms_splitter(char *str, char **array, bool quote, bool dquote);
 char	**ms_split(char *str);
 char	**free_reverse(int i, char **array);
-char	*remove_quote(char *str);
+char	*remove_quote(char *str, int i);
 int		quote_count(char *str);
 
 //HELPER
