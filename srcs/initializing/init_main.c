@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/26 17:00:09 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/26 18:19:51 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,7 +209,7 @@ char *rl_gets(char *line_read, int hist_file, int err_code)
 	if (!line_read && g_signal != 130)
 	{
 		//only works with ctrl + d?
-		ft_putendl_fd("exit", 2);
+		ft_putendl_fd("exit", STDOUT_FILENO);
 		exit (err_code);
 	}
 	else if (!line_read && g_signal == 130)

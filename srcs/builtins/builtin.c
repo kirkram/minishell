@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/22 13:38:35 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/28 16:10:32 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,18 +65,12 @@ int		echo_builtin(char **noio_args, t_utils *utils)
 	i = 1;
 	is_newlined = 1;
 	(void)utils;
-	// //tmp for exit codes
-	// if (noio_args[1] && !ft_strncmp(noio_args[1], "$?", -1))
-	// {
-	// 	ft_putendl_fd("hehe", 1);
-	// 	//don't update the error code
-	// 	ft_putendl_fd(ft_itoa(utils->err_code), 1);
-	// 	return (utils->err_code);
-	// }
 	if (noio_args[1] && !ft_strncmp(noio_args[1], "-n", -1))
 	{
 		is_newlined = 0;
 		i ++;
+		while (noio_args[i] && !ft_strncmp(noio_args[i], "-n", -1))
+			i ++;
 	}
 	while (noio_args[i])
 	{
