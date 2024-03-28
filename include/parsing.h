@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/28 14:25:22 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/28 17:56:36 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,8 @@ int			unset(t_utils *utils, char **arg);
 int			cd_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			update_pwd_oldpwd_env(t_utils *utils, char *cwd);
-
+int			export_error(char *arg, t_utils *utils);
+void		export_loop(char *arg, t_utils *utils, bool quote, bool dquote);
 //MS SPLIT
 
 int		str_count(char *str);
