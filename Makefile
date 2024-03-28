@@ -7,7 +7,8 @@ DEBUGFLAGS = -g -fsanitize=address,undefined,integer
 SRCS = \
  ./srcs/parsing/lexer.c ./srcs/parsing/lexer2.c ./srcs/parsing/parse.c \
  ./srcs/parsing/parsing.c ./srcs/parsing/ms_split.c ./srcs/parsing/parsing_utils.c \
- ./srcs/parsing/here_doc.c ./srcs/parsing/syntax_check.c \
+ ./srcs/parsing/here_doc.c ./srcs/parsing/syntax_check.c ./srcs/parsing/parse_env.c \
+ ./srcs/parsing/ms_split_utils.c ./srcs/parsing/tokens.c ./srcs/parsing/parsing_init.c \
  ./srcs/initializing/init_main.c \
  ./srcs/signal/signal.c \
  ./srcs/executing/exec_main.c \

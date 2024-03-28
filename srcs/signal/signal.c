@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signal.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:56:02 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 16:58:52 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/27 16:38:05 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	signal_handler(void)
 void	handle_sigint(int sig)
 {
 	(void)sig;
- 	int save_stdin;
+ 	//int save_stdin;
 
 	g_signal = 130;
 	//ft_putendl_fd("g_signal = 130", 2);

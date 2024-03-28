@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/13 11:18:05 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 16:39:32 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/27 18:56:33 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,8 @@ char	**ms_split(char *str)
 	return (0);
 }
 
-char	*remove_quote(char *str)
+char	*remove_quote(char *str, int i)
 {
-	int		i;
 	int		x;
 	char	*temp;
 	bool	quote;
@@ -115,25 +114,13 @@ char	**ms_splitter(char *str, char **array, bool quote, bool dquote)
 			quote_status2(&quote, &dquote, str[x]);
 			x++;
 		}
-		array[i] = remove_quote(ft_substr(str, start, (x - start)));
- 		if (!array[i])
+		array[i] = remove_quote(ft_substr(str, start, (x - start)), i);
+		if (!array[i])
 			return (free_reverse(i -1, array));
 		i++;
 	}
 	array[i] = NULL;
 	return (array);
-}
-
-char	**free_reverse(int i, char **array)
-{
-	while (i >= 0)
-	{
-		free (array[i]);
-		i --;
-	}
-	free (array);
-	malloc_error (1);
-	return (NULL);
 }
 
 int	str_count(char *str)

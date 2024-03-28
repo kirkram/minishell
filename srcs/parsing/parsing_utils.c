@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:51:27 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 11:44:25 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/28 14:38:20 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ void	quote_status2(bool *quote, bool *dquote, char c)
 		else if ((*dquote) == true)
 			(*dquote) = false;
 	}
-
 }
 
 void	quote_status(bool *quote)
@@ -61,7 +60,7 @@ int	get_token(char *str)
 		return (OUT_AP);
 	else if (ft_strncmp(str, "||", 3) == 0)
 		return (NOT_MS);
-	else if (ft_strncmp(str, "<<<", 3) == 0)
+	else if (ft_strncmp(str, "<<<", 4) == 0)
 		return (NOT_MS);
 	else
 		return (CMD);
