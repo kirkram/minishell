@@ -6,14 +6,13 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/14 12:41:01 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/28 14:42:09 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 void	print_exp(t_utils *utils, int fd)
-
 {
 	int	i;
 
@@ -28,7 +27,6 @@ void	print_exp(t_utils *utils, int fd)
 }
 
 void	sort_export(t_utils *utils)
-
 {
 	int		i;
 	char	*temp;
@@ -41,7 +39,8 @@ void	sort_export(t_utils *utils)
 		i = 0;
 		while (utils->export[i])
 		{
-			if (utils->export[i +1] && ft_strncmp (utils->export[i], utils->export[i +1], -1) > 0)
+			if (utils->export[i +1] &&
+				ft_strncmp(utils->export[i], utils->export[i +1], -1) > 0)
 			{
 				sorted = false;
 				temp = utils->export[i];
@@ -116,7 +115,6 @@ int	export(t_utils *utils, char **arg)
 }
 
 int	env(t_utils *utils)
-
 {
 	int	i;
 
@@ -132,7 +130,6 @@ int	env(t_utils *utils)
 }
 
 int	pwd(t_utils *utils)
-
 {
 	int		i;
 	char	*temp;
@@ -155,7 +152,6 @@ int	pwd(t_utils *utils)
 }
 
 int	unset(t_utils *utils, char **arg)
-
 {
 	int		i;
 	int		x;
@@ -214,7 +210,6 @@ int	unset(t_utils *utils, char **arg)
 }
 
 int	remove_exp(t_utils *utils, int i)
-
 {
 	int		x;
 	int		y;
@@ -246,7 +241,6 @@ int	remove_exp(t_utils *utils, int i)
 }
 
 int	remove_env(t_utils *utils, int i)
-
 {
 	int		x;
 	int		y;

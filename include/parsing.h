@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/27 19:48:50 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/28 14:25:22 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,5 +163,6 @@ int			is_only_digits_and_signs(char *str);
 # define SKIP_OUT 10 // should be created, but no information written to it
 # define SKIP_HD 11 // should activate Here_doc, but information should not be passed on
 # define NOT_MS 12 // operator that is not implemented in minishell
+# define NOT_DEF 13 // undefined token
 
 #endif

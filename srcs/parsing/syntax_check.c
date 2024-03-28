@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:44:05 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/27 18:10:15 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/28 14:39:05 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int	syntax_err(char **array, int *err_code, int i)
 int	not_ms(char **array, int *err_code, int i)
 {
 	ft_putstr_fd("minishell: syntax error: non implemented operator: ", 2);
-	ft_putendl_fd(array[i], 2); // maybe best to not implement at all
+	ft_putendl_fd(array[i], 2);
 	*err_code = 1;
 	return (1);
 }
@@ -69,7 +69,7 @@ int	pipe_error(int *tokens, int *err_code, int i)
 	}
 	if (tokens[i +1] == 0)
 	{
-		ft_putendl_fd("empty pipe", 2); // does it need different implementation?
+		ft_putendl_fd("empty pipe", 2); // does it need implementation?
 		*err_code = 258;
 		return (1);
 	}

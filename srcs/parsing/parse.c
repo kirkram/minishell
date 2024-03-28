@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/27 19:46:33 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/28 14:32:55 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,6 @@ void	init_remove_red(t_pipe *pipe, char ***temp, int **i_temp)
 
 	i = 0;
 	x = 1;
-	int y = 0;
-	while (y < 10)
-		printf("str = %s\n", pipe->args[y++]);
-	y = 0;
-	while (y < 10)
-		printf("token = %d\n", pipe->tokens[y++]);
 	while (pipe->tokens[i] != 0)
 	{
 		if (pipe->tokens[i] != REMOVE)

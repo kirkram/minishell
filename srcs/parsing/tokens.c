@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 18:58:14 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/27 19:08:43 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/28 14:32:28 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	init_token(t_pipe *pipe)
 		if (get_token(pipe->args[i]) == CMD)
 			pipe->tokens[i] = CMD;
 		else
-			pipe->tokens[i] = 0;
+			pipe->tokens[i] = NOT_DEF;
 		i++;
 	}
 	pipe->tokens[i] = 0;

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:51:27 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/27 19:48:49 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/28 14:38:20 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ void	quote_status2(bool *quote, bool *dquote, char c)
 		else if ((*dquote) == true)
 			(*dquote) = false;
 	}
-
 }
 
 void	quote_status(bool *quote)
