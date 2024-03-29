@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/26 16:58:11 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/29 13:41:36 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,6 +130,8 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	i = 0;
 	while (i < num_of_pipes)
 	{
+		if (g_signal == 130)
+			break;
 		//OPEN INFILE, OPEN/CREATE OUTFILE AND TRY TO ACCESS
 		infile = NULL;
 		outfile = NULL;
@@ -262,7 +264,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	close(savestdio[1]);
 	if (g_signal == 130)
 	{
-		ft_putendl_fd("", 1);
+		ft_putstr_fd("\n", STDOUT_FILENO);
 		return (130);
 	}
 	// while (1);

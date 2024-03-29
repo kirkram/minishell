@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 15:22:51 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/29 15:07:57 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,7 @@ int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
 	pipeline_init(array, pipe);
 	if (parser(array, pipe, &utils->err_code) == 1)
 		return (1); // free all first
-	here_doc(pipe);
+	here_doc(pipe, utils);
 	ft_arrfree(array);
 	if (utils->syntax_err == TRUE)
 		return (1); //free what is needed first

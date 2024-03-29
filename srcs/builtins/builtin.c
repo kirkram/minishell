@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/28 17:35:37 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/29 13:06:36 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ int		echo_builtin(char **noio_args, t_utils *utils)
 	return (0);
 }
 
-int	update_pwd_oldpwd_env(t_utils *utils, char *cwd)
+int	update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd)
 {
 	char	**export_args;
 
@@ -160,7 +160,7 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 				closedir(directory);
 			return (2);
 		}
-		update_pwd_oldpwd_env(utils, cwd);
+		update_pwd_oldpwd_env_exp(utils, cwd);
 	}
 	else
 	{
@@ -191,7 +191,7 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 				closedir(directory);
 			return (1);
 		}
-		update_pwd_oldpwd_env(utils, cwd);
+		update_pwd_oldpwd_env_exp(utils, cwd);
 	}
 	//chdir
 	//opendir, readdir, closedir:

@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 15:31:19 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/29 15:08:13 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ typedef struct s_utils
 {
 	bool	syntax_err;
 	int		err_code;
+	bool	was_prev_line_null;
 	char	**envp;
 	char	**export;
 }	t_utils;
@@ -59,7 +60,7 @@ void	handle_sigint(int sig);
 void	handle_sigquit(int sig);
 // INIT
 
-char	*rl_gets(char *line_read, int hist_file, int err_code);
+char	*rl_gets(char *line_read, int hist_file, int err_code, t_utils *utils);
 int		rl_loop(int ac, char **av, char **sys_envp);
 int		open_history_file(int hist_fd);
 int		interactive_mode_loop(int hist_fd, char **envp);
@@ -86,8 +87,8 @@ char		**get_cmd(char **cmds, int start, int end);
 void		pre_parse(char **array, t_pipe ***pipe);
 int			parser(char **array, t_pipe ***pipe, int *err_code);
 int			syntax_check(int *tokens, int *err_code, char **array);
-void		here_doc_open(char *eof, t_pipe *_pipe);
-void		here_doc(t_pipe ***pipe);
+void		here_doc_open(char *eof, t_pipe *_pipe, t_utils *utils);
+void		here_doc(t_pipe ***pipe, t_utils *utils);
 int			final_args(t_pipe *pipe, int i);
 void		remove_red(t_pipe *pipe, int i);
 int			make_tokens(t_pipe *pipe, int i);
@@ -130,7 +131,7 @@ int			remove_exp(t_utils *utils, int i);
 int			unset(t_utils *utils, char **arg);
 int			cd_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
-int			update_pwd_oldpwd_env(t_utils *utils, char *cwd);
+int			update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd);
 
 //MS SPLIT
 

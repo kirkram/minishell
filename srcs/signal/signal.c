@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:56:02 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/28 17:01:00 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/29 13:31:55 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	handle_sigint(int sig)
 	// rl_on_new_line();
 	//rl_redisplay();
 	//ft_putchar_fd('\0', 0);
-	ft_putchar_fd('\n', 0);
+	//ft_putchar_fd('\n', STDIN_FILENO);
 	close (STDIN_FILENO);
 	//ft_putendl_fd("", 1);
 	//rl_replace_line("", 0);

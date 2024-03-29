@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/26 18:19:51 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/29 15:11:40 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	{
 		g_signal = 0;
 		utils->syntax_err = false;
-		line_read = rl_gets(line_read, hist_fd, utils->err_code);
+		line_read = rl_gets(line_read, hist_fd, utils->err_code, utils);
 		if (line_read && parsing(&line_read, &_pipe, utils) != 1)
 		{
 			i = 0;
@@ -88,7 +88,6 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 }
 
 char *exp_init(char *str1, char *str2)
-
 {
 	int		i;
 	int		x;
@@ -159,6 +158,7 @@ void	intialize_utils(char **sys_envp, t_utils **utils)
 	(*utils)->export[i] = NULL;
 	(*utils)->err_code = 0;
 	(*utils)->syntax_err = false;
+	(*utils)->was_prev_line_null = 0;
 	sort_export(*utils);
 }
 
@@ -167,6 +167,7 @@ int	open_history_file(int hist_fd)
 {
 	int		err_check;
 	char	*gnl_line;
+	int		len;
 
 	gnl_line = NULL;
 	err_check = 0;
@@ -182,9 +183,12 @@ int	open_history_file(int hist_fd)
 				break;
 			else if (!gnl_line && err_check == 1)
 			{
-				ft_putendl_fd("HANDLE ERROR IN GNL", 2);
-				break; //error HANDLE
+				ft_putendl_fd("GNL History file Critical Failure", 2);
+				malloc_error(1);
 			}
+			len = ft_strlen(gnl_line) - 1;
+			if (gnl_line[len] == '\n')
+				gnl_line[len] = '\0';
 			add_history(gnl_line);
 			free (gnl_line);
 			gnl_line = NULL;
@@ -193,7 +197,7 @@ int	open_history_file(int hist_fd)
 	return (hist_fd);
 }
 
-char *rl_gets(char *line_read, int hist_file, int err_code)
+char *rl_gets(char *line_read, int hist_file, int err_code, t_utils *utils)
 {
 	int	savestdio;
 
@@ -215,11 +219,20 @@ char *rl_gets(char *line_read, int hist_file, int err_code)
 	else if (!line_read && g_signal == 130)
 	{
 		dup2 (savestdio, STDIN_FILENO);
+		//ft_putstr_fd("\b\b\033[K", STDOUT_FILENO);
+		//if (!was_previous_empty)
+		// ..rl_on_new_line();
+		if (utils->was_prev_line_null == 0)
+			ft_putchar_fd('\n', STDIN_FILENO);
+		ft_putstr_fd("\b\b\033[K", STDOUT_FILENO);
+		utils->was_prev_line_null = 1;
+		//line_read = ft_strdup("\n");
 	}
-	if (line_read && *line_read)
+	if (line_read && *line_read && g_signal != 130)
 	{
 		add_history(line_read);
 		ft_putendl_fd(line_read, hist_file);
+		utils->was_prev_line_null = 0;
 	}
 	close (savestdio);
 	return (line_read);

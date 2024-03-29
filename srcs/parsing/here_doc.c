@@ -6,13 +6,13 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:06:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/26 16:28:38 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/03/29 15:08:55 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	here_doc(t_pipe ***pipe)
+void	here_doc(t_pipe ***pipe, t_utils *utils)
 {
 	int	i;
 	int	x;
@@ -25,11 +25,13 @@ void	here_doc(t_pipe ***pipe)
 		{
 			if ((*pipe)[x]->tokens[i] == SKIP_HD)
 			{
-				here_doc_open((*pipe)[x]->args[i], (*pipe)[x]);
+				here_doc_open((*pipe)[x]->args[i], (*pipe)[x], utils);
 				close ((*pipe)[x]->hd_fd[0]);
 			}
 			else if ((*pipe)[x]->tokens[i] == IN_HD)
-				here_doc_open((*pipe)[x]->args[i], (*pipe)[x]);
+				here_doc_open((*pipe)[x]->args[i], (*pipe)[x], utils);
+			if (g_signal == 130)
+					return ;
 			i++;
 		}
 		x++;
@@ -37,7 +39,7 @@ void	here_doc(t_pipe ***pipe)
 }
 
 
-void	here_doc_open(char *eof, t_pipe *_pipe)
+void	here_doc_open(char *eof, t_pipe *_pipe, t_utils *utils)
 {
 	char	*buff;
 	int save_stdin;
@@ -51,7 +53,9 @@ void	here_doc_open(char *eof, t_pipe *_pipe)
 		{
 			dup2 (save_stdin, STDIN_FILENO);
 			close (save_stdin);
-			ft_putendl_fd("", 1);
+			ft_putstr_fd("\b\b\033[K", STDOUT_FILENO);
+			ft_putendl_fd(">", STDOUT_FILENO);
+			utils->was_prev_line_null = 1;
 			break;
 		}
 		if (!buff)
