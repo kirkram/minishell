@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/29 15:11:40 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/01 13:45:52 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,8 @@ char *exp_init(char *str1, char *str2)
 
 void	intialize_utils(char **sys_envp, t_utils **utils)
 {
-	int	i;
+	int		i;
+	char	cwd_buf[4096];
 
 	*(utils) = malloc(sizeof(t_utils));
 	if (*utils == NULL)
@@ -148,10 +149,16 @@ void	intialize_utils(char **sys_envp, t_utils **utils)
 	i = 0;
 	while (sys_envp[i])
 	{
-		(*utils)->envp[i] = ft_strdup(sys_envp[i]);
-		if ((*utils)->envp[i] == NULL)
-			malloc_error(1);
-		(*utils)->export[i] = exp_init("declare -x ", sys_envp[i]);
+		if (ft_strncmp("SHELL=", sys_envp[i], 6) == 0)
+		{
+			(*utils)->envp[i] = jointhree("SHELL=", getcwd(cwd_buf, 4096), "/minishell");
+			(*utils)->export[i] = exp_init("declare -x ", (*utils)->envp[i]);
+		}
+		else
+		{
+			(*utils)->envp[i] = ft_strdup(sys_envp[i]);
+			(*utils)->export[i] = exp_init("declare -x ", sys_envp[i]);
+		}
 		i ++;
 	}
 	(*utils)->envp[i] = NULL;
