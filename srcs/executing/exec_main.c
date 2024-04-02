@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/02 15:42:28 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/02 16:24:54 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -392,13 +392,16 @@ int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
 int		handle_execve_errors(char *failed_cmd)
 {
 	DIR	*dir;
+	//ft_putendl_fd(failed_cmd, 2);
 	//ACCESS() looks for a command as if it is ./
 	if (failed_cmd[0] == 0)
 		return (msg_stderr("minishell: permission denied: ", failed_cmd, 126));
 	else if (failed_cmd[0] == '.' && failed_cmd[1] == 0)
 		return (msg_stderr(".: not enough arguments", NULL, 1));
 	else if (access(failed_cmd, F_OK) == -1 && ft_strchr(failed_cmd, '/'))
-		return (msg_stderr("minishell: no such file or directory ", failed_cmd, 127));
+	{
+		return (msg_stderr("minishell: no such file or directory: ", failed_cmd, 127));
+	}
 	else if (access(failed_cmd, F_OK) == -1)
 		return (msg_stderr("minishell: command not found: ", failed_cmd, 127));
 	else if (access(failed_cmd, X_OK) == -1 || access(failed_cmd, R_OK) == -1 || \
@@ -416,8 +419,10 @@ int		handle_execve_errors(char *failed_cmd)
 		else
 			return (msg_stderr("minishell: is a directory: ", failed_cmd, 126));
 	}
+	else if (ft_strrchr(failed_cmd, '/') && (ft_strrchr(failed_cmd, '/'))[1] == '\0')
+			return (msg_stderr("minishell: Not a directory: ", failed_cmd, 127));
 	else
-		return (msg_stderr("minishell: permission denied: ", failed_cmd, 127));
+		return (msg_stderr("minishell: command not found: ", failed_cmd, 127));
 	return (127);
 }
 
