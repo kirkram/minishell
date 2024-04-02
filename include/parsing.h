@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/28 17:56:36 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/02 14:19:03 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ void	intialize_utils(char **sys_envp, t_utils **utils);
 int			parsing(char **line_read, t_pipe ***pipe, t_utils *utils);
 // LEXER
 
+void		lex_merror(t_utils *utils, char **str);
 int			check_quote(char **str, bool quote, bool dquote, int *err_code);
 int			lexer(char **str, t_utils *utils);
 void		env_variable(char **str, t_utils *utils, bool quote, bool dquote);
@@ -77,7 +78,7 @@ int			*tokenizer(char **array);
 int			get_token(char *str);
 
 char		*separator(char *str, bool quote, bool dquote, int i);
-void		remove_space(char **str, int i);
+void		remove_space(char **str, int i, t_utils *utils);
 
 void		init_token(t_pipe *pipe);
 void		remove_in(t_pipe *pipe, int i, int hd);
@@ -132,14 +133,16 @@ void		sort_export(t_utils *utils);
 int			export(t_utils *utils, char **arg);
 int			env(t_utils *utils);
 int			pwd(t_utils *utils);
-int			remove_env(t_utils *utils, int i);
-int			remove_exp(t_utils *utils, int i);
+int			remove_env(t_utils *utils, int i, int x, int y);
+int			remove_exp(t_utils *utils, int i, int x, int y);
 int			unset(t_utils *utils, char **arg);
 int			cd_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int			update_pwd_oldpwd_env(t_utils *utils, char *cwd);
 int			export_error(char *arg, t_utils *utils);
 void		export_loop(char *arg, t_utils *utils, bool quote, bool dquote);
+void		unset_exp(t_utils *utils, char **arg, int j, int i);
+void		unset_env(t_utils *utils, char **arg);
 //MS SPLIT
 
 int		str_count(char *str);
