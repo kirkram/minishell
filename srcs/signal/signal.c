@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:56:02 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/27 16:38:05 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/29 13:31:55 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,11 @@ void	handle_sigint(int sig)
 	//ft_putendl_fd("g_signal = 130", 2);
 	//write(save_stdin, '\0', 1);
 	//dup2 (save_stdin, STDIN_FILENO);
-	// ft_putstr_fd("\n", 1);
+	//ft_putstr_fd("\n", 1);
 	// rl_on_new_line();
 	//rl_redisplay();
+	//ft_putchar_fd('\0', 0);
+	//ft_putchar_fd('\n', STDIN_FILENO);
 	close (STDIN_FILENO);
 	//ft_putendl_fd("", 1);
 	//rl_replace_line("", 0);

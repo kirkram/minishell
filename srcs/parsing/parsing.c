@@ -108,7 +108,7 @@ int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
 	pipeline_init(array, pipe);
 	if (parser(array, pipe, &utils->err_code) == 1)
 		return (1); // free all first
-	here_doc(pipe);
+	here_doc(pipe, utils);
 	ft_arrfree(array);
 	if (utils->syntax_err == TRUE)
 		return (1); //free what is needed first

@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/26 16:58:11 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/02 16:24:54 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,6 +130,8 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	i = 0;
 	while (i < num_of_pipes)
 	{
+		if (g_signal == 130)
+			break;
 		//OPEN INFILE, OPEN/CREATE OUTFILE AND TRY TO ACCESS
 		infile = NULL;
 		outfile = NULL;
@@ -214,6 +216,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			{
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
+					//plus_one_to_shlvl_variable(utils, (_pipe)[i]->cmd_with_path);
 					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, utils->envp);
 					child_exit_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
 				}
@@ -262,7 +265,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	close(savestdio[1]);
 	if (g_signal == 130)
 	{
-		ft_putendl_fd("", 1);
+		ft_putstr_fd("\n", STDOUT_FILENO);
 		return (130);
 	}
 	// while (1);
@@ -271,6 +274,87 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	else
 		return (utils->err_code);
 }
+
+//Assumes that the minishell is run from the current folder (PWD)
+//Ignores ./ and ../ after PWD and looks for minishell name without anything afterwards instead
+// void	plus_one_to_shlvl_variable(t_utils *utils, char *cmd_with_path)
+// {
+// 	int		i;
+// 	int		j;
+// 	int		lvl;
+// 	char	*newstr;
+// 	char	*shlvl;
+// 	int		pwd_len;
+
+// 	i = 0;
+// 	j = 0;
+// 	lvl = -1;
+// 	shlvl = NULL;
+// 	while (utils->envp[i])
+// 	{
+// 		//ft_putendl_fd(utils->envp[i], 2);
+// 		if (ft_strncmp(utils->envp[i], "PWD=", 4) == 0)
+// 		//if we find the match until the pwd then if there is word minishell with no characters after
+// 		{
+// 			ft_putendl_fd("!looking for shell name", 2);
+// 			pwd_len = ft_strlen(utils->envp[i] + 4);
+// 			if (ft_strncmp(cmd_with_path, utils->envp[i] + 4, pwd_len) == 0)
+// 			{
+// 				newstr = ft_strnstr(cmd_with_path + pwd_len, "minishell", -1);
+// 				if (!newstr)
+// 					newstr = ft_strnstr(cmd_with_path + pwd_len, "bash", -1);
+// 				if (!newstr)
+// 					newstr = ft_strnstr(cmd_with_path + pwd_len, "zsh", -1);
+// 				if (newstr && (newstr + ft_strlen(newstr))[0] == '\0')
+// 				{
+// 					lvl = 1;
+// 					ft_putendl_fd("!!!! success in finding minishell exec in pwd and no extra char", 2);
+// 				}
+// 				newstr = NULL;
+// 			}
+// 			// else
+// 			// {
+// 			// 	ft_putendl_fd(ft_itoa(ft_strlen(utils->envp[i])), 2);
+// 			// 	ft_putendl_fd(cmd_with_path, 2);
+// 			// 	ft_putendl_fd(utils->envp[i] + 4, 2);
+// 			// }
+// 		}
+// 		else if (ft_strncmp(utils->envp[i], "SHLVL=", 6) == 0)
+// 		{
+// 			shlvl = utils->envp[i];
+// 			// ft_putendl_fd("!!!!!   found shlvl!   ", 2);
+// 		}
+// 		i ++;
+// 	}
+// 	if (!shlvl || lvl == -1)
+// 	{
+// 		// if (!shlvl)
+// 		// 	ft_putendl_fd("fail on shlvl find" , 2);
+// 		// if (lvl == -1)
+// 		// 	ft_putendl_fd("fail on equaling pwd to minishell" , 2);
+// 		return ;
+// 	}
+// 	// ft_putendl_fd("enter plus one" , 2);
+// 	i = 6;
+// 	while (shlvl[i])
+// 	{
+// 		if (ft_isdigit(shlvl[i]))
+// 		{
+// 			lvl = ft_atoi(shlvl + i) + 1;
+// 			newstr = ft_itoa(lvl);
+// 			if (!newstr)
+// 				malloc_error(1);
+// 			shlvl = ft_strjoin("SHLVL=", newstr);
+// 			if (!shlvl)
+// 				malloc_error(1);
+// 			change_env_var(&utils, "SHLVL=", shlvl);
+// 			//ft_putendl_fd(shlvl, 2);
+// 			free(shlvl);
+// 			return ;
+// 		}
+// 		i ++;
+// 	}
+// }
 
 /*
 When the name of a builtin command is used as the first word of a simple command (see Simple Commands),
@@ -308,13 +392,16 @@ int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
 int		handle_execve_errors(char *failed_cmd)
 {
 	DIR	*dir;
+	//ft_putendl_fd(failed_cmd, 2);
 	//ACCESS() looks for a command as if it is ./
 	if (failed_cmd[0] == 0)
 		return (msg_stderr("minishell: permission denied: ", failed_cmd, 126));
 	else if (failed_cmd[0] == '.' && failed_cmd[1] == 0)
 		return (msg_stderr(".: not enough arguments", NULL, 1));
 	else if (access(failed_cmd, F_OK) == -1 && ft_strchr(failed_cmd, '/'))
-		return (msg_stderr("minishell: no such file or directory ", failed_cmd, 127));
+	{
+		return (msg_stderr("minishell: no such file or directory: ", failed_cmd, 127));
+	}
 	else if (access(failed_cmd, F_OK) == -1)
 		return (msg_stderr("minishell: command not found: ", failed_cmd, 127));
 	else if (access(failed_cmd, X_OK) == -1 || access(failed_cmd, R_OK) == -1 || \
@@ -332,8 +419,10 @@ int		handle_execve_errors(char *failed_cmd)
 		else
 			return (msg_stderr("minishell: is a directory: ", failed_cmd, 126));
 	}
+	else if (ft_strrchr(failed_cmd, '/') && (ft_strrchr(failed_cmd, '/'))[1] == '\0')
+			return (msg_stderr("minishell: Not a directory: ", failed_cmd, 127));
 	else
-		return (msg_stderr("minishell: permission denied: ", failed_cmd, 127));
+		return (msg_stderr("minishell: command not found: ", failed_cmd, 127));
 	return (127);
 }
 
