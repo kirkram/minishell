@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/01 13:45:52 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/02 15:09:49 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,9 @@ void	intialize_utils(char **sys_envp, t_utils **utils)
 	{
 		if (ft_strncmp("SHELL=", sys_envp[i], 6) == 0)
 		{
-			(*utils)->envp[i] = jointhree("SHELL=", getcwd(cwd_buf, 4096), "/minishell");
+			(*utils)->envp[i] = ft_strjoin("SHELL=", "minishell");
+			if (!(*utils)->envp[i])
+				malloc_error(1);
 			(*utils)->export[i] = exp_init("declare -x ", (*utils)->envp[i]);
 		}
 		else
@@ -216,7 +218,7 @@ char *rl_gets(char *line_read, int hist_file, int err_code, t_utils *utils)
 	}
 	g_signal = 0;
 	//ft_putendl_fd("g_signal = 0", 2);
-	line_read = readline("minishell-0.5$ ");
+	line_read = readline("MINISHELL-0.7$ ");
 	if (!line_read && g_signal != 130)
 	{
 		//only works with ctrl + d?

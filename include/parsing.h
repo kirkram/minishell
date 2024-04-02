@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/29 15:08:13 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/01 14:24:24 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,7 @@ char	**find_path_and_pwd(char **envp, char *scmd);
 int		user_cmd_path(char **args, char *arg_cmd, char **paths);
 void	delete_pwd_path(char **paths);
 int		free_and_1(char **paths, int **end);
+void	plus_one_to_shlvl_variable(t_utils *utils, char *cmd_with_path);
 
 // BUILTINS
 

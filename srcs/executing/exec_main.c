@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/03/29 13:41:36 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/02 15:42:28 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,6 +216,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			{
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
+					//plus_one_to_shlvl_variable(utils, (_pipe)[i]->cmd_with_path);
 					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, utils->envp);
 					child_exit_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
 				}
@@ -273,6 +274,87 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	else
 		return (utils->err_code);
 }
+
+//Assumes that the minishell is run from the current folder (PWD)
+//Ignores ./ and ../ after PWD and looks for minishell name without anything afterwards instead
+// void	plus_one_to_shlvl_variable(t_utils *utils, char *cmd_with_path)
+// {
+// 	int		i;
+// 	int		j;
+// 	int		lvl;
+// 	char	*newstr;
+// 	char	*shlvl;
+// 	int		pwd_len;
+
+// 	i = 0;
+// 	j = 0;
+// 	lvl = -1;
+// 	shlvl = NULL;
+// 	while (utils->envp[i])
+// 	{
+// 		//ft_putendl_fd(utils->envp[i], 2);
+// 		if (ft_strncmp(utils->envp[i], "PWD=", 4) == 0)
+// 		//if we find the match until the pwd then if there is word minishell with no characters after
+// 		{
+// 			ft_putendl_fd("!looking for shell name", 2);
+// 			pwd_len = ft_strlen(utils->envp[i] + 4);
+// 			if (ft_strncmp(cmd_with_path, utils->envp[i] + 4, pwd_len) == 0)
+// 			{
+// 				newstr = ft_strnstr(cmd_with_path + pwd_len, "minishell", -1);
+// 				if (!newstr)
+// 					newstr = ft_strnstr(cmd_with_path + pwd_len, "bash", -1);
+// 				if (!newstr)
+// 					newstr = ft_strnstr(cmd_with_path + pwd_len, "zsh", -1);
+// 				if (newstr && (newstr + ft_strlen(newstr))[0] == '\0')
+// 				{
+// 					lvl = 1;
+// 					ft_putendl_fd("!!!! success in finding minishell exec in pwd and no extra char", 2);
+// 				}
+// 				newstr = NULL;
+// 			}
+// 			// else
+// 			// {
+// 			// 	ft_putendl_fd(ft_itoa(ft_strlen(utils->envp[i])), 2);
+// 			// 	ft_putendl_fd(cmd_with_path, 2);
+// 			// 	ft_putendl_fd(utils->envp[i] + 4, 2);
+// 			// }
+// 		}
+// 		else if (ft_strncmp(utils->envp[i], "SHLVL=", 6) == 0)
+// 		{
+// 			shlvl = utils->envp[i];
+// 			// ft_putendl_fd("!!!!!   found shlvl!   ", 2);
+// 		}
+// 		i ++;
+// 	}
+// 	if (!shlvl || lvl == -1)
+// 	{
+// 		// if (!shlvl)
+// 		// 	ft_putendl_fd("fail on shlvl find" , 2);
+// 		// if (lvl == -1)
+// 		// 	ft_putendl_fd("fail on equaling pwd to minishell" , 2);
+// 		return ;
+// 	}
+// 	// ft_putendl_fd("enter plus one" , 2);
+// 	i = 6;
+// 	while (shlvl[i])
+// 	{
+// 		if (ft_isdigit(shlvl[i]))
+// 		{
+// 			lvl = ft_atoi(shlvl + i) + 1;
+// 			newstr = ft_itoa(lvl);
+// 			if (!newstr)
+// 				malloc_error(1);
+// 			shlvl = ft_strjoin("SHLVL=", newstr);
+// 			if (!shlvl)
+// 				malloc_error(1);
+// 			change_env_var(&utils, "SHLVL=", shlvl);
+// 			//ft_putendl_fd(shlvl, 2);
+// 			free(shlvl);
+// 			return ;
+// 		}
+// 		i ++;
+// 	}
+// }
 
 /*
 When the name of a builtin command is used as the first word of a simple command (see Simple Commands),

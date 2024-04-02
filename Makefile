@@ -1,4 +1,4 @@
-NAME = m_shell
+NAME = minishell
 LIBFT_PATH = ./lib/libft
 LIBFT = $(LIBFT_PATH)/libft.a
 CFLAGS = -Wall -Wextra -Werror
@@ -27,7 +27,7 @@ $(LIBFT):
 debug: .debug
 
 .debug: $(LIBFT) $(SRCS) 
-	cc $(DEBUGFLAGS) $(HEADERS) -lreadline $(SRCS) $(LIBFT) -o debug.out
+	cc $(DEBUGFLAGS) $(HEADERS) -lreadline $(SRCS) $(LIBFT) -o minishell
 	touch .debug
 
 %.o: %.c
