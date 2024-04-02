@@ -6,14 +6,13 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/14 12:41:01 by clundber         ###   ########.fr       */
+/*   Updated: 2024/03/28 18:02:23 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 void	print_exp(t_utils *utils, int fd)
-
 {
 	int	i;
 
@@ -28,7 +27,6 @@ void	print_exp(t_utils *utils, int fd)
 }
 
 void	sort_export(t_utils *utils)
-
 {
 	int		i;
 	char	*temp;
@@ -41,7 +39,8 @@ void	sort_export(t_utils *utils)
 		i = 0;
 		while (utils->export[i])
 		{
-			if (utils->export[i +1] && ft_strncmp (utils->export[i], utils->export[i +1], -1) > 0)
+			if (utils->export[i +1] &&
+				ft_strncmp(utils->export[i], utils->export[i +1], -1) > 0)
 			{
 				sorted = false;
 				temp = utils->export[i];
@@ -53,19 +52,63 @@ void	sort_export(t_utils *utils)
 	}
 }
 
+int	export_error(char *arg, t_utils *utils)
+{
+	int	x;
 
+	x = 0;
+	while (arg[x] && (arg[x] == '\'' || arg[x] == '\"'))
+		x++;
+	if (arg[x] >= '0' && arg[x] <= '9')
+	{
+		ft_putstr_fd("export: `", 2);
+		ft_putstr_fd(arg, 2);
+		ft_putendl_fd("\': not a valid identifier", 2);
+		utils->err_code = 1;
+		return (1);
+	}
+	return (0);
+}
+
+void	export_loop(char *arg, t_utils *utils, bool quote, bool dquote)
+{
+	int		i;
+	char	*temp;
+
+	temp = NULL;
+	i = 0;
+	while (arg[i])
+	{
+		quote_status2(&quote, &dquote, arg[i]);
+		if (arg[i] == '=' && quote == false && dquote == false)
+		{
+			temp = jointhree("declare -x ", ft_substr(arg, 0, (i +1)), "\"");
+			if (!temp)
+				malloc_error (1);
+			temp = jointhree(temp, ft_substr(arg, (i +1),
+						(ft_strlen(arg) - i)), "\"");
+			if (!temp)
+				malloc_error (1);
+			change_env_var(&utils, ft_substr(arg, 0, (i +1)), arg);
+			change_exp_var(&utils, ft_strjoin("declare -x ",
+					ft_substr(arg, 0, (i +1))), temp);
+			break ;
+		}
+		i++;
+		if (arg[i] == '\0')
+			add_exp_var(&utils, ft_strjoin("declare -x ", arg));
+	}
+}
 
 int	export(t_utils *utils, char **arg)
 {
 	int		i;
-	int		x;
 	bool	quote;
 	bool	dquote;
-	char	*temp;
-	bool	fault;
-	
+
+	quote = false;
+	dquote = false;
 	i = 1;
-	x = 0;
 	if (!utils)
 		return (1);
 	if (!arg || !arg[0])
@@ -77,38 +120,8 @@ int	export(t_utils *utils, char **arg)
 	}
 	while (arg[0] && arg[i])
 	{
-		quote = false;
-		dquote = false;
-		fault = false;
-		while (arg[i][x] && (arg[i][x] == '\'' || arg[i][x] == '\"'))
-			x++;
-		if (arg[i][x] >= '0' && arg[i][x] <= '9')
-		{
-			ft_putstr_fd("export: `", 2);
-			ft_putstr_fd(arg[i], 2);
-			ft_putendl_fd("\': not a valid identifier", 2);
-			utils->err_code = 1;
-			fault = true;
-		}
-		x = 0;
-		while (arg[i][x] && fault == false)
-		{
-			if (arg[i][x] == '\'')
-				quote_status(&quote);
-			else if (arg[i][x] == '\"')
-				quote_status(&dquote);
-			if (arg[i][x] == '=' && quote == false && dquote == false)
-			{
-				temp = jointhree("declare -x ", ft_substr(arg[i], 0, (x +1)), "\"");
-				temp = jointhree(temp, ft_substr(arg[i], (x +1), (ft_strlen(arg[i]) - x)), "\"");
-				change_env_var(&utils, ft_substr(arg[i], 0, (x +1)), arg[i]);
-				change_exp_var(&utils, ft_strjoin("declare -x ", ft_substr(arg[i], 0, (x +1))), temp);
-				break ;
-			}
-			x++;
-			if (arg[i][x] == '\0')
-				add_exp_var(&utils,ft_strjoin("declare -x ", arg[i]));
-		}
+		if (export_error(arg[i], utils) == 0)
+			export_loop(arg[i], utils, quote, dquote);
 		i++;
 	}
 	sort_export(utils);
@@ -116,7 +129,6 @@ int	export(t_utils *utils, char **arg)
 }
 
 int	env(t_utils *utils)
-
 {
 	int	i;
 
@@ -132,7 +144,6 @@ int	env(t_utils *utils)
 }
 
 int	pwd(t_utils *utils)
-
 {
 	int		i;
 	char	*temp;
@@ -155,7 +166,6 @@ int	pwd(t_utils *utils)
 }
 
 int	unset(t_utils *utils, char **arg)
-
 {
 	int		i;
 	int		x;
@@ -214,7 +224,6 @@ int	unset(t_utils *utils, char **arg)
 }
 
 int	remove_exp(t_utils *utils, int i)
-
 {
 	int		x;
 	int		y;
@@ -246,7 +255,6 @@ int	remove_exp(t_utils *utils, int i)
 }
 
 int	remove_env(t_utils *utils, int i)
-
 {
 	int		x;
 	int		y;

@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:06:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/29 15:08:55 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/02 16:32:37 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	here_doc_open(char *eof, t_pipe *_pipe, t_utils *utils)
 		{
 			dup2 (save_stdin, STDIN_FILENO);
 			close (save_stdin);
-			ft_putstr_fd("\b\b\033[K", STDOUT_FILENO);
+			//ft_putstr_fd("\b\b\033[K", STDOUT_FILENO);
 			ft_putendl_fd(">", STDOUT_FILENO);
 			utils->was_prev_line_null = 1;
 			break;
