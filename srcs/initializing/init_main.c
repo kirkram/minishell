@@ -17,9 +17,9 @@ int	g_signal;
 
 int	main(int ac, char **av, char **sys_envp)
 {
+	
 	(void)ac;
 	int		ret;
-	g_signal = 0;
 
 	signal_handler();
 	ret = 0;
@@ -132,7 +132,7 @@ char *exp_init(char *str1, char *str2)
 void	intialize_utils(char **sys_envp, t_utils **utils)
 {
 	int		i;
-	char	cwd_buf[4096];
+	//char	cwd_buf[4096];
 
 	*(utils) = malloc(sizeof(t_utils));
 	if (*utils == NULL)

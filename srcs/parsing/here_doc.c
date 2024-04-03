@@ -6,11 +6,13 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:06:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/02 16:32:37 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/03 10:46:54 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+
+extern int g_signal;
 
 void	here_doc(t_pipe ***pipe, t_utils *utils)
 {
