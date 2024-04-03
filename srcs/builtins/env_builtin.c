@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/28 18:02:23 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/03 14:35:08 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ void	sort_export(t_utils *utils)
 		i = 0;
 		while (utils->export[i])
 		{
-			if (utils->export[i +1] &&
-				ft_strncmp(utils->export[i], utils->export[i +1], -1) > 0)
+			if (utils->export[i +1] && ft_strncmp
+				(utils->export[i], utils->export[i +1], -1) > 0)
 			{
 				sorted = false;
 				temp = utils->export[i];
@@ -59,13 +59,25 @@ int	export_error(char *arg, t_utils *utils)
 	x = 0;
 	while (arg[x] && (arg[x] == '\'' || arg[x] == '\"'))
 		x++;
-	if (arg[x] >= '0' && arg[x] <= '9')
+	if ((arg[x] >= '0' && arg[x] <= '9') || arg[x] == '=')
 	{
 		ft_putstr_fd("export: `", 2);
 		ft_putstr_fd(arg, 2);
 		ft_putendl_fd("\': not a valid identifier", 2);
 		utils->err_code = 1;
 		return (1);
+	}
+	while (arg[x] && arg[x] != '=')
+	{
+		if (arg[x] == '-')
+		{
+			ft_putstr_fd("export: `", 2);
+			ft_putstr_fd(arg, 2);
+			ft_putendl_fd("\': not a valid identifier", 2);
+			//utils->err_code = 1;
+			return (1);
+		}
+		x++;
 	}
 	return (0);
 }
@@ -94,8 +106,7 @@ void	export_loop(char *arg, t_utils *utils, bool quote, bool dquote)
 					ft_substr(arg, 0, (i +1))), temp);
 			break ;
 		}
-		i++;
-		if (arg[i] == '\0')
+		if (arg[++i] == '\0')
 			add_exp_var(&utils, ft_strjoin("declare -x ", arg));
 	}
 }
@@ -120,8 +131,9 @@ int	export(t_utils *utils, char **arg)
 	}
 	while (arg[0] && arg[i])
 	{
-		if (export_error(arg[i], utils) == 0)
-			export_loop(arg[i], utils, quote, dquote);
+		if (export_error(arg[i], utils) != 0)
+			return(1);
+		export_loop(arg[i], utils, quote, dquote);
 		i++;
 	}
 	sort_export(utils);
@@ -164,16 +176,12 @@ int	pwd(t_utils *utils)
 	}
 	return (0);
 }
-
-int	unset(t_utils *utils, char **arg)
+void	unset_env(t_utils *utils, char **arg)
 {
-	int		i;
-	int		x;
-	int		y;
-	int		j;
+	int	y;
+	int	x;
+	int	i;
 
-	if (!arg || !arg[1] || !arg[1][0])
-		return (0);
 	y = 1;
 	while (arg[y])
 	{
@@ -188,14 +196,21 @@ int	unset(t_utils *utils, char **arg)
 				else
 					break ;
 				if (arg[y][x] == '\0' && utils->envp[i][x] == '=')
-					remove_env(utils, i);
+					remove_env(utils, i, x, y);
 			}
 			i++;
 		}
 		y++;
 	}
-	j = 1;
-	while (arg[j])
+
+}
+
+void	unset_exp(t_utils *utils, char **arg, int j, int i)
+{
+	int	x;
+	int	y;
+
+	while (arg[++j])
 	{
 		i = 0;
 		while (arg[j] && utils->export[i])
@@ -206,27 +221,36 @@ int	unset(t_utils *utils, char **arg)
 				y++;
 			while (arg[j][x] && utils->export[i][y])
 			{
-				if (arg[j][x] == utils->export[i][y])
-				{
+				if (arg[j][x] == utils->export[i][y++])
 					x++;
-					y++;
-				}
 				else
 					break ;
-				if (arg[j][x] == '\0' && (utils->export[i][y] == '=' || utils->export[i][y] == '\0'))
-					remove_exp(utils, i);
+				if (arg[j][x] == '\0' && (utils->export[i][y] == '='
+					|| utils->export[i][y] == '\0'))
+					remove_exp(utils, i, x, y);
 			}
 			i++;
 		}
-		j++;
 	}
+}
+
+int	unset(t_utils *utils, char **arg)
+{
+	int		i;
+	int		j;
+
+	j = 0;
+	i = 0;
+	if (!arg || !arg[1] || !arg[1][0])
+		return (0);
+	unset_env(utils, arg);
+	unset_exp(utils, arg, j, i);
 	return (0);
 }
 
-int	remove_exp(t_utils *utils, int i)
+
+int	remove_exp(t_utils *utils, int i, int x, int y)
 {
-	int		x;
-	int		y;
 	char	**temp_arr;
 
 	y = 0;
@@ -235,7 +259,7 @@ int	remove_exp(t_utils *utils, int i)
 		x++;
 	temp_arr = malloc(sizeof(char *) * x);
 	if (!temp_arr)
-		return (1);
+		malloc_error(1);
 	x = 0;
 	while (utils->export[x])
 	{
@@ -254,10 +278,8 @@ int	remove_exp(t_utils *utils, int i)
 	return (0);
 }
 
-int	remove_env(t_utils *utils, int i)
+int	remove_env(t_utils *utils, int i, int x, int y)
 {
-	int		x;
-	int		y;
 	char	**temp_arr;
 
 	y = 0;

@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/03 10:48:08 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/03 11:25:18 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../lib/get_next_line/get_next_line.h"
 
-int g_signal = 0;
+int	g_signal;
 
 int	main(int ac, char **av, char **sys_envp)
 {

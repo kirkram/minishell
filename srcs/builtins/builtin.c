@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
 /*   Updated: 2024/04/03 11:18:43 by klukiano         ###   ########.fr       */
@@ -135,8 +135,6 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 	{
 		if (!ft_strncmp(utils->envp[i], "HOME=", 5))
 			home_path = utils->envp[i] + 5;
-		//else if (!ft_strncmp(utils->envp[i], "PWD=", 4))
-			//pwd = utils->envp[i] + 4;
 		i ++;
 	}
 	getcwd(cwd, 4095);
