@@ -6,13 +6,14 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/02 16:24:54 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/03 10:47:23 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //test in the file change
 
 #include "../../include/minishell.h"
+extern int g_signal;
 
 char	*assign_scmd_path(char *scmd, char **envp)
 {
