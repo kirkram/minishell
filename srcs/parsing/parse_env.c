@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 18:44:51 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/02 14:40:29 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/03 12:32:01 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,9 @@ void	env_variable(char **str, t_utils *utils, bool quote, bool dquote)
 	{
 		quote_status2(&quote, &dquote, (*str)[i]);
 		if ((*str)[i] == '$' && quote == false && (*str)[i +1]
-			&& (*str)[i +1] != ' ' && (*str)[i +1] != '$')
+			&& (*str)[i +1] != ' ' && (*str)[i +1] != '$'
+			&& (!(dquote == true && ((*str)[i +1] == '\''
+			|| (*str)[i +1] == '\"' || (*str)[i +1] == ' '))))
 		{
 			env_loop(str, &new_str, &start, &i);
 			if (!new_str)
