@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/02 14:19:03 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/03 11:25:01 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # include <signal.h>
 # include <dirent.h>
 
-int	g_signal;
+extern int	g_signal;
 
 //# include </usr/include/readline/readline.h> //needed for Linux
 //# include </usr/include/readline/history.h> // needed for Linux
