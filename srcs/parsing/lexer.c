@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:21:44 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/27 19:08:36 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/03 11:39:12 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	combine_str(char **new_str, char *temp)
 	free (ptr);
 }
 
-void	remove_space(char **str, int i)
+void	remove_space(char **str, int i, t_utils *utils)
 {
 	int		end;
 	char	*temp;
@@ -63,7 +63,7 @@ void	remove_space(char **str, int i)
 	{
 		temp = ft_substr((*str), 0, i +1);
 		if (!temp)
-			malloc_error(1);
+			lex_merror(utils, str);
 		free (*str);
 		(*str) = temp;
 	}
@@ -102,7 +102,7 @@ int	lexer(char **str, t_utils *utils)
 	dquote = false;
 	if (check_quote(str, quote, dquote, &utils->err_code) == 1)
 		return (1);
-	remove_space(str, i);
+	remove_space(str, i, utils);
 	while ((*str)[i])
 	{
 		if ((*str)[i] == '$')

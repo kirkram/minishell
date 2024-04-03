@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 18:44:51 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/28 17:26:33 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/03 12:32:01 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,25 +19,36 @@ void	env_loop(char **str, char **new_str, int *start, int *i)
 			(*new_str) = ft_substr((*str), (*start), (*i));
 		else
 			combine_str(new_str, ft_substr((*str), (*start), (*i) - (*start)));
-		if (!(*new_str))
-			malloc_error (1);
+	//	if (!(*new_str))
+	//		malloc_error (1);
 		(*i)++;
 		(*start) = (*i);
 		while ((*str)[(*i)] && (*str)[(*i)] != ' ' && (*str)[(*i)] != '\0'
 			&& (*str)[(*i)] != '$' && (*str)[(*i)] != '\'' && (*str)[(*i)]
-			!= '\"' && (*str)[(*i) - 1] != '?' && (*str)[(*i)] != '/')
+			!= '\"' && (*str)[(*i) - 1] != '?' && (*str)[(*i)] != '/'
+			&& (*str)[(*i)] != ':')
 			(*i)++;
 	}
 }
 
-void	env_loop2(char **temp, char **new_str, t_utils *utils)
+void	env_loop2(char **temp, char **new_str, t_utils *utils, char **str)
 {
 	if (!(*temp))
-		malloc_error (1);
+	{
+		if ((*new_str))
+			free((*new_str));
+		lex_merror(utils, str);
+	//	malloc_error (1);
+	}
 	combine_str(new_str, get_variable((*temp),
 			utils->envp, utils->err_code));
 	if (!(*new_str))
-		malloc_error (1);
+	{
+		if (temp)
+			free (temp);
+		lex_merror(utils, str);
+	//	malloc_error (1);
+	}
 }
 
 void	env_util(char **new_str, char **str, int start, int i)
@@ -63,11 +74,15 @@ void	env_variable(char **str, t_utils *utils, bool quote, bool dquote)
 	{
 		quote_status2(&quote, &dquote, (*str)[i]);
 		if ((*str)[i] == '$' && quote == false && (*str)[i +1]
-			&& (*str)[i +1] != ' ' && (*str)[i +1] != '$')
+			&& (*str)[i +1] != ' ' && (*str)[i +1] != '$'
+			&& (!(dquote == true && ((*str)[i +1] == '\''
+			|| (*str)[i +1] == '\"' || (*str)[i +1] == ' '))))
 		{
 			env_loop(str, &new_str, &start, &i);
+			if (!new_str)
+				lex_merror(utils, str);
 			temp = ft_substr((*str), start, i - start);
-			env_loop2(&temp, &new_str, utils);
+			env_loop2(&temp, &new_str, utils, str);
 			start = i;
 		}
 		else
@@ -93,7 +108,8 @@ char	*get_variable(char *temp, char **envp, int err_code)
 			env_var = ft_substr(envp[i], ft_strlen(temp),
 					ft_strlen(envp[i]) - ft_strlen(temp));
 			if (!env_var)
-				malloc_error(1);
+				return (0);
+			//	malloc_error(1);
 			break ;
 		}
 		i++;

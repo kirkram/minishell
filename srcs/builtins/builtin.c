@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
 /*   Updated: 2024/03/29 13:06:36 by klukiano         ###   ########.fr       */
@@ -119,14 +119,14 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 {
 	int		i;
 	char	*home_path;
-	char	*pwd;
+	//char	*pwd;
 	char	cwd[4096]; //windows limit is 32767, usually 4096 for unix
 	DIR		*directory;
 
 
 	char **noio_args;
 	home_path = NULL;
-	pwd = NULL;
+	//pwd = NULL;
 	i = 0;
 	noio_args = (_pipe)[index]->noio_args;
 
@@ -134,8 +134,8 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 	{
 		if (!ft_strncmp(utils->envp[i], "HOME=", 5))
 			home_path = utils->envp[i] + 5;
-		else if (!ft_strncmp(utils->envp[i], "PWD=", 4))
-			pwd = utils->envp[i] + 4;
+	//	else if (!ft_strncmp(utils->envp[i], "PWD=", 4))
+	//		pwd = utils->envp[i] + 4;
 		i ++;
 	}
 	getcwd(cwd, 4095);
