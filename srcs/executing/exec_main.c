@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/03 10:47:23 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:46:48 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -376,7 +376,12 @@ int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "pwd", -1))
 		return (pwd(utils));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "export", -1))
-		return (export(utils, (_pipe)[i]->noio_args));
+	{
+		if (_pipe[0] && !_pipe[1])
+			return (export(utils, (_pipe)[i]->noio_args));
+		else
+			return (0);
+	}
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "unset", -1))
 			return (unset(utils, (_pipe)[i]->noio_args));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "env", -1))

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/03 15:03:27 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:05:35 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ int	main(int ac, char **av, char **sys_envp)
 	
 	(void)ac;
 	int		ret;
-
+	g_signal = 0;
+	
 	signal_handler();
 	ret = 0;
 	ret = rl_loop(ac, av, sys_envp);

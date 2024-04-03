@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/13 11:18:05 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/27 18:56:33 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/03 16:27:13 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,7 @@ char	**ms_splitter(char *str, char **array, bool quote, bool dquote)
 			quote_status2(&quote, &dquote, str[x]);
 			x++;
 		}
+		//array[i] = ft_substr(str, start, (x - start));
 		array[i] = remove_quote(ft_substr(str, start, (x - start)), i);
 		if (!array[i])
 			return (free_reverse(i -1, array));
