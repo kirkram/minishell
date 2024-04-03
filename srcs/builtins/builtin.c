@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/03 10:46:34 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/03 11:18:43 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,7 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 				ft_putstr_fd(noio_args[1], 2);
 				ft_putendl_fd(": No such file or directory", 2);
 			}
-			else if (access(noio_args[1], X_OK) == -1 && !directory)
+			else if (!directory)
 			{
 				ft_putstr_fd("minishell: cd: ", 2);
 				ft_putstr_fd(noio_args[1], 2);
