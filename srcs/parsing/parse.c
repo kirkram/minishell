@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/28 14:32:55 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/04 11:09:07 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,7 @@ int	parser(char **array, t_pipe ***pipe, int *err_code)
 		init_token((*pipe)[x]);
 		if (make_tokens((*pipe)[x], i) == 1)
 			return (1);
+		quote_remover((*pipe)[x]);
 		remove_red((*pipe)[x], i);
 		if (final_args((*pipe)[x], i) == 1)
 		{

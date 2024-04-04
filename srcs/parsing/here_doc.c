@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   here_doc.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:06:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/03 10:46:54 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/04 12:14:02 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-
-extern int g_signal;
 
 void	here_doc(t_pipe ***pipe, t_utils *utils)
 {
@@ -33,7 +31,7 @@ void	here_doc(t_pipe ***pipe, t_utils *utils)
 			else if ((*pipe)[x]->tokens[i] == IN_HD)
 				here_doc_open((*pipe)[x]->args[i], (*pipe)[x], utils);
 			if (g_signal == 130)
-					return ;
+				return ;
 			i++;
 		}
 		x++;
@@ -44,7 +42,7 @@ void	here_doc(t_pipe ***pipe, t_utils *utils)
 void	here_doc_open(char *eof, t_pipe *_pipe, t_utils *utils)
 {
 	char	*buff;
-	int save_stdin;
+	int		save_stdin;
 
 	save_stdin = dup(STDIN_FILENO);
 	pipe(_pipe->hd_fd);
@@ -58,7 +56,7 @@ void	here_doc_open(char *eof, t_pipe *_pipe, t_utils *utils)
 			//ft_putstr_fd("\b\b\033[K", STDOUT_FILENO);
 			ft_putendl_fd(">", STDOUT_FILENO);
 			utils->was_prev_line_null = 1;
-			break;
+			break ;
 		}
 		if (!buff)
 			break ;
