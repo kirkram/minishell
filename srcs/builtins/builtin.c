@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/03 11:18:43 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/05 11:41:42 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,7 +224,7 @@ int	exit_builtin(t_pipe **_pipe, t_utils *utils, int i)
 	else if (_pipe[i]->args[1] && _pipe[i]->args[2])
 	{
 		ft_putendl_fd("exit", 1);
-		ft_putendl_fd("minishell: exit: too many arguments", 1);
+		ft_putendl_fd("minishell: exit: too many arguments", 2);
 		return (1);
 	}
 	else
