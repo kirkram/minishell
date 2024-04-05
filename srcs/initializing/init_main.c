@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/04 12:05:47 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/05 14:34:56 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,9 @@ char	*shell_level(char *str)
 	int	i;
 	int	start;
 	int	lvl;
+	char *temp;
 
+	temp = NULL;
 	lvl = 0;
 	start = 0;
 	i = 0;
@@ -146,9 +148,13 @@ char	*shell_level(char *str)
 			start = i;
 			while (str[i])
 				i++;
-			lvl = ft_atoi(ft_substr(str, start, i - start));
+			temp = ft_substr(str, start, i - start);
+			if (!temp)
+				malloc_error (1);
+			lvl = ft_atoi(temp);
+			free (temp);
 			lvl++;
-			return (ft_strjoin(ft_substr(str, 0, start), ft_itoa(lvl)));
+			return (ft_free_strjoin(ft_substr(str, 0, start), ft_itoa(lvl)));
 		}
 		i++;
 	}

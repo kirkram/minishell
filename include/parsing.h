@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/04 14:37:37 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/05 14:38:24 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,6 +158,7 @@ int		quote_count(char *str);
 
 //HELPER
 int			is_only_digits_and_signs(char *str);
+char		*ft_free_strjoin(char *s1, char *s2);
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2
