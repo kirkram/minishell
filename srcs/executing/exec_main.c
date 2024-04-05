@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/05 13:45:57 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/05 13:48:54 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,7 +246,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		close(fd[1]);
 		if (!has_fd_failed && _pipe[i]->tokens && _pipe[i]->tokens[0] != BUILTIN)
 		{
-			// ft_putendl_fd("ready to fork", 2);
 			pid[i] = fork();
 			if (pid[i] == 0)
 			{
@@ -257,16 +256,8 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				}
 				else if ((_pipe)[i]->noio_args[0])
 					child_exit_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
-				// if (i != num_of_pipes - 1)
-				// 	child_exit_code = 127;
 				free_pipes_utils_and_exit(_pipe, utils, child_exit_code);
 			}
-			// else
-			// {
-			// 	ft_putstr_fd("the main process pid is ", 2);
-			// 	ft_putendl_fd(ft_itoa(pid[i]), 2);
-			// }
-
 		}
 		else if (!has_fd_failed)
 		{
@@ -283,15 +274,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				utils->err_code = exec_builtin(_pipe, utils, i);
 		}
 		i ++;
-	}
-	i = 0;
-	while (i < num_of_pipes)
-	{
-		// if ((_pipe[i])->tokens && (_pipe[i])->tokens[0] == BUILTIN)
-		// 	i ++;
-		if (pid[i] == -2)
-			ft_putendl_fd("error in outer pid", 2);
-			i ++;
 	}
 	return (waitpid_and_close_exec(_pipe, &pid, savestdio, utils, has_fd_failed));
 }
