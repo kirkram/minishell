@@ -6,19 +6,19 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 17:53:32 by klukiano          #+#    #+#             */
-/*   Updated: 2024/01/31 12:26:43 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/05 11:48:45 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int		get_next_line(char **str, int fd);
+int		get_next_line_nonewline(char **str, int fd);
 void	handle_buffer(char	**cache, char **buffer, int bytes_read);
 int		handle_cache(char **str, char **cache, int bytes_read, int fd);
 int		return_line(char **str, char ***cache, size_t i);
 int		handle_read(char **cache, char **buffer, int bytes_read);
 
-int	get_next_line(char **str, int fd)
+int	get_next_line_nonewline(char **str, int fd)
 {
 	static char	*cache;
 	char		*buffer;
@@ -116,7 +116,7 @@ int	handle_cache(char **str, char **cache, int bytes_read, int fd)
 		return (0);
 	}
 	else if (i == 0)
-		return (get_next_line(str, fd));
+		return (get_next_line_nonewline(str, fd));
 	else
 		return (return_line(str, &cache, i));
 }
@@ -143,6 +143,8 @@ int	return_line(char **str, char ***cache, size_t i)
 	}
 	free (**cache);
 	**cache = tmp_cache;
+	if (line[ft_strlen(line) - 1] == '\n')
+		line[ft_strlen(line) - 1] = '\0';
 	*str = line;
 	return (0);
 }

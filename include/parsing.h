@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/04 18:13:03 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/05 13:28:11 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	handle_sigint(int sig);
 void	handle_sigquit(int sig);
 // INIT
 
-char	*rl_gets(char *line_read, int hist_file, int err_code, t_utils *utils);
+char	*rl_gets(char *line_read, int hist_file, t_utils *utils);
 int		rl_loop(int ac, char **av, char **sys_envp);
 int		open_history_file(int hist_fd);
 int		interactive_mode_loop(int hist_fd, char **envp);
@@ -121,9 +121,9 @@ char	**find_path_and_pwd(char **envp, char *scmd);
 int		user_cmd_path(char **args, char *arg_cmd, char **paths);
 void	delete_pwd_path(char **paths);
 int		free_and_1(char **paths, int **end);
-void	plus_one_to_shlvl_variable(t_utils *utils, char *cmd_with_path);
 int		exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2], char **infile, char **outfile);
-void	free_pipes_and_exit(t_pipe **_pipe, t_utils *utils, int child_exit_code);
+void	free_pipes_utils_and_exit(t_pipe **_pipe, t_utils *utils, int child_exit_code);
+int		waitpid_and_close_exec(t_pipe **_pipe, pid_t (*pid)[256], int savestdio[2], t_utils *utils, int has_fd_failed);
 
 // BUILTINS
 int			exec_builtin(t_pipe **_pipe, t_utils *utils, int i);

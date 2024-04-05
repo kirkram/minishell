@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/04 19:19:20 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/05 13:45:57 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,8 @@ int	exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2], char **infile, char 
 	return (has_fd_failed);
 }
 
-void	free_pipes_and_exit(t_pipe **_pipe, t_utils *utils, int child_exit_code)
+//if exit code is -42 doesn't exit
+void	free_pipes_utils_and_exit(t_pipe **_pipe, t_utils *utils, int child_exit_code)
 {
 	int i;
 
@@ -174,11 +175,15 @@ void	free_pipes_and_exit(t_pipe **_pipe, t_utils *utils, int child_exit_code)
 		free(_pipe[i]);
 		i ++;
 	}
-	ft_arrfree(utils->envp);
-	ft_arrfree(utils->export);
-	free(utils);
 	free (_pipe);
-	exit (child_exit_code);
+	if (utils)
+	{
+		ft_arrfree(utils->envp);
+		ft_arrfree(utils->export);
+		free(utils);
+	}
+	if (child_exit_code != -42)
+		exit (child_exit_code);
 }
 
 int	execute(t_utils *utils, t_pipe **_pipe)
@@ -193,7 +198,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	char		*infile;
 	int			num_of_pipes;
 	char		*outfile;
-	int			*tokens;
 	int			has_fd_failed;
 
 
@@ -207,7 +211,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	while (_pipe[i])
 		i ++;
 	num_of_pipes = i;
-	ft_memset(pid, -1, sizeof(pid));
 	fd[0] = 0;
 	fd[1] = 1;
 	//MAIN LOOP
@@ -219,7 +222,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 
 		infile = NULL;
 		outfile = NULL;
-		tokens = _pipe[i]->tokens;
 		has_fd_failed = exec_assign_redirections(_pipe[i], &fd, &infile, &outfile);
 		if (!infile && i == 0)
 			fd[0] = dup(savestdio[0]);
@@ -242,24 +244,29 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		}
 		dup2(fd[1], STDOUT_FILENO);
 		close(fd[1]);
-		if (!has_fd_failed && tokens && tokens[0] != BUILTIN)
+		if (!has_fd_failed && _pipe[i]->tokens && _pipe[i]->tokens[0] != BUILTIN)
 		{
+			// ft_putendl_fd("ready to fork", 2);
 			pid[i] = fork();
 			if (pid[i] == 0)
 			{
-				//execute_child();
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
-					//plus_one_to_shlvl_variable(utils, (_pipe)[i]->cmd_with_path);
 					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, utils->envp);
 					child_exit_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
 				}
 				else if ((_pipe)[i]->noio_args[0])
 					child_exit_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
-				if (i != num_of_pipes - 1)
-					child_exit_code = 127;
-				free_pipes_and_exit(_pipe, utils, child_exit_code);
+				// if (i != num_of_pipes - 1)
+				// 	child_exit_code = 127;
+				free_pipes_utils_and_exit(_pipe, utils, child_exit_code);
 			}
+			// else
+			// {
+			// 	ft_putstr_fd("the main process pid is ", 2);
+			// 	ft_putendl_fd(ft_itoa(pid[i]), 2);
+			// }
+
 		}
 		else if (!has_fd_failed)
 		{
@@ -269,7 +276,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				if (pid[i] == 0)
 				{
 					utils->err_code = exec_builtin(_pipe, utils, i);
-					exit (utils->err_code);
+					free_pipes_utils_and_exit(_pipe, utils, utils->err_code);
 				}
 			}
 			else
@@ -277,114 +284,65 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		}
 		i ++;
 	}
-
 	i = 0;
 	while (i < num_of_pipes)
 	{
-		if ((_pipe[i])->tokens && (_pipe[i])->tokens[0] == BUILTIN)
+		// if ((_pipe[i])->tokens && (_pipe[i])->tokens[0] == BUILTIN)
+		// 	i ++;
+		if (pid[i] == -2)
+			ft_putendl_fd("error in outer pid", 2);
 			i ++;
-		if (i == num_of_pipes - 1 && pid[i] != -1)
-			waitpid(pid[i], &child_exit_code, 0);
-		else if (pid[i] != -1)
-			waitpid(pid[i], NULL, 0);
+	}
+	return (waitpid_and_close_exec(_pipe, &pid, savestdio, utils, has_fd_failed));
+}
+
+int	waitpid_and_close_exec(t_pipe **_pipe, pid_t (*pid)[256], int savestdio[2], t_utils *utils, int has_fd_failed)
+{
+	int		i;
+	int		child_exit_code;
+	int		num_of_pipes;
+
+	i = 0;
+	child_exit_code = 0;
+	while (_pipe[i])
+		i ++;
+	num_of_pipes = i;
+	i = 0;
+	if ((_pipe[i])->tokens && (_pipe[i])->tokens[0] == BUILTIN && !_pipe[1])
+			i ++;
+	while (i < num_of_pipes)
+	{
+		// if ((*pid)[i] == -2)
+		// 	ft_putendl_fd("error in pid", 2);
+		if (i == num_of_pipes - 1)
+		{
+			//ft_putendl_fd("waiting for child", 2);
+			waitpid((*pid)[i], &child_exit_code, 0);
+		}
+		else if ((*pid)[i] != -2)
+			waitpid((*pid)[i], NULL, 0);
 		i ++;
 	}
 	dup2(savestdio[0], STDIN_FILENO);
 	dup2(savestdio[1], STDOUT_FILENO);
 	close(savestdio[0]);
 	close(savestdio[1]);
+	//printf("The cild exit code is %d\n", child_exit_code);
 	if (g_signal == 130)
 	{
 		ft_putstr_fd("\n", STDOUT_FILENO);
 		return (130);
 	}
-	// while (1);
-	if (WIFEXITED(child_exit_code))
+	if (WIFEXITED(child_exit_code) && !has_fd_failed && \
+	!(_pipe[0]->tokens[0] == BUILTIN && !_pipe[1]))
+	{
+		//printf("wexitd\n");
 		return (WEXITSTATUS(child_exit_code));
+	}
 	else
 		return (utils->err_code);
 }
 
-//Assumes that the minishell is run from the current folder (PWD)
-//Ignores ./ and ../ after PWD and looks for minishell name without anything afterwards instead
-// void	plus_one_to_shlvl_variable(t_utils *utils, char *cmd_with_path)
-// {
-// 	int		i;
-// 	int		j;
-// 	int		lvl;
-// 	char	*newstr;
-// 	char	*shlvl;
-// 	int		pwd_len;
-
-// 	i = 0;
-// 	j = 0;
-// 	lvl = -1;
-// 	shlvl = NULL;
-// 	while (utils->envp[i])
-// 	{
-// 		//ft_putendl_fd(utils->envp[i], 2);
-// 		if (ft_strncmp(utils->envp[i], "PWD=", 4) == 0)
-// 		//if we find the match until the pwd then if there is word minishell with no characters after
-// 		{
-// 			ft_putendl_fd("!looking for shell name", 2);
-// 			pwd_len = ft_strlen(utils->envp[i] + 4);
-// 			if (ft_strncmp(cmd_with_path, utils->envp[i] + 4, pwd_len) == 0)
-// 			{
-// 				newstr = ft_strnstr(cmd_with_path + pwd_len, "minishell", -1);
-// 				if (!newstr)
-// 					newstr = ft_strnstr(cmd_with_path + pwd_len, "bash", -1);
-// 				if (!newstr)
-// 					newstr = ft_strnstr(cmd_with_path + pwd_len, "zsh", -1);
-// 				if (newstr && (newstr + ft_strlen(newstr))[0] == '\0')
-// 				{
-// 					lvl = 1;
-// 					ft_putendl_fd("!!!! success in finding minishell exec in pwd and no extra char", 2);
-// 				}
-// 				newstr = NULL;
-// 			}
-// 			// else
-// 			// {
-// 			// 	ft_putendl_fd(ft_itoa(ft_strlen(utils->envp[i])), 2);
-// 			// 	ft_putendl_fd(cmd_with_path, 2);
-// 			// 	ft_putendl_fd(utils->envp[i] + 4, 2);
-// 			// }
-// 		}
-// 		else if (ft_strncmp(utils->envp[i], "SHLVL=", 6) == 0)
-// 		{
-// 			shlvl = utils->envp[i];
-// 			// ft_putendl_fd("!!!!!   found shlvl!   ", 2);
-// 		}
-// 		i ++;
-// 	}
-// 	if (!shlvl || lvl == -1)
-// 	{
-// 		// if (!shlvl)
-// 		// 	ft_putendl_fd("fail on shlvl find" , 2);
-// 		// if (lvl == -1)
-// 		// 	ft_putendl_fd("fail on equaling pwd to minishell" , 2);
-// 		return ;
-// 	}
-// 	// ft_putendl_fd("enter plus one" , 2);
-// 	i = 6;
-// 	while (shlvl[i])
-// 	{
-// 		if (ft_isdigit(shlvl[i]))
-// 		{
-// 			lvl = ft_atoi(shlvl + i) + 1;
-// 			newstr = ft_itoa(lvl);
-// 			if (!newstr)
-// 				malloc_error(1);
-// 			shlvl = ft_strjoin("SHLVL=", newstr);
-// 			if (!shlvl)
-// 				malloc_error(1);
-// 			change_env_var(&utils, "SHLVL=", shlvl);
-// 			//ft_putendl_fd(shlvl, 2);
-// 			free(shlvl);
-// 			return ;
-// 		}
-// 		i ++;
-// 	}
-// }
 
 /*
 When the name of a builtin command is used as the first word of a simple command (see Simple Commands),
