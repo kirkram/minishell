@@ -20,7 +20,8 @@ int	main(int ac, char **av, char **sys_envp)
 
 	(void)ac;
 	int		ret;
-
+	g_signal = 0;
+	
 	signal_handler();
 	ret = 0;
 	ret = rl_loop(ac, av, sys_envp);
@@ -112,6 +113,32 @@ char *exp_init(char *str1, char *str2)
 	return (temp);
 }
 
+char	*shell_level(char *str)
+{
+	int	i;
+	int	start;
+	int	lvl;
+
+	lvl = 0;
+	start = 0;
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] >= '0' && str[i] <= '9')
+		{
+			start = i;
+			while (str[i])
+				i++;
+			lvl = ft_atoi(ft_substr(str, start, i - start));
+			lvl++;
+			return (ft_strjoin(ft_substr(str, 0, start), ft_itoa(lvl)));
+		}
+		i++;
+	}
+	return (ft_strdup(str));
+
+}
+
 void	intialize_utils(char **sys_envp, t_utils **utils)
 {
 	int		i;
@@ -134,6 +161,13 @@ void	intialize_utils(char **sys_envp, t_utils **utils)
 		if (ft_strncmp("SHELL=", sys_envp[i], 6) == 0)
 		{
 			(*utils)->envp[i] = ft_strjoin("SHELL=", "minishell");
+			(*utils)->export[i] = exp_init("declare -x ", (*utils)->envp[i]);
+		}
+		else if (ft_strncmp("SHLVL=", sys_envp[i], 6) == 0)
+		{
+			(*utils)->envp[i] = shell_level(sys_envp[i]);
+			if (!(*utils)->envp[i])
+				malloc_error(1);
 			(*utils)->export[i] = exp_init("declare -x ", (*utils)->envp[i]);
 		}
 		else

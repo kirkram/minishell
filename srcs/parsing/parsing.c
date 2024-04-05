@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/03 10:47:10 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/04 11:26:33 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,18 @@ void	pre_parse(char **array, t_pipe ***pipe)
 	}
 }
 
+void	quote_remover(t_pipe *pipe)
+{
+	int	i;
+
+	i = 0;
+	while (pipe->args[i])
+	{
+		pipe->args[i] = remove_quote(pipe->args[i], i);
+		i++;
+	}
+}
+
 int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
 {
 	char	**array;
@@ -109,6 +121,7 @@ int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
 	if (parser(array, pipe, &utils->err_code) == 1)
 		return (1); // free all first
 	here_doc(pipe, utils);
+	//quote_remover(pipe);
 	ft_arrfree(array);
 	if (utils->syntax_err == TRUE)
 		return (1); //free what is needed first
