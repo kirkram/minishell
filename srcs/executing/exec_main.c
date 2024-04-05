@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/05 13:48:54 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/05 16:23:33 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,11 +222,12 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 
 		infile = NULL;
 		outfile = NULL;
+		//while (1);
 		has_fd_failed = exec_assign_redirections(_pipe[i], &fd, &infile, &outfile);
 		if (!infile && i == 0)
 			fd[0] = dup(savestdio[0]);
 		if (!outfile && i == num_of_pipes - 1)
-			fd[1] = dup(savestdio[1]);
+			fd[1] = dup(savestdio[1]);  // =  indstwad
 		if (has_fd_failed)
 			utils->err_code = 1;
 
@@ -251,6 +252,9 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			{
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
+					// close(pipefd[0]);
+					// close(pipefd[1]);
+					// close(fd[1]);
 					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, utils->envp);
 					child_exit_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
 				}
@@ -258,21 +262,22 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 					child_exit_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
 				free_pipes_utils_and_exit(_pipe, utils, child_exit_code);
 			}
+			// else{
+			// 	ft_putnbr_fd(pid[i], 2);
+			// 	ft_putstr_fd("\n", 2);
+			// }
+		}
+		else if (!has_fd_failed && _pipe[1])
+		{
+			pid[i] = fork();
+			if (pid[i] == 0)
+			{
+				utils->err_code = exec_builtin(_pipe, utils, i);
+				free_pipes_utils_and_exit(_pipe, utils, utils->err_code);
+			}
 		}
 		else if (!has_fd_failed)
-		{
-			if (_pipe[1])
-			{
-				pid[i] = fork();
-				if (pid[i] == 0)
-				{
-					utils->err_code = exec_builtin(_pipe, utils, i);
-					free_pipes_utils_and_exit(_pipe, utils, utils->err_code);
-				}
-			}
-			else
-				utils->err_code = exec_builtin(_pipe, utils, i);
-		}
+			utils->err_code = exec_builtin(_pipe, utils, i);
 		i ++;
 	}
 	return (waitpid_and_close_exec(_pipe, &pid, savestdio, utils, has_fd_failed));
