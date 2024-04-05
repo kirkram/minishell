@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/05 16:30:53 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/05 19:25:36 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,9 +217,9 @@ int	open_history_file(int hist_fd)
 
 char *rl_gets(char *line_read, int hist_file, t_utils *utils)
 {
-	int	savestdio;
+	int	saveint;
 
-	savestdio = dup(STDIN_FILENO);
+	saveint = dup(STDIN_FILENO);
 	if (line_read)
 	{
 		free (line_read);
@@ -234,7 +234,8 @@ char *rl_gets(char *line_read, int hist_file, t_utils *utils)
 	}
 	else if (!line_read && g_signal == 130)
 	{
-		dup2 (savestdio, STDIN_FILENO);
+		//ft_putendl_fd("Restore STDIN", 2);
+		dup2 (saveint, STDIN_FILENO);
 		if (utils->was_prev_line_null == 0)
 			ft_putchar_fd('\n', STDIN_FILENO);
 		utils->was_prev_line_null = 1;
@@ -245,6 +246,6 @@ char *rl_gets(char *line_read, int hist_file, t_utils *utils)
 		ft_putendl_fd(line_read, hist_file);
 		utils->was_prev_line_null = 0;
 	}
-	close (savestdio);
+	close (saveint);
 	return (line_read);
 }
