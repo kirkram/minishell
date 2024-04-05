@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/03 15:44:21 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/05 11:35:35 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	sort_export(t_utils *utils)
 	}
 }
 
-int	export_error(char *arg, t_utils *utils)
+int	export_error(char *arg)
 {
 	int	x;
 
@@ -64,17 +64,16 @@ int	export_error(char *arg, t_utils *utils)
 		ft_putstr_fd("export: `", 2);
 		ft_putstr_fd(arg, 2);
 		ft_putendl_fd("\': not a valid identifier", 2);
-		utils->err_code = 1;
 		return (1);
 	}
 	while (arg[x] && arg[x] != '=')
 	{
-		if (arg[x] == '-')
+		if (!((arg[x] >= '0' && arg[x] <= '9') || (arg[x] >= 'a' && arg[x] <= 'z')
+			|| (arg[x] >= 'A' && arg[x] <= 'Z') || (arg[x] == '_')))
 		{
 			ft_putstr_fd("export: `", 2);
 			ft_putstr_fd(arg, 2);
 			ft_putendl_fd("\': not a valid identifier", 2);
-			//utils->err_code = 1;
 			return (1);
 		}
 		x++;
@@ -131,8 +130,8 @@ int	export(t_utils *utils, char **arg)
 	}
 	while (arg[0] && arg[i])
 	{
-		if (export_error(arg[i], utils) != 0)
-			return(1);
+		if (export_error(arg[i]) != 0)
+			return (1);
 		export_loop(arg[i], utils, quote, dquote);
 		i++;
 	}
