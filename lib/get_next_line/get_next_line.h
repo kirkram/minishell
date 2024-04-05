@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 11:14:40 by klukiano          #+#    #+#             */
-/*   Updated: 2024/01/26 14:16:22 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/05 11:48:10 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include <unistd.h>
 # include <stdlib.h>
 
-int		get_next_line(char **str, int fd);
+int		get_next_line_nonewline(char **str, int fd);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 size_t	ft_strlen(const char *str);
 size_t	ft_strlcpy(char *dst, char *src, size_t dstsize);
