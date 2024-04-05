@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/05 14:42:23 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/05 15:17:25 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,8 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 			while (_pipe[++i])
 				(_pipe)[i]->cmd_with_path = assign_scmd_path((_pipe)[i]->noio_args[0], utils->envp);
 			utils->err_code = execute(utils, _pipe);
-			free_pipes_utils_and_exit(_pipe, NULL, -42);
 		}
+		free_pipes_utils_and_exit(_pipe, NULL, -42);
 	}
 	free (utils);
 	free (line_read);
