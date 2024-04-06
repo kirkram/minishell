@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:56:02 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/05 16:30:43 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/06 15:17:16 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ void	handle_sigint(int sig)
  	//int save_stdin;
 
 	g_signal = 130;
+	//ft_putendl_fd(ft_itoa(g_signal), 2);
 	//ft_putendl_fd("g_signal = 130", 2);
 	//write(save_stdin, '\0', 1);
 	//dup2 (save_stdin, STDIN_FILENO);

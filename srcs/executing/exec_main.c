@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/06 14:47:11 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/06 15:27:52 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,7 +189,7 @@ void	free_pipes_utils_and_exit(t_pipe **_pipe, t_utils *utils, int child_exit_co
 int	execute(t_utils *utils, t_pipe **_pipe)
 {
 	//int			fd[2];
-	//int			savestdio[2];
+	int			savestdio[2];
 	pid_t		pid[256]; //zsh limit descriptors = 256
 	int			pipefd[2];
 	int			i;
@@ -205,8 +205,8 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	if (g_signal == 130)
 		return (130);
 
-	// savestdio[0] = dup(STDIN_FILENO);
-	// savestdio[1] = dup(STDOUT_FILENO);
+	savestdio[0] = dup(STDIN_FILENO);
+	savestdio[1] = dup(STDOUT_FILENO);
 	//PREP
 	i = 0;
 	while (_pipe[i])
@@ -215,6 +215,8 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	// fd[0] = -1;
 	// fd[1] = -2;
 	tempfd_0 = -1;
+	pipefd[0] = -1;
+	pipefd[1] = -2;
 	//MAIN LOOP
 	i = 0;
 
@@ -236,16 +238,20 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			pid[i] = fork();
 			if (pid[i] == 0)
 			{
-				close(pipefd[0]);
+				//if (pipefd[0] != 0)
+					close(pipefd[0]);
+
 				if (i != 0)
 				{
-					ft_putendl_fd("duped stdin", 2);
 					dup2(tempfd_0, STDIN_FILENO);
 					close(tempfd_0);
 				}
 				if (i != num_of_pipes - 1 && _pipe[1])
 					dup2(pipefd[1], STDOUT_FILENO);
-				close(pipefd[1]);
+
+
+				//if (pipefd[1] != 0)
+					close(pipefd[1]);
 
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
@@ -286,49 +292,16 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	close (pipefd[1]);
 	close(tempfd_0);
 
-	i = 0;
-	child_exit_code = 0;
-	while (_pipe[i])
-		i ++;
-	num_of_pipes = i;
-	i = 0;
-	if ((_pipe[i])->tokens && (_pipe[i])->tokens[0] == BUILTIN && !_pipe[1])
-			i ++;
-	while (i < num_of_pipes)
-	{
-		// if ((*pid)[i] == -2)
-		// 	ft_putendl_fd("error in pid", 2);
-		if (i == num_of_pipes - 1)
-		{
-			//ft_putendl_fd("waiting for child", 2);
-			waitpid(pid[i], &child_exit_code, 0);
-		}
-		else
-			waitpid(pid[i], NULL, 0);
-		i ++;
-	}
-	printf("123\n");
+	//printf("123\n");
 	//dup2(savestdio[0], STDIN_FILENO);
 	//dup2(savestdio[1], STDOUT_FILENO);
 	//ft_putendl_fd("Restoring the STDIO", 2);
 	//close(savestdio[0]);
 	//close(savestdio[1]);
 	//printf("The cild exit code is %d\n", child_exit_code);
-	if (g_signal == 130)
-	{
-		ft_putstr_fd("\n", STDOUT_FILENO);
-		return (130);
-	}
-	if (WIFEXITED(child_exit_code) && !has_fd_failed && \
-	!(_pipe[0]->tokens[0] == BUILTIN && !_pipe[1]))
-	{
-		return (WEXITSTATUS(child_exit_code));
-	}
-	else
-		return (utils->err_code);
 
 
-	//return (waitpid_and_close_exec(_pipe, &pid, savestdio, utils, has_fd_failed));
+	return (waitpid_and_close_exec(_pipe, &pid, savestdio, utils, has_fd_failed));
 }
 
 int	waitpid_and_close_exec(t_pipe **_pipe, pid_t (*pid)[256], int savestdio[2], t_utils *utils, int has_fd_failed)

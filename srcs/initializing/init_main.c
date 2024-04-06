@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/05 19:25:36 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/06 14:58:24 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,6 @@ void	intialize_utils(char **sys_envp, t_utils **utils)
 	if ((*utils)->export == NULL)
 		malloc_error(1);
 	i = 0;
-	//copy_envp_change_shl()
 	while (sys_envp[i])
 	{
 		if (ft_strncmp("SHELL=", sys_envp[i], 6) == 0)
@@ -217,9 +216,9 @@ int	open_history_file(int hist_fd)
 
 char *rl_gets(char *line_read, int hist_file, t_utils *utils)
 {
-	int	saveint;
+	int	savestdio;
 
-	saveint = dup(STDIN_FILENO);
+	savestdio = dup(STDIN_FILENO);
 	if (line_read)
 	{
 		free (line_read);
@@ -234,8 +233,7 @@ char *rl_gets(char *line_read, int hist_file, t_utils *utils)
 	}
 	else if (!line_read && g_signal == 130)
 	{
-		//ft_putendl_fd("Restore STDIN", 2);
-		dup2 (saveint, STDIN_FILENO);
+		dup2 (savestdio, STDIN_FILENO);
 		if (utils->was_prev_line_null == 0)
 			ft_putchar_fd('\n', STDIN_FILENO);
 		utils->was_prev_line_null = 1;
@@ -246,6 +244,6 @@ char *rl_gets(char *line_read, int hist_file, t_utils *utils)
 		ft_putendl_fd(line_read, hist_file);
 		utils->was_prev_line_null = 0;
 	}
-	close (saveint);
+	close (savestdio);
 	return (line_read);
 }
