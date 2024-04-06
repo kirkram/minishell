@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/05 19:27:55 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/06 14:47:11 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,11 +188,12 @@ void	free_pipes_utils_and_exit(t_pipe **_pipe, t_utils *utils, int child_exit_co
 
 int	execute(t_utils *utils, t_pipe **_pipe)
 {
-	int			fd[2];
-	int			savestdio[2];
+	//int			fd[2];
+	//int			savestdio[2];
 	pid_t		pid[256]; //zsh limit descriptors = 256
 	int			pipefd[2];
 	int			i;
+	int			tempfd_0;
 
 	int			child_exit_code;
 	char		*infile;
@@ -204,15 +205,16 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	if (g_signal == 130)
 		return (130);
 
-	savestdio[0] = dup(STDIN_FILENO);
-	savestdio[1] = dup(STDOUT_FILENO);
+	// savestdio[0] = dup(STDIN_FILENO);
+	// savestdio[1] = dup(STDOUT_FILENO);
 	//PREP
 	i = 0;
 	while (_pipe[i])
 		i ++;
 	num_of_pipes = i;
-	fd[0] = 0;
-	fd[1] = 1;
+	// fd[0] = -1;
+	// fd[1] = -2;
+	tempfd_0 = -1;
 	//MAIN LOOP
 	i = 0;
 
@@ -223,15 +225,10 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 
 		infile = NULL;
 		outfile = NULL;
-		//while (1);
-		//has_fd_failed = exec_assign_redirections(_pipe[i], &fd, &infile, &outfile);
-		//if (!infile && i == 0)
-		//	dup2(savestdio[0], STDIN_FILENO);
-		// if (has_fd_failed)
-		// 	utils->err_code = 1;
+
 		has_fd_failed = 0;
 		//PIPING
-		if (i != num_of_pipes - 1)
+		if (i != num_of_pipes - 1 && _pipe[1])
 			pipe(pipefd);
 
 		if (!has_fd_failed && _pipe[i]->tokens && _pipe[i]->tokens[0] != BUILTIN)
@@ -239,37 +236,19 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			pid[i] = fork();
 			if (pid[i] == 0)
 			{
+				close(pipefd[0]);
 				if (i != 0)
 				{
-					dup2(pipefd[0], STDIN_FILENO);
-					//ft_putendl_fd("i != 0, dup stdin, close pipe0", 2);
-					close(pipefd[0]);
+					ft_putendl_fd("duped stdin", 2);
+					dup2(tempfd_0, STDIN_FILENO);
+					close(tempfd_0);
 				}
-				else
-				{
-					//ft_putendl_fd("i == 0, close pipe0", 2);
-					close(pipefd[0]);
-				}
-				if (i != num_of_pipes - 1)
-				{
+				if (i != num_of_pipes - 1 && _pipe[1])
 					dup2(pipefd[1], STDOUT_FILENO);
-					//ft_putendl_fd("i != last, dup out stdout and close 1", 2);
-					close(pipefd[1]);
-				}
-				else
-				{
-					close(pipefd[1]);
-					//ft_putendl_fd("i is last, dup out stdout and close 1", 2);
-				}
-				if (!outfile && i == num_of_pipes - 1)
-				{
-					dup2(savestdio[1], STDOUT_FILENO);
-				}
+				close(pipefd[1]);
+
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
-					// close(pipefd[0]);
-					// close(pipefd[1]);
-					// close(fd[1]);
 					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, utils->envp);
 					child_exit_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
 				}
@@ -279,20 +258,16 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			}
 			else
 			{
+				if (i != 0)
+					close(tempfd_0);
+				if (_pipe[1] && i != num_of_pipes - 1)
+					tempfd_0 = dup(pipefd[0]);
+				close(pipefd[0]);
 				close(pipefd[1]);
-				// if (i != 0)
-				// 	close(pipefd[0]);
-				if (i == num_of_pipes - 1)
-				{
-					close(pipefd[0]);
-				}
-
 			}
-			// else{
-			// 	ft_putnbr_fd(pid[i], 2);
-			// 	ft_putstr_fd("\n", 2);
-			// }
+
 		}
+
 
 		else if (!has_fd_failed && _pipe[1])
 		{
@@ -309,6 +284,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 	}
 	close (pipefd[0]);
 	close (pipefd[1]);
+	close(tempfd_0);
 
 	i = 0;
 	child_exit_code = 0;
@@ -327,15 +303,16 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			//ft_putendl_fd("waiting for child", 2);
 			waitpid(pid[i], &child_exit_code, 0);
 		}
-		else if (pid[i] != -2)
+		else
 			waitpid(pid[i], NULL, 0);
 		i ++;
 	}
-	dup2(savestdio[0], STDIN_FILENO);
-	dup2(savestdio[1], STDOUT_FILENO);
+	printf("123\n");
+	//dup2(savestdio[0], STDIN_FILENO);
+	//dup2(savestdio[1], STDOUT_FILENO);
 	//ft_putendl_fd("Restoring the STDIO", 2);
-	close(savestdio[0]);
-	close(savestdio[1]);
+	//close(savestdio[0]);
+	//close(savestdio[1]);
 	//printf("The cild exit code is %d\n", child_exit_code);
 	if (g_signal == 130)
 	{
