@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/06 15:27:52 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/06 16:28:48 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,8 +136,12 @@ int	exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2], char **infile, char 
 		}
 		else if (tokens[j] == SKIP_OUT || tokens[j] == OUT || tokens[j] == OUT_AP)
 		{
+			//HAVE TO CLOSE EVERY ONE!
 			if (tokens[j] == SKIP_OUT)
+			{
 				(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY, 0644);
+				close (*fd)[1];
+			}
 			else if (tokens[j] == OUT)
 				(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY | O_TRUNC, 0644);
 			else if (tokens[j] == OUT_AP)
@@ -188,7 +192,7 @@ void	free_pipes_utils_and_exit(t_pipe **_pipe, t_utils *utils, int child_exit_co
 
 int	execute(t_utils *utils, t_pipe **_pipe)
 {
-	//int			fd[2];
+	int			fd[2];
 	int			savestdio[2];
 	pid_t		pid[256]; //zsh limit descriptors = 256
 	int			pipefd[2];
@@ -207,30 +211,44 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 
 	savestdio[0] = dup(STDIN_FILENO);
 	savestdio[1] = dup(STDOUT_FILENO);
+
 	//PREP
 	i = 0;
 	while (_pipe[i])
 		i ++;
 	num_of_pipes = i;
-	// fd[0] = -1;
-	// fd[1] = -2;
 	tempfd_0 = -1;
 	pipefd[0] = -1;
 	pipefd[1] = -2;
+
 	//MAIN LOOP
 	i = 0;
-
 	while (i < num_of_pipes)
 	{
 		if (g_signal == 130)
 			break;
 
+		//delete
 		infile = NULL;
 		outfile = NULL;
 
+		fd[0] = -1;
+		fd[1] = -2;
 		has_fd_failed = 0;
+
+		has_fd_failed = exec_assign_redirections(_pipe[i], &fd, &infile, &outfile);
+		if (has_fd_failed)
+		{
+			close(fd[0]);
+			close(fd[1]);
+			fd[0] = -1;
+			fd[1] = -2;
+			utils->err_code = 1;
+		}
+
+
 		//PIPING
-		if (i != num_of_pipes - 1 && _pipe[1])
+		if (i != num_of_pipes - 1)
 			pipe(pipefd);
 
 		if (!has_fd_failed && _pipe[i]->tokens && _pipe[i]->tokens[0] != BUILTIN)
@@ -238,20 +256,20 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			pid[i] = fork();
 			if (pid[i] == 0)
 			{
-				//if (pipefd[0] != 0)
-					close(pipefd[0]);
-
-				if (i != 0)
+				close(pipefd[0]);
+				if (i != 0 && fd[0] < 0)
 				{
 					dup2(tempfd_0, STDIN_FILENO);
 					close(tempfd_0);
 				}
-				if (i != num_of_pipes - 1 && _pipe[1])
+				else
+				{
+					dup2(fd[0])
+				}
+				if (i != num_of_pipes - 1)
 					dup2(pipefd[1], STDOUT_FILENO);
+				close(pipefd[1]);
 
-
-				//if (pipefd[1] != 0)
-					close(pipefd[1]);
 
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
@@ -271,25 +289,45 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				close(pipefd[0]);
 				close(pipefd[1]);
 			}
-
 		}
-
-
 		else if (!has_fd_failed && _pipe[1])
 		{
 			pid[i] = fork();
 			if (pid[i] == 0)
 			{
+				close(pipefd[0]);
+				if (i != 0)
+				{
+					dup2(tempfd_0, STDIN_FILENO);
+					close(tempfd_0);
+				}
+				if (i != num_of_pipes - 1)
+					dup2(pipefd[1], STDOUT_FILENO);
+				close(pipefd[1]);
+
 				utils->err_code = exec_builtin(_pipe, utils, i);
 				free_pipes_utils_and_exit(_pipe, utils, utils->err_code);
 			}
+			else
+			{
+				if (i != 0)
+					close(tempfd_0);
+				if (_pipe[1] && i != num_of_pipes - 1)
+					tempfd_0 = dup(pipefd[0]);
+				close(pipefd[0]);
+				close(pipefd[1]);
+			}
+
 		}
-		else if (!has_fd_failed)
+		else if (!has_fd_failed & !_pipe[1])
+		{
 			utils->err_code = exec_builtin(_pipe, utils, i);
+		}
+
 		i ++;
 	}
-	close (pipefd[0]);
-	close (pipefd[1]);
+	// close (pipefd[0]);
+	// close (pipefd[1]);
 	close(tempfd_0);
 
 	//printf("123\n");

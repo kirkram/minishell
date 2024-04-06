@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/05 11:41:42 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/06 16:12:05 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 	if (!noio_args[1] || !ft_strncmp(noio_args[1], "~", -1))
 	{
 		//this condition is needed to check if there is a pipe in the pipeline
-		if ((_pipe[0] && !_pipe[1]) && chdir(home_path) == -1)
+		if (chdir(home_path) == -1)
 		{
 			directory = opendir(home_path);
 			if (access(home_path, F_OK) == -1)
@@ -163,7 +163,7 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 	}
 	else
 	{
-		if ((_pipe[0] && !_pipe[1]) && chdir(noio_args[1]) == -1)
+		if (chdir(noio_args[1]) == -1)
 		{
 			directory = opendir(noio_args[1]);
 			if (access(noio_args[1], F_OK) == -1)
@@ -192,14 +192,7 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 		}
 		update_pwd_oldpwd_env_exp(utils, cwd);
 	}
-	//chdir
-	//opendir, readdir, closedir:
-	//if we cd add oldpwd to the env vars
-	// .. and ../ are same
-	// . and ./ without aythhing extra - do nothing
-	// ++++++++ done +++++ cd with no args = cd ~
 	//
-
 	return (0);
 }
 
