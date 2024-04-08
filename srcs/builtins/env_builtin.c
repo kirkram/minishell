@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/07 19:45:12 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/08 10:58:34 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,21 +98,41 @@ void	export_loop(char *arg, t_utils *utils, bool quote, bool dquote)
 			temp2 = ft_substr(arg, 0, (i +1));
 			if (!temp2)
 				malloc_error (1);
+			change_env_var(&utils, temp2, arg);
 			temp = jointhree("declare -x ", temp2, "\"");
+			free (temp2);
+			if (!temp)
+				malloc_error (1);
+			temp2 = ft_free_strjoin(temp, ft_substr(arg, (i +1), (ft_strlen(arg) - i)));
+			if (!temp2)
+				malloc_error (1);
+			temp = ft_strjoin(temp2, "\"");
 			if (!temp)
 				malloc_error (1);
 			free (temp2);
-			temp = jointhree(temp, ft_substr(arg, (i +1),
-						(ft_strlen(arg) - i)), "\"");
-			if (!temp)
+			temp2 = ft_strdup("declare -x ");
+			if (!temp2)
 				malloc_error (1);
-			change_env_var(&utils, ft_substr(arg, 0, (i +1)), arg);
-			change_exp_var(&utils, ft_strjoin("declare -x ",
-					ft_substr(arg, 0, (i +1))), temp);
+			temp2 = ft_free_strjoin(temp2, ft_substr(arg, 0, (i +1)));
+			if (!temp2)
+				malloc_error(1);
+
+			//temp = jointhree(temp, ft_substr(arg, (i +1),
+			//			(ft_strlen(arg) - i)), "\"");
+		//	change_env_var(&utils, ft_substr(arg, 0, (i +1)), arg);
+			change_exp_var(&utils, temp2, temp);
+			free (temp);
+			free (temp2);
 			break ;
 		}
 		if (arg[++i] == '\0')
-			add_exp_var(&utils, ft_strjoin("declare -x ", arg));
+		{
+			temp = ft_strjoin("declare -x ", arg);
+			if (!temp)
+				malloc_error(1);
+			add_exp_var(&utils, temp);
+			free (temp);
+		}
 	}
 }
 
