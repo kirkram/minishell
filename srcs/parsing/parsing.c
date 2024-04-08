@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/05 13:19:19 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/05 15:44:37 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,7 @@ int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
 	if (syntax_check(tokens, &utils->err_code, array) == 1)
 		utils->syntax_err = TRUE;
 	pipeline_init(array, pipe);
+	free (tokens);
 	if (parser(array, pipe, &utils->err_code) == 1)
 		return (1); // free all first
 	here_doc(pipe, utils);

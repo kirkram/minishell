@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/06 14:58:24 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/08 12:02:26 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,11 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	t_pipe	**_pipe;
 	int		i;
 	t_utils	*utils;
-
+	t_free	*ms_free;
+	ms_free = malloc(sizeof (t_free));
 	intialize_utils(sys_envp, &utils);
+	ms_free->utils = utils;
+	ms_free->pipe = _pipe;
 	line_read = NULL;
 	while (1)
 	{
@@ -62,8 +65,8 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 			while (_pipe[++i])
 				(_pipe)[i]->cmd_with_path = assign_scmd_path((_pipe)[i]->noio_args[0], utils->envp);
 			utils->err_code = execute(utils, _pipe);
-			free_pipes_utils_and_exit(_pipe, NULL, -42);
 		}
+		free_pipes_utils_and_exit(_pipe, NULL, -42);
 	}
 	free (utils);
 	free (line_read);
@@ -118,7 +121,9 @@ char	*shell_level(char *str)
 	int	i;
 	int	start;
 	int	lvl;
+	char *temp;
 
+	temp = NULL;
 	lvl = 0;
 	start = 0;
 	i = 0;
@@ -129,9 +134,13 @@ char	*shell_level(char *str)
 			start = i;
 			while (str[i])
 				i++;
-			lvl = ft_atoi(ft_substr(str, start, i - start));
+			temp = ft_substr(str, start, i - start);
+			if (!temp)
+				malloc_error (1);
+			lvl = ft_atoi(temp);
+			free (temp);
 			lvl++;
-			return (ft_strjoin(ft_substr(str, 0, start), ft_itoa(lvl)));
+			return (ft_free_strjoin(ft_substr(str, 0, start), ft_itoa(lvl)));
 		}
 		i++;
 	}

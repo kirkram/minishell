@@ -183,6 +183,8 @@ void	free_pipes_utils_and_exit(t_pipe **_pipe, t_utils *utils, int child_exit_co
 		free(_pipe[i]);
 		i ++;
 	}
+	if (_pipe[i])
+		free(_pipe[i]);
 	free (_pipe);
 	if (utils)
 	{

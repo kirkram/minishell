@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:51:27 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/28 14:38:20 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/08 11:26:52 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,17 @@ void	quote_status(bool *quote)
 
 void	malloc_error(int err)
 {
-	ft_putendl_fd("Malloc failed\n", 2);
+	ft_putendl_fd("Malloc failed", 2);
 	exit(err);
+}
+
+void	malloc_error2(char **str)
+{
+	if (!(*str))
+	{
+		ft_putendl_fd("Malloc failed", 2);
+		exit(1);
+	}
 }
 
 int	get_token(char *str)
@@ -83,4 +92,40 @@ int	is_builtin(char *str)
 	else if (ft_strncmp(str, "exit", 5) == 0)
 		return (8);
 	return (0);
+}
+
+char	*ft_free_strjoin(char *s1, char *s2)
+{
+	char	*str;
+	int		i;
+	int		j;
+
+	i = 0;
+	j = 0;
+	if (!s1 || !s2)
+		return (0);
+	str = malloc ((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
+	if (!str)
+		return (0);
+	while (s1[i])
+	{
+		str[i] = s1[i];
+		i++;
+	}
+	while (s2[j])
+		str[i++] = s2[j++];
+	str[i] = '\0';
+	free (s1);
+	free (s2);
+	return (str);
+}
+
+void ft_nullfree(char **str)
+{
+	if (*str)
+	{
+		(*str) = NULL;
+		free (*str);
+	}
+
 }
