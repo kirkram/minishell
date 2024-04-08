@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_builtin.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/05 11:35:35 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/05 15:52:37 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ void	export_loop(char *arg, t_utils *utils, bool quote, bool dquote)
 			if (!temp)
 				malloc_error (1);
 			temp = jointhree(temp, ft_substr(arg, (i +1),
-						(ft_strlen(arg) - i)), "\"");
+				(ft_strlen(arg) - i)), "\"");
 			if (!temp)
 				malloc_error (1);
 			change_env_var(&utils, ft_substr(arg, 0, (i +1)), arg);

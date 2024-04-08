@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/04 11:09:07 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/05 15:53:03 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,8 +88,6 @@ int	final_args(t_pipe *pipe, int i)
 	init_noio(pipe);
 	while (pipe->args[i])
 	{
-		if (pipe->tokens[i] == IN_FD || pipe->tokens[i] == IN_HD)
-			pipe->infile = ft_strdup(pipe->args[i]);
 		if (pipe->tokens[i] == CMD)
 		{
 			pipe->noio_args[x] = ft_strdup(pipe->args[i]);
