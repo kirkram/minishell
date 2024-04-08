@@ -6,13 +6,16 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/06 16:28:48 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/08 15:21:45 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //test in the file change
 
 #include "../../include/minishell.h"
+
+#include <errno.h>
+
 extern int g_signal;
 
 char	*assign_scmd_path(char *scmd, char **envp)
@@ -140,7 +143,8 @@ int	exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2], char **infile, char 
 			if (tokens[j] == SKIP_OUT)
 			{
 				(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY, 0644);
-				close (*fd)[1];
+				close ((*fd)[1]);
+				ft_putendl_fd("closing skip out", 2);
 			}
 			else if (tokens[j] == OUT)
 				(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY | O_TRUNC, 0644);
@@ -239,14 +243,15 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		has_fd_failed = exec_assign_redirections(_pipe[i], &fd, &infile, &outfile);
 		if (has_fd_failed)
 		{
+			//ft_putendl_fd("Fd has failed", 2);
 			close(fd[0]);
 			close(fd[1]);
 			fd[0] = -1;
 			fd[1] = -2;
 			utils->err_code = 1;
 		}
-
-
+		//ft_putendl_fd(ft_strjoin("---The fd[0] is ", ft_itoa(fd[0])), 2);
+		//ft_putendl_fd(ft_strjoin("---The fd[1] is ", ft_itoa(fd[1])), 2);
 		//PIPING
 		if (i != num_of_pipes - 1)
 			pipe(pipefd);
@@ -256,21 +261,29 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			pid[i] = fork();
 			if (pid[i] == 0)
 			{
-				close(pipefd[0]);
+
 				if (i != 0 && fd[0] < 0)
-				{
 					dup2(tempfd_0, STDIN_FILENO);
-					close(tempfd_0);
-				}
-				else
-				{
-					dup2(fd[0])
-				}
-				if (i != num_of_pipes - 1)
+				else if (fd[0] > -1)
+					dup2(fd[0], STDIN_FILENO);
+				if (i != num_of_pipes - 1 && fd[1] < 0)
 					dup2(pipefd[1], STDOUT_FILENO);
+				else if (fd[1] > -1)
+				{
+					//ft_putendl_fd("redirect output", 2);
+					//ft_putendl_fd(ft_itoa(fd[1]), 2);
+					if (dup2(fd[1], STDOUT_FILENO) < 0)
+					{
+						///ft_putendl_fd("dup2 failed", 2);
+						ft_putendl_fd(strerror(errno), 2);
+					}
+
+				}
+				close (fd[0]);
+				close (tempfd_0);
+				close(pipefd[0]);
 				close(pipefd[1]);
-
-
+				close(fd[1]);
 				if ((_pipe)[i]->cmd_with_path != NULL)
 				{
 					execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, utils->envp);
@@ -288,6 +301,8 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 					tempfd_0 = dup(pipefd[0]);
 				close(pipefd[0]);
 				close(pipefd[1]);
+				close(fd[0]);
+				close(fd[1]);
 			}
 		}
 		else if (!has_fd_failed && _pipe[1])
@@ -295,16 +310,23 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			pid[i] = fork();
 			if (pid[i] == 0)
 			{
-				close(pipefd[0]);
-				if (i != 0)
-				{
+				if (i != 0 && fd[0] < 0)
 					dup2(tempfd_0, STDIN_FILENO);
-					close(tempfd_0);
-				}
-				if (i != num_of_pipes - 1)
+				else
+					dup2(fd[0], STDIN_FILENO);
+				if (i != num_of_pipes - 1 && fd[1] < 0)
 					dup2(pipefd[1], STDOUT_FILENO);
+				else if (fd[1] > -1)
+				{
+					//ft_putendl_fd("redirect output", 2);
+					//ft_putendl_fd(ft_itoa(fd[1]), 2);
+					dup2(fd[1], STDOUT_FILENO);
+				}
+				close (fd[0]);
+				close(tempfd_0);
 				close(pipefd[1]);
-
+				close(pipefd[0]);
+				close(fd[1]);
 				utils->err_code = exec_builtin(_pipe, utils, i);
 				free_pipes_utils_and_exit(_pipe, utils, utils->err_code);
 			}
@@ -316,11 +338,23 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 					tempfd_0 = dup(pipefd[0]);
 				close(pipefd[0]);
 				close(pipefd[1]);
+				close(fd[0]);
+				close(fd[1]);
 			}
 
 		}
 		else if (!has_fd_failed & !_pipe[1])
 		{
+			if (fd[0] > -1)
+				dup2(fd[0], STDIN_FILENO);
+			close(fd[0]);
+			if (fd[1] > -1)
+			{
+				//ft_putendl_fd("redirect output in no pipe and bulitn", 2);
+				dup2(fd[1], STDOUT_FILENO);
+			}
+			close(fd[1]);
+			//ft_putendl_fd("no pipe and builtin", 2);
 			utils->err_code = exec_builtin(_pipe, utils, i);
 		}
 
