@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/05 11:35:35 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/07 19:45:12 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,9 @@ void	export_loop(char *arg, t_utils *utils, bool quote, bool dquote)
 {
 	int		i;
 	char	*temp;
+	char	*temp2;
 
+	temp2 = NULL;
 	temp = NULL;
 	i = 0;
 	while (arg[i])
@@ -93,9 +95,13 @@ void	export_loop(char *arg, t_utils *utils, bool quote, bool dquote)
 		quote_status2(&quote, &dquote, arg[i]);
 		if (arg[i] == '=' && quote == false && dquote == false)
 		{
-			temp = jointhree("declare -x ", ft_substr(arg, 0, (i +1)), "\"");
+			temp2 = ft_substr(arg, 0, (i +1));
+			if (!temp2)
+				malloc_error (1);
+			temp = jointhree("declare -x ", temp2, "\"");
 			if (!temp)
 				malloc_error (1);
+			free (temp2);
 			temp = jointhree(temp, ft_substr(arg, (i +1),
 						(ft_strlen(arg) - i)), "\"");
 			if (!temp)
