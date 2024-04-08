@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/05 15:17:25 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/08 12:02:26 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,11 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	t_pipe	**_pipe;
 	int		i;
 	t_utils	*utils;
-
+	t_free	*ms_free;
+	ms_free = malloc(sizeof (t_free));
 	intialize_utils(sys_envp, &utils);
+	ms_free->utils = utils;
+	ms_free->pipe = _pipe;
 	line_read = NULL;
 	while (1)
 	{

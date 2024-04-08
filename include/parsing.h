@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/05 15:29:13 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/08 12:01:38 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,9 @@ extern int	g_signal;
 
 //# include </usr/include/readline/readline.h> //needed for Linux
 //# include </usr/include/readline/history.h> // needed for Linux
+
+
+
 typedef struct s_paths
 {
 	int		i;
@@ -52,6 +55,13 @@ typedef struct s_utils
 	char	**envp;
 	char	**export;
 }	t_utils;
+
+typedef struct s_free
+{
+	t_pipe **pipe;
+	t_utils *utils;
+	t_paths *vars;
+}	t_free;
 
 // SIGNAL
 void	signal_handler(void);
@@ -156,6 +166,8 @@ char	*remove_quote(char *str, int i);
 int		quote_count(char *str);
 
 //HELPER
+void		ft_nullfree(char **str);
+void		malloc_error2(char **str);
 int			is_only_digits_and_signs(char *str);
 char		*ft_free_strjoin(char *s1, char *s2);
 

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:51:27 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/05 14:38:04 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/08 11:26:52 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,17 @@ void	quote_status(bool *quote)
 
 void	malloc_error(int err)
 {
-	ft_putendl_fd("Malloc failed\n", 2);
+	ft_putendl_fd("Malloc failed", 2);
 	exit(err);
+}
+
+void	malloc_error2(char **str)
+{
+	if (!(*str))
+	{
+		ft_putendl_fd("Malloc failed", 2);
+		exit(1);
+	}
 }
 
 int	get_token(char *str)
@@ -109,4 +118,14 @@ char	*ft_free_strjoin(char *s1, char *s2)
 	free (s1);
 	free (s2);
 	return (str);
+}
+
+void ft_nullfree(char **str)
+{
+	if (*str)
+	{
+		(*str) = NULL;
+		free (*str);
+	}
+
 }
