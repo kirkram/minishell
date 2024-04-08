@@ -21,7 +21,7 @@ int	main(int ac, char **av, char **sys_envp)
 	(void)ac;
 	int		ret;
 	g_signal = 0;
-	
+
 	signal_handler();
 	ret = 0;
 	ret = rl_loop(ac, av, sys_envp);
