@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/08 12:01:38 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/08 16:21:31 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,12 +56,13 @@ typedef struct s_utils
 	char	**export;
 }	t_utils;
 
-typedef struct s_free
+typedef struct s_ms
 {
-	t_pipe **pipe;
-	t_utils *utils;
-	t_paths *vars;
-}	t_free;
+	t_pipe	**pipe;
+	t_utils	*utils;
+	char	*temp;
+	char	*temp2;
+}	t_ms;
 
 // SIGNAL
 void	signal_handler(void);
@@ -170,6 +171,9 @@ void		ft_nullfree(char **str);
 void		malloc_error2(char **str);
 int			is_only_digits_and_signs(char *str);
 char		*ft_free_strjoin(char *s1, char *s2);
+
+// UTILS
+void	malloc_check(char **str, t_ms *ms);
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2
