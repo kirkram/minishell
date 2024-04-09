@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 15:31:41 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 23:07:09 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ char	*rl_gets(char *line_read, int hist_file, t_utils *utils);
 int		rl_loop(int ac, char **av, char **sys_envp);
 int		open_history_file(int hist_fd);
 int		interactive_mode_loop(int hist_fd, char **envp);
-void	intialize_utils(char **sys_envp, t_utils **utils);
+void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms);
 
 // LEXER
 

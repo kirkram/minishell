@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 18:44:51 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 15:32:15 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 23:30:07 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	env_loop(t_ms *ms, int *start, int *i)
 			ms->temp = ft_substr(ms->line, (*start), (*i));
 		else
 			combine_str(&ms->temp, ft_substr(ms->line, (*start), (*i) - (*start)));
-		malloc_check(&ms->line, ms);//should be ms->temp?
+		malloc_check(&ms->temp, ms);
 		(*i)++;
 		(*start) = (*i);
 		while (ms->line[(*i)] && ms->line[(*i)] != ' ' && ms->line[(*i)] != '\0'
@@ -48,6 +48,7 @@ void	env_loop2(t_ms *ms)
 //void	env_util(char **new_str, char **str, int start, int i)
 void	env_util(t_ms *ms, int start, int i)
 {
+	//printf("is this the place?\n");
 	combine_str(&ms->temp, ft_substr(ms->line, start, i - start));
 	malloc_check(&ms->temp, ms);
 	ms->line = ft_strdup(ms->temp);

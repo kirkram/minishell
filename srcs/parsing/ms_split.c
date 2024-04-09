@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/13 11:18:05 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 15:28:51 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 20:22:31 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ char	**ms_split(char *str, t_ms *ms)
 	quote = false;
 	dquote = false;
 	array = NULL;
+
 	if (!str)
 		return (0);
 	if (str_count(str) == 0)
@@ -123,7 +124,7 @@ int	ms_splitter(char *str, char ***array, bool quote, bool dquote)
 		}
 		i++;
 	}
-	array[i] = NULL;
+	(*array)[i] = NULL;
 	return (0);
 }
 

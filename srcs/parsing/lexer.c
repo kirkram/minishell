@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:21:44 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 15:17:23 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 23:31:06 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,6 @@ int	lexer(t_ms *ms)
 		i++;
 	}
 	i = 0;
-	ms->line = separator(ms, quote, dquote, i); //to do
+	ms->line = separator(ms, quote, dquote, i);
 	return (0);
 }
