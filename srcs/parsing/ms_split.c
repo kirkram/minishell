@@ -6,13 +6,13 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/13 11:18:05 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/04 12:14:47 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 15:28:51 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-char	**ms_split(char *str)
+char	**ms_split(char *str, t_ms *ms)
 {
 	char	**array;
 	bool	quote;
@@ -31,8 +31,9 @@ char	**ms_split(char *str)
 			return (0);
 		array = malloc((str_count(str) + 1) * sizeof(char *));
 		if (!array)
-			return (0);
-		ms_splitter(str, array, quote, dquote);
+			malloc_check(NULL, ms);
+		if (ms_splitter(str, &array, quote, dquote) == 1)
+			malloc_check(NULL, ms);
 		return (array);
 	}
 	return (0);
@@ -95,7 +96,7 @@ int	quote_count(char *str)
 	return (count);
 }
 
-char	**ms_splitter(char *str, char **array, bool quote, bool dquote)
+int	ms_splitter(char *str, char ***array, bool quote, bool dquote)
 {
 	int		i;
 	int		x;
@@ -114,13 +115,16 @@ char	**ms_splitter(char *str, char **array, bool quote, bool dquote)
 			quote_status2(&quote, &dquote, str[x]);
 			x++;
 		}
-		array[i] = ft_substr(str, start, (x - start));
-		if (!array[i])
-			return (free_reverse(i -1, array));
+		(*array)[i] = ft_substr(str, start, (x - start));
+		if (!(*array)[i])
+		{
+			free_reverse(i -1, (*array));
+			return (1);
+		}
 		i++;
 	}
 	array[i] = NULL;
-	return (array);
+	return (0);
 }
 
 int	str_count(char *str)

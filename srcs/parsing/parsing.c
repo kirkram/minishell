@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 00:07:12 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 15:42:24 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ char	**array_copy(char **array)
 	return (new_array);
 }
 
-char	**get_cmd(char **cmds, int start, int end)
+char	**get_cmd(char **cmds, int start, int end, t_ms *ms)
 {
 	char	**temp_arr;
 	int		i;
@@ -48,12 +48,15 @@ char	**get_cmd(char **cmds, int start, int end)
 	temp_arr = NULL;
 	temp_arr = malloc(sizeof (char *) * ((end - start) + 2));
 	if (!temp_arr)
-		malloc_error(1);
+		malloc_check(NULL, ms);
 	while (cmds[start] && start <= end)
 	{
 		temp_arr[i] = ft_strdup(cmds[start]);
 		if (!temp_arr[i])
-			malloc_error(1);
+		{
+			ft_arrfree(temp_arr);
+			malloc_check(NULL, ms);
+		}
 		i++;
 		start++;
 	}
@@ -61,7 +64,7 @@ char	**get_cmd(char **cmds, int start, int end)
 	return (temp_arr);
 }
 
-void	pre_parse(char **array, t_pipe ***pipe)
+void	pre_parse(char **array, t_pipe ***pipe, t_ms *ms)
 {
 	int	i;
 	int	x;
@@ -74,13 +77,13 @@ void	pre_parse(char **array, t_pipe ***pipe)
 	{
 		if (array[i][0] == '|')
 		{
-			(*pipe)[x]->args = get_cmd(array, start, i -1);
+			(*pipe)[x]->args = get_cmd(array, start, i -1, ms);
 			x++;
 			start = i +1;
 		}
 		else if (array[i +1] == 0)
 		{
-			(*pipe)[x]->args = get_cmd(array, start, i);
+			(*pipe)[x]->args = get_cmd(array, start, i, ms);
 			break ;
 		}
 		i++;
@@ -105,25 +108,24 @@ int	parsing(t_ms *ms)//t_pipe ***pipe, t_utils *utils)
 	int		*tokens;
 
 	array = NULL;
+	ms->utils->syntax_err = FALSE;
 	if (lexer(ms) == 1)
 		return (1);
 	if (ms->line == NULL || ms->line[0] == '\0')
 		return (1);
-	array = ms_split(*line_read);
-	free(*line_read);
-	*line_read = NULL;
+	array = ms_split(ms->line, ms);
+	ft_nullfree(&ms->line);
 	if (!array)
 		return (1);
-	init_tokenarr(&tokens, array);
-	if (syntax_check(tokens, &utils->err_code, array) == 1)
-		utils->syntax_err = TRUE;
-	pipeline_init(array, pipe);
+	init_tokenarr(&tokens, array, ms);
+	if (syntax_check(tokens, &ms->utils->err_code, array) == 1)
+		ms->utils->syntax_err = TRUE;
+	pipeline_init(array, &ms->pipe, ms);
 	free (tokens);
-	if (parser(array, pipe, &utils->err_code) == 1)
-		return (1); // free all first
-	here_doc(pipe, utils);
-	ft_arrfree(array);
-	if (utils->syntax_err == TRUE)
-		return (1); //free what is needed first
+	parser(array, &ms->pipe, ms);
+	here_doc(&ms->pipe, ms->utils);
+	//ft_arrfree(array);
+	if (ms->utils->syntax_err == TRUE)
+		return (1);
 	return (0);
 }

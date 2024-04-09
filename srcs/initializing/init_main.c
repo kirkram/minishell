@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/08 23:20:46 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 15:35:28 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,18 +45,18 @@ int	rl_loop(int ac, char **av, char **sys_envp)
 int	interactive_mode_loop(int hist_fd, char **sys_envp)
 {
 	//char	*line_read;
-	t_pipe	**_pipe;
+	//t_pipe	**_pipe;
 	int		i;
 	//t_utils	*utils;
 	t_ms	ms;
 
-	ms.line  = NULL;
+	ms.line = NULL;
 	intialize_utils(sys_envp, &(ms.utils));
 	//line_read = NULL;
 	while (1)
 	{
 		g_signal = 0;
-		ms.utils->syntax_err = false;
+		//ms.utils->syntax_err = false;
 		//line_read = rl_gets(line_read, hist_fd, ms.utils);
 		ms.line = rl_gets(ms.line, hist_fd, ms.utils);
 		//if (line_read && parsing(&line_read, &ms) != 1)
@@ -64,8 +64,8 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 		{
 			i = -1;
 			while (ms.pipe[++i])
-				ms.pipe[i]->cmd_with_path = assign_scmd_path(ms.pipe[i]->noio_args[0], &ms);
-			ms.utils->err_code = execute(&ms);
+				ms.pipe[i]->cmd_with_path = assign_scmd_path(ms.pipe[i]->noio_args[0], ms.utils->envp);//&ms);
+			ms.utils->err_code = execute(ms.utils, ms.pipe);   //(&ms); //just for compiling
 		}
 		free_pipes_utils_and_exit(ms.pipe, NULL, -42);
 	}

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 00:07:07 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 15:31:41 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,36 +83,39 @@ void	lex_merror(t_utils *utils, char **str);
 int		check_quote(char **str, bool quote, bool dquote, int *err_code);
 //int		lexer(char **str, t_utils *utils);
 int		lexer(t_ms *ms);
-void	env_variable(char **str, t_utils *utils, bool quote, bool dquote);
+//void	env_variable(char **str, t_utils *utils, bool quote, bool dquote);
+void	env_variable(t_ms *ms, bool quote, bool dquote);
 char	**array_copy(char **array);
-char	*get_variable(char *temp, char **envp, int err_code);
+//char	*get_variable(char *temp, char **envp, int err_code);
+char	*get_variable(t_ms *ms);
 int		*tokenizer(char **array);
 int		get_token(char *str);
 
-char	*separator(char *str, bool quote, bool dquote, int i);
-void	remove_space(char **str, int i, t_utils *utils);
-
+char	*separator(t_ms *ms, bool quote, bool dquote, int i);
+//void	remove_space(char **str, int i, t_utils *utils);
+void	remove_space(int i, t_ms *ms);
 void	init_token(t_pipe *pipe);
 void	remove_in(t_pipe *pipe, int i, int hd);
 void	remove_out(t_pipe *pipe, int i, int app);
-int		make_tokens(t_pipe *pipe, int i);
-int		env_error(char **temp);
+//int		make_tokens(t_pipe *pipe, int i);
+void	make_tokens(t_pipe *pipe, int i);
+int		env_error(char **temp, t_ms *ms);
 void	combine_str(char **new_str, char *temp);
 
-void	pipeline_init(char **array, t_pipe ***pipe);
-void	init_tokenarr(int **tokens, char **array);
+void	pipeline_init(char **array, t_pipe ***pipe, t_ms *ms);
+void	init_tokenarr(int **tokens, char **array, t_ms *ms);
 void	quote_remover(t_pipe *pipe);
 // PARSER
 
 //int		parsing(char **line_read, t_pipe ***pipe, t_utils *utils);
 int		parsing(t_ms *ms);
-char	**get_cmd(char **cmds, int start, int end);
-void	pre_parse(char **array, t_pipe ***pipe);
-int		parser(char **array, t_pipe ***pipe, int *err_code);
+char	**get_cmd(char **cmds, int start, int end, t_ms *ms);
+void	pre_parse(char **array, t_pipe ***pipe, t_ms *ms);
+void	parser(char **array, t_pipe ***pipe, t_ms *ms);
 int		syntax_check(int *tokens, int *err_code, char **array);
 void	here_doc_open(char *eof, t_pipe *_pipe, t_utils *utils);
 void	here_doc(t_pipe ***pipe, t_utils *utils);
-int		final_args(t_pipe *pipe, int i);
+void	final_args(t_pipe *pipe, int i, t_ms *ms);
 void	remove_red(t_pipe *pipe, int i);
 
 // LEXER/PARSER UTILS
@@ -164,8 +167,9 @@ void	unset_env(t_utils *utils, char **arg);
 //MS SPLIT
 
 int		str_count(char *str);
-char	**ms_splitter(char *str, char **array, bool quote, bool dquote);
-char	**ms_split(char *str);
+//char	**ms_splitter(char *str, char **array, bool quote, bool dquote);
+int		ms_splitter(char *str, char ***array, bool quote, bool dquote);
+char	**ms_split(char *str, t_ms *ms);
 char	**free_reverse(int i, char **array);
 char	*remove_quote(char *str, int i);
 int		quote_count(char *str);
