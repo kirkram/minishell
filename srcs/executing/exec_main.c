@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/08 17:57:48 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/09 17:59:08 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,11 +62,7 @@ char	**find_path_and_pwd(char **envp, char *scmd)
 {
 	t_paths	vars;
 
-	vars.paths = NULL;
-	vars.i = 0;
-	vars.path = NULL;
-	vars.pwd = NULL;
-	vars.should_skip_pwd = false;
+	ft_bzero(&vars, sizeof(t_paths));
 	if (!ft_strnstr(scmd, "./", -1))
 		vars.should_skip_pwd = true;
 	while (envp[vars.i])
@@ -84,8 +80,9 @@ char	**find_path_and_pwd(char **envp, char *scmd)
 		vars.paths = ft_split(vars.path, ':');
 	else if (!vars.should_skip_pwd)
 		vars.paths = ft_split(vars.pwd, ':');
-	if (!vars.paths)
-			malloc_error(1);
+	if(((vars.bigpath && !vars.should_skip_pwd) || (!vars.bigpath && vars.path) || \
+	(!vars.path && !vars.should_skip_pwd)) && !vars.paths)
+		malloc_error(1);
 	free (vars.bigpath);
 	return (vars.paths);
 }
@@ -129,7 +126,6 @@ int	exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2], char **infile, char 
 		}
 		else if (tokens[j] == SKIP_OUT || tokens[j] == OUT || tokens[j] == OUT_AP)
 		{
-			//HAVE TO CLOSE EVERY ONE!
 			if (tokens[j] == SKIP_OUT)
 			{
 				(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY, 0644);
@@ -157,7 +153,7 @@ int	exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2], char **infile, char 
 	return (has_fd_failed);
 }
 
-//if exit code is -42 doesn't exit
+//if exit code is -42 then it doesn't exit
 void	free_pipes_utils_and_exit(t_pipe ***_pipe, t_utils **utils, int child_exit_code)
 {
 	int i;
@@ -434,46 +430,48 @@ int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
 int		handle_execve_errors(char *failed_cmd)
 {
 	DIR	*dir;
-	//ft_putendl_fd(failed_cmd, 2);
-	//ACCESS() looks for a command as if it is ./
+
 	if (failed_cmd[0] == 0)
 		return (msg_stderr("minishell: : command not found", NULL, 127));
 	else if (failed_cmd[0] == '.' && failed_cmd[1] == 0)
 		return (msg_stderr(".: not enough arguments", NULL, 1));
 	else if (access(failed_cmd, F_OK) == -1 && ft_strchr(failed_cmd, '/'))
 	{
-		return (msg_stderr("minishell: no such file or directory: ", failed_cmd, 127));
+		return (msg_stderr(failed_cmd, ": No such file or directory", 127));
 	}
 	else if (access(failed_cmd, F_OK) == -1)
-		return (msg_stderr("minishell: command not found: ", failed_cmd, 127));
-	else if (access(failed_cmd, X_OK) == -1 || access(failed_cmd, R_OK) == -1 || \
-	ft_strncmp(failed_cmd, "./", 3) == 0)
-		return (msg_stderr("minishell: permission denied: ", failed_cmd, 126));
+		return (msg_stderr(failed_cmd, ": command not found", 127));
+	else if ((access(failed_cmd, X_OK) == -1 || access(failed_cmd, R_OK) == -1 || \
+	ft_strncmp(failed_cmd, "./", 3) == 0) && ft_strnstr(failed_cmd, "/", -1))
+		return (msg_stderr(failed_cmd, ": Permission denied", 126));
 	// else if (!closedir(opendir(failed_cmd)))
 	dir = opendir(failed_cmd);
 	if (dir)
 	{
 		closedir(dir);
 		if (ft_strnstr(failed_cmd, "../", -1))
-			return (msg_stderr("minishell: is a directory: ", ft_strnstr(failed_cmd, "../", -1), 126));
+			return (msg_stderr(ft_strnstr(failed_cmd, "../", -1), ": is a directory", 126));
 		else if (ft_strnstr(failed_cmd, "./", -1))
-			return (msg_stderr("minishell: is a directory: ", ft_strnstr(failed_cmd, "./", -1), 126));
+			return (msg_stderr(ft_strnstr(failed_cmd, "./", -1), ": is a directory", 126));
+		else if (ft_strnstr(failed_cmd, "/", -1))
+			return (msg_stderr(failed_cmd, ": is a directory", 126));
 		else
-			return (msg_stderr("minishell: is a directory: ", failed_cmd, 126));
+			return (msg_stderr(failed_cmd, ": command not found", 127));
 	}
 	else if (ft_strrchr(failed_cmd, '/') && (ft_strrchr(failed_cmd, '/'))[1] == '\0')
-			return (msg_stderr("minishell: Not a directory: ", failed_cmd, 127));
+			return (msg_stderr(failed_cmd, ": not a directory", 127));
 	else
-		return (msg_stderr("minishell: command not found: ", failed_cmd, 127));
+		return (msg_stderr(failed_cmd, ": command not found", 127));
 	return (127);
 }
 
-int	msg_stderr(char *message, char *cmd, int err_code)
+int	msg_stderr(char *cmd, char *message, int err_code)
 {
-	if (message)
-		ft_putstr_fd(message, 2);
+	ft_putstr_fd("minishell: ", 2);
 	if (cmd)
 		ft_putstr_fd(cmd, 2);
+	if (message)
+		ft_putstr_fd(message, 2);
 	ft_putstr_fd("\n", 2);
 	return (err_code);
 }
