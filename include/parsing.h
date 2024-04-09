@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/08 16:21:31 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 00:07:07 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ typedef struct s_ms
 {
 	t_pipe	**pipe;
 	t_utils	*utils;
+	char	*line;
 	char	*temp;
 	char	*temp2;
 }	t_ms;
@@ -75,12 +76,13 @@ int		rl_loop(int ac, char **av, char **sys_envp);
 int		open_history_file(int hist_fd);
 int		interactive_mode_loop(int hist_fd, char **envp);
 void	intialize_utils(char **sys_envp, t_utils **utils);
-int		parsing(char **line_read, t_pipe ***pipe, t_utils *utils);
+
 // LEXER
 
 void	lex_merror(t_utils *utils, char **str);
 int		check_quote(char **str, bool quote, bool dquote, int *err_code);
-int		lexer(char **str, t_utils *utils);
+//int		lexer(char **str, t_utils *utils);
+int		lexer(t_ms *ms);
 void	env_variable(char **str, t_utils *utils, bool quote, bool dquote);
 char	**array_copy(char **array);
 char	*get_variable(char *temp, char **envp, int err_code);
@@ -102,6 +104,8 @@ void	init_tokenarr(int **tokens, char **array);
 void	quote_remover(t_pipe *pipe);
 // PARSER
 
+//int		parsing(char **line_read, t_pipe ***pipe, t_utils *utils);
+int		parsing(t_ms *ms);
 char	**get_cmd(char **cmds, int start, int end);
 void	pre_parse(char **array, t_pipe ***pipe);
 int		parser(char **array, t_pipe ***pipe, int *err_code);

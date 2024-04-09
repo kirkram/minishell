@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/08 16:34:24 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/08 23:20:46 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,22 +44,23 @@ int	rl_loop(int ac, char **av, char **sys_envp)
 
 int	interactive_mode_loop(int hist_fd, char **sys_envp)
 {
-	char	*line_read;
+	//char	*line_read;
 	t_pipe	**_pipe;
 	int		i;
 	//t_utils	*utils;
 	t_ms	ms;
 
+	ms.line  = NULL;
 	intialize_utils(sys_envp, &(ms.utils));
-	//ms_free->utils = utils;
-	//ms_free->pipe = _pipe;
-	line_read = NULL;
+	//line_read = NULL;
 	while (1)
 	{
 		g_signal = 0;
 		ms.utils->syntax_err = false;
-		line_read = rl_gets(line_read, hist_fd, ms.utils);
-		if (line_read && parsing(&line_read, &ms) != 1)
+		//line_read = rl_gets(line_read, hist_fd, ms.utils);
+		ms.line = rl_gets(ms.line, hist_fd, ms.utils);
+		//if (line_read && parsing(&line_read, &ms) != 1)
+		if (ms.line && parsing(&ms) != 1)
 		{
 			i = -1;
 			while (ms.pipe[++i])
@@ -69,7 +70,8 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 		free_pipes_utils_and_exit(ms.pipe, NULL, -42);
 	}
 	free_pipes_utils_and_exit(NULL, ms.utils, -42);
-	free (line_read);
+	free (ms.line);
+	//free (line_read);
 	close(hist_fd);
 	return (0);
 }
@@ -150,6 +152,7 @@ char	*shell_level(char *str)
 
 void	intialize_utils(char **sys_envp, t_utils **utils)
 {
+	// mallloc error needs to bee fixed
 	int		i;
 
 	*(utils) = malloc(sizeof(t_utils));

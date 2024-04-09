@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 15:55:33 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/08 16:24:23 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/08 23:42:05 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ void	malloc_check(char **str, t_ms *ms)
 		ft_arrfree(ms->utils->export);
 		free(ms->utils);
 	}
+	if (ms->line)
+		free (ms->line);
 	if (ms->temp)
 		free (ms->temp);
 	if (ms->temp2)
