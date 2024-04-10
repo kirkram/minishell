@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/10 14:49:28 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 18:34:41 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -415,9 +415,9 @@ int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms)
 			return (0);
 	}
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "unset", -1))
-			return (unset(utils, (_pipe)[i]->noio_args));
+			return (unset(utils, (_pipe)[i]->noio_args, ms));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "env", -1))
-		return (env(utils));
+		return (env(utils, (_pipe)[i]->noio_args));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "exit", -1))
 		return (exit_builtin(_pipe, utils, i));
 	else

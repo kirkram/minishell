@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/10 14:49:29 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 18:59:57 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,10 +72,9 @@ char	*rl_gets(char *line_read, t_utils *utils);
 
 // LEXER
 
-void	lex_merror(t_utils *utils, char **str);
 int		check_quote(char **str, bool quote, bool dquote, int *err_code);
 int		lexer(t_ms *ms);
-void	env_variable(t_ms *ms, bool quote, bool dquote);
+void	env_variable(t_ms *ms, bool quote, bool dquote, char **str);
 char	**array_copy(char **array);
 char	*get_variable(t_ms *ms);
 int		*tokenizer(char **array);
@@ -83,7 +82,7 @@ int		get_token(char *str);
 
 char	*separator(t_ms *ms, bool quote, bool dquote, int i);
 void	remove_space(int i, t_ms *ms);
-void	init_token(t_pipe *pipe);
+void	init_token(t_pipe *pipe, t_ms *ms);
 void	remove_in(t_pipe *pipe, int i, int hd);
 void	remove_out(t_pipe *pipe, int i, int app);
 void	make_tokens(t_pipe *pipe, int i);
@@ -92,7 +91,7 @@ void	combine_str(char **new_str, char *temp);
 
 void	pipeline_init(char **array, t_pipe ***pipe, t_ms *ms);
 void	init_tokenarr(int **tokens, char **array, t_ms *ms);
-void	quote_remover(t_pipe *pipe);
+void	quote_remover(t_pipe *pipe, t_ms *ms);
 // PARSER
 
 int		parsing(t_ms *ms);
@@ -100,15 +99,15 @@ char	**get_cmd(char **cmds, int start, int end, t_ms *ms);
 void	pre_parse(char **array, t_pipe ***pipe, t_ms *ms);
 void	parser(char **array, t_pipe ***pipe, t_ms *ms);
 int		syntax_check(int *tokens, int *err_code, char **array);
-void	here_doc_open(char *eof, t_pipe *_pipe, t_utils *utils);
-void	here_doc(t_pipe ***pipe, t_utils *utils);
+void	here_doc_open(char *eof, t_pipe *_pipe, t_utils *utils, t_ms *ms);
+void	here_doc(t_pipe ***pipe, t_utils *utils, t_ms *ms);
 void	final_args(t_pipe *pipe, int i, t_ms *ms);
-void	remove_red(t_pipe *pipe, int i);
+void	remove_red(t_pipe *pipe, int i, t_ms *ms);
 
 // LEXER/PARSER UTILS
 int			is_builtin(char *str);
 int			syntax_err(char **array, int *err_code, int i);
-void		malloc_error(int err);
+void		malloc_error(int err); // DELETE ONCE NOT IN USE AT EXECUTING
 void		quote_status2(bool *quote, bool *dquote, char c);
 void		quote_status(bool *quote);
 int			not_ms(char **array, int *err_code, int i);
@@ -137,11 +136,11 @@ int		change_exp_var(t_utils **utils, char *env_name, char *newstr, t_ms *ms);
 void	print_exp(t_utils *utils, int fd);
 void	sort_export(t_utils *utils);
 int		export(t_utils *utils, char **arg, t_ms *ms);
-int		env(t_utils *utils);
+int		env(t_utils *utils, char **noio_arg);
 int		pwd(t_utils *utils);
-int		remove_env(t_utils *utils, int i, int x, int y);
-int		remove_exp(t_utils *utils, int i, int x, int y);
-int		unset(t_utils *utils, char **arg);
+int		remove_env(t_ms *ms, int i, int x, int y);
+int		remove_exp(t_ms *ms, int i, int x, int y);
+int		unset(t_utils *utils, char **arg, t_ms *ms);
 int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms);
 int		exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
 
@@ -149,20 +148,19 @@ int		update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd, t_ms *ms);
 int		update_pwd_oldpwd_env(t_utils *utils, char *cwd, t_ms *ms);
 int		export_error(char *arg);
 void	export_loop(char *arg, t_ms *ms, bool quote, bool dquote);
-void	unset_exp(t_utils *utils, char **arg, int j, int i);
-void	unset_env(t_utils *utils, char **arg);
+void	unset_exp(t_ms *ms, char **arg, int j, int i);
+void	unset_env(t_utils *utils, char **arg, t_ms *ms);
 //MS SPLIT
 
 int		str_count(char *str);
 int		ms_splitter(char *str, char ***array, bool quote, bool dquote);
 char	**ms_split(char *str, t_ms *ms);
 char	**free_reverse(int i, char **array);
-char	*remove_quote(char *str, int i);
+char	*remove_quote(char *str, int i, int x, t_ms *ms);
 int		quote_count(char *str);
 
 //HELPER
 void		ft_nullfree(char **str);
-void		malloc_error2(char **str);
 int			is_only_digits_and_signs(char *str);
 char		*ft_free_strjoin(char *s1, char *s2);
 

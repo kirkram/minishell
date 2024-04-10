@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 19:15:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 15:42:25 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 19:06:59 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	pipeline_init(char **array, t_pipe ***pipe, t_ms *ms)
 	}
 	*pipe = malloc(sizeof(t_pipe *) * (x +1));
 	if (!*pipe)
-	malloc_check(NULL, ms);
+		malloc_check(NULL, ms);
 	i = 0;
 	while (i < x)
 	{

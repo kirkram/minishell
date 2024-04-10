@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/10 14:49:31 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 18:31:38 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,17 +98,14 @@ int	update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd, t_ms *ms)
 
 	export_args = malloc((3 + 1) * sizeof(char *));
 	if (!export_args)
-		malloc_error(1);
+		malloc_check(NULL, ms);
 	export_args[0] = ft_strdup("export");
-	if (!export_args[0])
-		malloc_error(1);
+	malloc_check(&export_args[0], ms);
 	export_args[1] = ft_strjoin("OLDPWD=", cwd);
-	if (!export_args[1])
-		malloc_error(1);
+	malloc_check(&export_args[1], ms);
 	getcwd(cwd, 4095);
 	export_args[2] = ft_strjoin("PWD=", cwd);
-	if (!export_args[2])
-		malloc_error(1);
+	malloc_check(&export_args[2], ms);
 	export_args[3] = NULL;
 	export(utils, export_args, ms);
 	ft_arrfree(export_args);
