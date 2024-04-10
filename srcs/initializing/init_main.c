@@ -32,7 +32,6 @@ int	main(int ac, char **av, char **sys_envp)
 
 int	interactive_mode_loop(char **sys_envp)
 {
-
 	int		i;
 	t_ms	ms;
 
@@ -50,12 +49,9 @@ int	interactive_mode_loop(char **sys_envp)
 		{
 			i = -1;
 			while (ms.pipe[++i])
-
-				ms.pipe[i]->cmd_with_path = assign_scmd_path(ms.pipe[i]->noio_args[0], ms.utils->envp);//&ms);
-			ms.utils->err_code = execute(ms.utils, ms.pipe, &ms);   //(&ms); //just for compiling
-
+				ms.pipe[i]->cmd_with_path = assign_scmd_path(ms.pipe[i]->noio_args[0], ms.utils->envp);
+			ms.utils->err_code = execute(ms.utils, ms.pipe, &ms);
 		}
-		
 		free_pipes_utils_and_exit(&ms.pipe, NULL, -42);
 	}
 	free (ms.line);
@@ -132,12 +128,10 @@ char	*shell_level(char *str, t_ms *ms)
 		i++;
 	}
 	return (ft_strdup(str));
-
 }
 
 void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms)
 {
-	// mallloc error fixed
 	int		i;
 
 	*(utils) = malloc(sizeof(t_utils));
@@ -160,7 +154,7 @@ void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms)
 			(*utils)->envp[i] = ft_strjoin("SHELL=", "minishell");
 			malloc_check(&(*utils)->envp[i], ms);
 			(*utils)->export[i] = exp_init("declare -x ", (*utils)->envp[i], ms);
-		} 
+		}
 		else if (ft_strncmp("SHLVL=", sys_envp[i], 6) == 0)
 		{
 			(*utils)->envp[i] = shell_level(sys_envp[i], ms);
@@ -175,11 +169,11 @@ void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms)
 		}
 		i ++;
 	}
+	(*utils)->syntax_err = false;
+	(*utils)->was_prev_line_null = false;
 	(*utils)->envp[i] = NULL;
 	(*utils)->export[i] = NULL;
 	(*utils)->err_code = 0;
-	(*utils)->syntax_err = false;
-	(*utils)->was_prev_line_null = 0;
 	sort_export(*utils);
 }
 
