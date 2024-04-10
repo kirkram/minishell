@@ -39,8 +39,9 @@ int	interactive_mode_loop(char **sys_envp)
 	ms.line = NULL;
 	ms.temp = NULL;
 	ms.temp2 = NULL;
+	ft_bzero(ms.pipe, sizeof(t_pipe));
+	ms.pipe = NULL;
 	intialize_utils(sys_envp, &ms.utils, &ms);
-
 	while (1)
 	{
 		g_signal = 0;
@@ -54,6 +55,7 @@ int	interactive_mode_loop(char **sys_envp)
 			ms.utils->err_code = execute(ms.utils, ms.pipe, &ms);   //(&ms); //just for compiling
 
 		}
+		
 		free_pipes_utils_and_exit(&ms.pipe, NULL, -42);
 	}
 	free (ms.line);
@@ -193,7 +195,8 @@ char *rl_gets(char *line_read, t_utils *utils)
 	}
 	g_signal = 0;
 	line_read = readline(YEL"MINISHELL-0.7$ "CRESET);
-	if (!line_read && g_signal != 130)
+	if (!
+	line_read && g_signal != 130)
 	{
 		ft_putendl_fd("exit", STDOUT_FILENO);
 		exit (utils->err_code);
