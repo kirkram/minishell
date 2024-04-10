@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/09 17:59:08 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/10 13:34:04 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,7 +183,7 @@ void	free_pipes_utils_and_exit(t_pipe ***_pipe, t_utils **utils, int child_exit_
 		exit (child_exit_code);
 }
 
-int	execute(t_utils *utils, t_pipe **_pipe)
+int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 {
 	int			fd[2];
 	int			savestdio[2];
@@ -300,7 +300,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				close(pipefd[1]);
 				close(pipefd[0]);
 				close(fd[1]);
-				utils->err_code = exec_builtin(_pipe, utils, i);
+				utils->err_code = exec_builtin(_pipe, utils, i, ms);
 				free_pipes_utils_and_exit(&_pipe, &utils, utils->err_code);
 			}
 			else
@@ -323,7 +323,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 			if (fd[1] > -1)
 				dup2(fd[1], STDOUT_FILENO);
 			close(fd[1]);
-			utils->err_code = exec_builtin(_pipe, utils, i);
+			utils->err_code = exec_builtin(_pipe, utils, i, ms);
 		}
 		else if (has_fd_failed)
 		{
