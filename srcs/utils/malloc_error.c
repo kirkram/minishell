@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 15:55:33 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/10 14:28:05 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 14:49:33 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	malloc_check(char **str, t_ms *ms)
 	int	i;
 
 	i = 0;
-	if ((str != NULL && *str != '\0'))
+	if ((str && *str))
 		return ;
 	if (ms->pipe)
 	{

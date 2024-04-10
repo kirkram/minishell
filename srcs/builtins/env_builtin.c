@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/10 12:23:50 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 14:48:01 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,7 @@ int	env(t_utils *utils)
 	int	i;
 
 	i = 0;
-	if (!utils->envp)
+	if (!utils->envp || !utils->envp[0])
 		return (0);
 	while (utils->envp[i])
 	{

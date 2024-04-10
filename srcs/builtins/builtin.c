@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/10 14:24:54 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 14:49:31 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,7 @@ int	change_env_var(t_utils **utils, char *env_name, char *newstr, t_ms *ms)
 	if (!tmp_arr)
 		malloc_check(NULL, ms);
 	i = 0;
-	//tmp_arr[0] = ft_strdup(newstr);
-	tmp_arr[0] = ft_strdup("");
+	tmp_arr[0] = ft_strdup(newstr);
 	malloc_check(&tmp_arr[0], ms);
 	while ((*utils)->envp[i])
 	{
