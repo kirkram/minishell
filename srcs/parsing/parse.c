@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/05 15:53:03 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/09 15:06:28 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void	remove_red(t_pipe *pipe, int i)
 	pipe->tokens = i_temp;
 }
 
-void	init_noio(t_pipe *pipe)
+void	init_noio(t_pipe *pipe, t_ms *ms)
 {
 	int	i;
 	int	x;
@@ -77,15 +77,15 @@ void	init_noio(t_pipe *pipe)
 	}
 	pipe->noio_args = malloc (sizeof(char *) * (x +1));
 	if (!pipe->noio_args)
-		malloc_error(1);
+		malloc_check(NULL, ms);
 }
 
-int	final_args(t_pipe *pipe, int i)
+void	final_args(t_pipe *pipe, int i, t_ms *ms)
 {
 	int	x;
 
 	x = 0;
-	init_noio(pipe);
+	init_noio(pipe, ms);
 	while (pipe->args[i])
 	{
 		if (pipe->tokens[i] == CMD)
@@ -97,36 +97,30 @@ int	final_args(t_pipe *pipe, int i)
 					pipe->tokens[i] = 8;
 			}
 			if (!pipe->noio_args[x])
-				malloc_error(1);
+				malloc_check(NULL, ms);
 			x++;
 		}
 		i++;
 	}
 	pipe->noio_args[x] = NULL;
-	return (0);
 }
 
-int	parser(char **array, t_pipe ***pipe, int *err_code)
+void	parser(char **array, t_pipe ***pipe, t_ms *ms)//int *err_code)
 {
 	int	x;
 	int	i;
 
 	i = 0;
 	x = 0;
-	pre_parse(array, pipe);
+	pre_parse(array, pipe, ms);
+	ft_arrfree(array); // is it on stack or heap
 	while ((*pipe)[x])
 	{
 		init_token((*pipe)[x]);
-		if (make_tokens((*pipe)[x], i) == 1)
-			return (1);
+		make_tokens((*pipe)[x], i);
 		quote_remover((*pipe)[x]);
 		remove_red((*pipe)[x], i);
-		if (final_args((*pipe)[x], i) == 1)
-		{
-			*err_code = 1;
-			return (1);
-		}
+		final_args((*pipe)[x], i, ms);
 		x++;
 	}
-	return (0);
 }

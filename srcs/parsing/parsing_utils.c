@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:51:27 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/08 11:26:52 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 21:48:20 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,8 +124,8 @@ void ft_nullfree(char **str)
 {
 	if (*str)
 	{
-		(*str) = NULL;
 		free (*str);
+		(*str) = NULL;
 	}
 
 }

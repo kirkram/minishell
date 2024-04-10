@@ -6,7 +6,8 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/08 17:52:42 by klukiano         ###   ########.fr       */
+
+/*   Updated: 2024/04/10 13:37:31 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,35 +32,38 @@ int	main(int ac, char **av, char **sys_envp)
 
 int	interactive_mode_loop(char **sys_envp)
 {
-	t_pipe	**_pipe;
+
 	int		i;
 	t_ms	ms;
 
-	ms.line  = NULL;
-	intialize_utils(sys_envp, &(ms.utils));
+	ms.line = NULL;
+	ms.temp = NULL;
+	ms.temp2 = NULL;
+	intialize_utils(sys_envp, &ms.utils, &ms);
+
 
 	while (1)
 	{
 		g_signal = 0;
-		ms.utils->syntax_err = false;
-		//line_read = rl_gets(line_read, hist_fd, ms.utils);
 		ms.line = rl_gets(ms.line, hist_fd, ms.utils);
-		//if (line_read && parsing(&line_read, &ms) != 1)
 		if (ms.line && parsing(&ms) != 1)
 		{
 			i = -1;
 			while (ms.pipe[++i])
-				ms.pipe[i]->cmd_with_path = assign_scmd_path(ms.pipe[i]->noio_args[0], ms.utils->envp);
-			ms.utils->err_code = execute(ms.utils, ms.pipe);
+
+				ms.pipe[i]->cmd_with_path = assign_scmd_path(ms.pipe[i]->noio_args[0], ms.utils->envp);//&ms);
+			ms.utils->err_code = execute(ms.utils, ms.pipe, &ms);   //(&ms); //just for compiling
+
 		}
 		free_pipes_utils_and_exit(&ms.pipe, NULL, -42);
 	}
-	free (line_read);
+
+	free (ms.line);
 	free_pipes_utils_and_exit(NULL, &ms.utils, -42);
 	return (0);
 }
 
-char *exp_init(char *str1, char *str2)
+char *exp_init(char *str1, char *str2, t_ms *ms)
 {
 	int		i;
 	int		x;
@@ -71,8 +75,7 @@ char *exp_init(char *str1, char *str2)
 	equal = false;
 	temp = NULL;
 	temp = malloc(sizeof(char) * (ft_strlen(str1) + ft_strlen(str2) + 3));
-	if (!temp)
-		malloc_error(1);
+	malloc_check(&temp, ms);
 	while(str1[i])
 	{
 		temp[i] = str1[i];
@@ -101,7 +104,7 @@ char *exp_init(char *str1, char *str2)
 	return (temp);
 }
 
-char	*shell_level(char *str)
+char	*shell_level(char *str, t_ms *ms)
 {
 	int	i;
 	int	start;
@@ -120,10 +123,9 @@ char	*shell_level(char *str)
 			while (str[i])
 				i++;
 			temp = ft_substr(str, start, i - start);
-			if (!temp)
-				malloc_error (1);
+			malloc_check(&temp, ms);
 			lvl = ft_atoi(temp);
-			free (temp);
+			ft_nullfree(&temp);
 			lvl++;
 			return (ft_free_strjoin(ft_substr(str, 0, start), ft_itoa(lvl)));
 		}
@@ -133,42 +135,43 @@ char	*shell_level(char *str)
 
 }
 
-void	intialize_utils(char **sys_envp, t_utils **utils)
+void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms)
 {
-	// mallloc error needs to bee fixed
+	// mallloc error fixed
 	int		i;
 
 	*(utils) = malloc(sizeof(t_utils));
 	if (*utils == NULL)
-		malloc_error(1);
+		malloc_check(NULL, ms);
 	i = 0;
 	while (sys_envp[i])
 		i ++;
 	(*utils)->envp = malloc((i + 1) * sizeof(char *));
 	if ((*utils)->envp == NULL)
-		malloc_error(1);
+		malloc_check(NULL, ms);
 	(*utils)->export = malloc((i + 1) * sizeof(char *));
 	if ((*utils)->export == NULL)
-		malloc_error(1);
+		malloc_check(NULL, ms);
 	i = 0;
 	while (sys_envp[i])
 	{
-		if (ft_strncmp("SHELL=", sys_envp[i], 6) == 0)
+ 		if (ft_strncmp("SHELL=", sys_envp[i], 6) == 0)
 		{
 			(*utils)->envp[i] = ft_strjoin("SHELL=", "minishell");
-			(*utils)->export[i] = exp_init("declare -x ", (*utils)->envp[i]);
-		}
+			malloc_check(&(*utils)->envp[i], ms);
+			(*utils)->export[i] = exp_init("declare -x ", (*utils)->envp[i], ms);
+		} 
 		else if (ft_strncmp("SHLVL=", sys_envp[i], 6) == 0)
 		{
-			(*utils)->envp[i] = shell_level(sys_envp[i]);
-			if (!(*utils)->envp[i])
-				malloc_error(1);
-			(*utils)->export[i] = exp_init("declare -x ", (*utils)->envp[i]);
+			(*utils)->envp[i] = shell_level(sys_envp[i], ms);
+			malloc_check(&(*utils)->envp[i], ms);
+			(*utils)->export[i] = exp_init("declare -x ", (*utils)->envp[i], ms);
 		}
 		else
 		{
 			(*utils)->envp[i] = ft_strdup(sys_envp[i]);
-			(*utils)->export[i] = exp_init("declare -x ", sys_envp[i]);
+			malloc_check(&(*utils)->envp[i], ms);
+			(*utils)->export[i] = exp_init("declare -x ", sys_envp[i], ms);
 		}
 		i ++;
 	}

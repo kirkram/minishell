@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/06 16:12:05 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/10 12:33:35 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ returns -1 on malloc fail
 */
 extern int g_signal;
 
-int	change_env_var(t_utils **utils, char *env_name, char *newstr)
+int	change_env_var(t_utils **utils, char *env_name, char *newstr, t_ms *ms)
 {
 	int		i;
 	char	**tmp_arr;
@@ -34,21 +34,25 @@ int	change_env_var(t_utils **utils, char *env_name, char *newstr)
 		{
 			free((*utils)->envp[i]);
 			(*utils)->envp[i] = ft_strdup(newstr);
-			if ((*utils)->envp[i] == NULL)
-				return (-1);
+			malloc_check(&(*utils)->envp[i], ms);
 			return (0);
 		}
 		i ++;
 	}
 	tmp_arr = malloc((i + 2) * sizeof(char*));
-	//mal check return (-1);
+	if (!tmp_arr)
+		malloc_check(NULL, ms);
 	i = 0;
 	tmp_arr[0] = ft_strdup(newstr);
-	//mal check return (-1);
+	malloc_check(&tmp_arr[0], ms);
 	while ((*utils)->envp[i])
 	{
 		tmp_arr[i + 1] = ft_strdup((*utils)->envp[i]);
-		//mal check return (-1);
+		if (!tmp_arr[i +1])
+		{
+			free_reverse(i +1, tmp_arr);
+			malloc_check(NULL, ms);
+		}
 		free((*utils)->envp[i]);
 		i ++;
 	}
@@ -88,7 +92,7 @@ int		echo_builtin(char **noio_args, t_utils *utils)
 	return (0);
 }
 
-int	update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd)
+int	update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd, t_ms *ms)
 {
 	char	**export_args;
 
@@ -106,7 +110,7 @@ int	update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd)
 	if (!export_args[2])
 		malloc_error(1);
 	export_args[3] = NULL;
-	export(utils, export_args);
+	export(utils, export_args, ms);
 	ft_arrfree(export_args);
 	return (0);
 }
@@ -116,7 +120,7 @@ int	update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd)
 //i guess becuase its just stderr
 // cd ./testfiles/ ; echo "hehe" will not change dir
 // cd ./testfiles/folder_no_x/ | echo "hehe" will print an error as usual
-int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
+int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms)
 {
 	int		i;
 	char	*home_path;
@@ -159,7 +163,7 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 				closedir(directory);
 			return (2);
 		}
-		update_pwd_oldpwd_env_exp(utils, cwd);
+		update_pwd_oldpwd_env_exp(utils, cwd, ms);
 	}
 	else
 	{
@@ -190,7 +194,7 @@ int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index)
 				closedir(directory);
 			return (1);
 		}
-		update_pwd_oldpwd_env_exp(utils, cwd);
+		update_pwd_oldpwd_env_exp(utils, cwd, ms);
 	}
 	//
 	return (0);
@@ -241,8 +245,7 @@ int	is_only_digits_and_signs(char *str)
 	return (1);
 }
 
-int	change_exp_var(t_utils **utils, char *env_name, char *newstr)
-
+int	change_exp_var(t_utils **utils, char *env_name, char *newstr, t_ms *ms)
 {
 	int		i;
 	char	**tmp_arr;
@@ -254,21 +257,25 @@ int	change_exp_var(t_utils **utils, char *env_name, char *newstr)
 		{
 			free((*utils)->export[i]);
 			(*utils)->export[i] = ft_strdup(newstr);
-			if ((*utils)->export[i] == NULL)
-				return (-1);
+			malloc_check(&(*utils)->export[i], ms);
 			return (0);
 		}
 		i ++;
 	}
 	tmp_arr = malloc((i + 2) * sizeof(char*));
-	//mal check return (-1);
+	if (!tmp_arr)
+		malloc_check(NULL, ms);
 	i = 0;
 	tmp_arr[0] = ft_strdup(newstr);
-	//mal check return (-1);
+	malloc_check(&tmp_arr[0], ms);
 	while ((*utils)->export[i])
 	{
 		tmp_arr[i + 1] = ft_strdup((*utils)->export[i]);
-		//mal check return (-1);
+		if (!tmp_arr[i + 1])
+		{
+			free_reverse(i +1, tmp_arr);
+			malloc_check(NULL, ms);
+		}
 		free((*utils)->export[i]);
 		i ++;
 	}
@@ -278,7 +285,7 @@ int	change_exp_var(t_utils **utils, char *env_name, char *newstr)
 	return (1);
 }
 
-int	add_exp_var(t_utils **utils, char *newstr)
+int	add_exp_var(t_utils **utils, char *newstr, t_ms *ms)
 
 {
 	int		i;
@@ -291,21 +298,25 @@ int	add_exp_var(t_utils **utils, char *newstr)
 		{
 			free((*utils)->export[i]);
 			(*utils)->export[i] = ft_strdup(newstr);
-			if ((*utils)->export[i] == NULL)
-				return (-1);
+			malloc_check(&(*utils)->export[i], ms);
 			return (0);
 		}
 		i ++;
 	}
 	tmp_arr = malloc((i + 2) * sizeof(char*));
-	//mal check return (-1);
+	if (!tmp_arr)
+		malloc_check(NULL, ms);
 	i = 0;
 	tmp_arr[0] = ft_strdup(newstr);
-	//mal check return (-1);
+	malloc_check(&tmp_arr[0], ms);
 	while ((*utils)->export[i])
 	{
 		tmp_arr[i + 1] = ft_strdup((*utils)->export[i]);
-		//mal check return (-1);
+		if (!tmp_arr[i + 1])
+		{
+			free_reverse(i +1, tmp_arr);
+			malloc_check(NULL, ms);
+		}
 		free((*utils)->export[i]);
 		i ++;
 	}

@@ -6,13 +6,13 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/02 21:46:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/27 18:54:33 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 15:17:51 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	init_sep(char **temp, char *str)
+void	init_sep(char **temp, t_ms *ms)//char *str)
 {
 	bool	quote;
 	bool	dquote;
@@ -23,46 +23,47 @@ void	init_sep(char **temp, char *str)
 	i = 0;
 	quote = false;
 	dquote = false;
-	while (str && str[i])
+	while (ms->line && ms->line[i])
 	{
-		quote_status2(&quote, &dquote, str[i]);
+		quote_status2(&quote, &dquote, ms->line[i]);
 		if (quote == false && dquote == false)
 		{
-			if (str[i] == '>' || str[i] == '|' || str[i] == '<')
+			if (ms->line[i] == '>' ||ms->line[i] == '|' || ms->line[i] == '<')
 				x++;
 		}
 		i++;
 	}
 	(*temp) = malloc(sizeof(char) * (i +(x * 2) + 1));
-	if (!(*temp))
-		malloc_error(1);
+	malloc_check(temp, ms);
 }
 
-char	*separator(char *str, bool quote, bool dquote, int i)
+//char	*separator(char *str, bool quote, bool dquote, int i)
+char	*separator(t_ms *ms, bool quote, bool dquote, int i)
 {
 	int		x;
 	char	*temp;
 	int		count;
 
 	x = 0;
-	init_sep(&temp, str);
-	while (str && str[i])
+	init_sep(&temp, ms);
+	while (ms->line && ms->line[i])
 	{
-		quote_status2(&quote, &dquote, str[i]);
-		if ((str[i] == '>' || str[i] == '|' || str[i] == '<')
+		quote_status2(&quote, &dquote, ms->line[i]);
+		if ((ms->line[i] == '>' || ms->line[i] == '|' || ms->line[i] == '<')
 			&& (quote == false && dquote == false))
 		{
 			temp[x++] = ' ';
 			count = 0;
-			while (str[i] && count <= 1 && str[i] == str[i - count++])
-				temp[x++] = str[i++];
-			if (str[i] == '<' && i >= 2 && str[i -1] == '<' && str[i -2 == '<'])
-				temp[x++] = str[i++];
+			while (ms->line[i] && count <= 1 && ms->line[i] == ms->line[i - count++])
+				temp[x++] = ms->line[i++];
+			if (ms->line[i] == '<' && i >= 2 && ms->line[i -1] == '<' && ms->line[i -2 == '<'])
+				temp[x++] = ms->line[i++];
 			temp[x++] = ' ';
 		}
 		else
-			temp[x++] = str[i++];
+			temp[x++] = ms->line[i++];
 	}
 	temp[x] = '\0';
+	ft_nullfree(&ms->line);
 	return (temp);
 }

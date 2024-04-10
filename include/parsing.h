@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 00:07:07 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 13:37:32 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,9 +71,9 @@ void	handle_sigint(int sig);
 void	handle_sigquit(int sig);
 // INIT
 
+void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms);
 int		interactive_mode_loop(char **envp);
 char	*rl_gets(char *line_read, t_utils *utils);
-void	intialize_utils(char **sys_envp, t_utils **utils);
 
 // LEXER
 
@@ -81,36 +81,39 @@ void	lex_merror(t_utils *utils, char **str);
 int		check_quote(char **str, bool quote, bool dquote, int *err_code);
 //int		lexer(char **str, t_utils *utils);
 int		lexer(t_ms *ms);
-void	env_variable(char **str, t_utils *utils, bool quote, bool dquote);
+//void	env_variable(char **str, t_utils *utils, bool quote, bool dquote);
+void	env_variable(t_ms *ms, bool quote, bool dquote);
 char	**array_copy(char **array);
-char	*get_variable(char *temp, char **envp, int err_code);
+//char	*get_variable(char *temp, char **envp, int err_code);
+char	*get_variable(t_ms *ms);
 int		*tokenizer(char **array);
 int		get_token(char *str);
 
-char	*separator(char *str, bool quote, bool dquote, int i);
-void	remove_space(char **str, int i, t_utils *utils);
-
+char	*separator(t_ms *ms, bool quote, bool dquote, int i);
+//void	remove_space(char **str, int i, t_utils *utils);
+void	remove_space(int i, t_ms *ms);
 void	init_token(t_pipe *pipe);
 void	remove_in(t_pipe *pipe, int i, int hd);
 void	remove_out(t_pipe *pipe, int i, int app);
-int		make_tokens(t_pipe *pipe, int i);
-int		env_error(char **temp);
+//int		make_tokens(t_pipe *pipe, int i);
+void	make_tokens(t_pipe *pipe, int i);
+int		env_error(char **temp, t_ms *ms);
 void	combine_str(char **new_str, char *temp);
 
-void	pipeline_init(char **array, t_pipe ***pipe);
-void	init_tokenarr(int **tokens, char **array);
+void	pipeline_init(char **array, t_pipe ***pipe, t_ms *ms);
+void	init_tokenarr(int **tokens, char **array, t_ms *ms);
 void	quote_remover(t_pipe *pipe);
 // PARSER
 
 //int		parsing(char **line_read, t_pipe ***pipe, t_utils *utils);
 int		parsing(t_ms *ms);
-char	**get_cmd(char **cmds, int start, int end);
-void	pre_parse(char **array, t_pipe ***pipe);
-int		parser(char **array, t_pipe ***pipe, int *err_code);
+char	**get_cmd(char **cmds, int start, int end, t_ms *ms);
+void	pre_parse(char **array, t_pipe ***pipe, t_ms *ms);
+void	parser(char **array, t_pipe ***pipe, t_ms *ms);
 int		syntax_check(int *tokens, int *err_code, char **array);
 void	here_doc_open(char *eof, t_pipe *_pipe, t_utils *utils);
 void	here_doc(t_pipe ***pipe, t_utils *utils);
-int		final_args(t_pipe *pipe, int i);
+void	final_args(t_pipe *pipe, int i, t_ms *ms);
 void	remove_red(t_pipe *pipe, int i);
 
 // LEXER/PARSER UTILS
@@ -124,7 +127,8 @@ int			pipe_error(int *tokens, int *err_code, int i);
 
 //EXECUTE
 char	*assign_scmd_path(char *scmd, char **envp);
-int		execute(t_utils *utils, t_pipe **_pipe);
+//int		execute(t_utils *utils, t_pipe **_pipe);
+int		execute(t_utils *utils, t_pipe **_pipe, t_ms *ms);
 char	*jointhree(char const *s1, char const *s2, char const *s3);
 int		handle_execve_errors(char *failed_cmd);
 int		msg_stderr(char *message, char *cmd, int err_code);
@@ -137,33 +141,41 @@ void	free_pipes_utils_and_exit(t_pipe ***_pipe, t_utils **utils, int child_exit_
 int		waitpid_and_close_exec(t_pipe **_pipe, pid_t (*pid)[256], int savestdio[2], t_utils *utils, int has_fd_failed);
 
 // BUILTINS
-int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i);
-int		change_env_var(t_utils **utils, char *env_name, char *newstr);
+//int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i);
+int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms);
+int		change_env_var(t_utils **utils, char *env_name, char *newstr, t_ms *ms);
 int		echo_builtin(char **noio_args, t_utils *utils);
-int		add_exp_var(t_utils **utils, char *newstr);
-int		change_exp_var(t_utils **utils, char *env_name, char *newstr);
+int		add_exp_var(t_utils **utils, char *newstr, t_ms *ms);
+//int		change_exp_var(t_utils **utils, char *env_name, char *newstr);
+int		change_exp_var(t_utils **utils, char *env_name, char *newstr, t_ms *ms);
 void	print_exp(t_utils *utils, int fd);
 void	sort_export(t_utils *utils);
-int		export(t_utils *utils, char **arg);
+//int		export(t_utils *utils, char **arg);
+int		export(t_utils *utils, char **arg, t_ms *ms);
 int		env(t_utils *utils);
 int		pwd(t_utils *utils);
 int		remove_env(t_utils *utils, int i, int x, int y);
 int		remove_exp(t_utils *utils, int i, int x, int y);
 int		unset(t_utils *utils, char **arg);
-int		cd_builtin(t_pipe **_pipe, t_utils *utils, int i);
+//int		cd_builtin(t_pipe **_pipe, t_utils *utils, int i);
+int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms);
 int		exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
 
-int		update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd);
-int		update_pwd_oldpwd_env(t_utils *utils, char *cwd);
+//int		update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd);
+int		update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd, t_ms *ms);
+//int		update_pwd_oldpwd_env(t_utils *utils, char *cwd);
+int		update_pwd_oldpwd_env(t_utils *utils, char *cwd, t_ms *ms);
 int		export_error(char *arg);
-void	export_loop(char *arg, t_utils *utils, bool quote, bool dquote);
+//void	export_loop(char *arg, t_utils *utils, bool quote, bool dquote);
+void	export_loop(char *arg, t_ms *ms, bool quote, bool dquote);
 void	unset_exp(t_utils *utils, char **arg, int j, int i);
 void	unset_env(t_utils *utils, char **arg);
 //MS SPLIT
 
 int		str_count(char *str);
-char	**ms_splitter(char *str, char **array, bool quote, bool dquote);
-char	**ms_split(char *str);
+//char	**ms_splitter(char *str, char **array, bool quote, bool dquote);
+int		ms_splitter(char *str, char ***array, bool quote, bool dquote);
+char	**ms_split(char *str, t_ms *ms);
 char	**free_reverse(int i, char **array);
 char	*remove_quote(char *str, int i);
 int		quote_count(char *str);

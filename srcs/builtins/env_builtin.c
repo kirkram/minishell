@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_builtin.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 15:38:21 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 16:54:28 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/10 12:23:50 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,51 +81,48 @@ int	export_error(char *arg)
 	return (0);
 }
 
-void	export_loop(char *arg, t_utils *utils, bool quote, bool dquote)
+//void	export_loop(char *arg, t_utils *utils, bool quote, bool dquote)
+void	export_loop(char *arg, t_ms *ms, bool quote, bool dquote)
 {
 	int		i;
-	char	*temp;
-	char	*temp2;
 
-	temp2 = NULL;
-	temp = NULL;
 	i = 0;
 	while (arg[i])
 	{
 		quote_status2(&quote, &dquote, arg[i]);
 		if (arg[i] == '=' && quote == false && dquote == false)
 		{
-			temp2 = ft_substr(arg, 0, (i +1));
-			malloc_error2(&temp2);
-			change_env_var(&utils, temp2, arg);
-			temp = jointhree("declare -x ", temp2, "\"");
-			ft_nullfree(&temp2);
-			malloc_error2(&temp);
-			temp2 = ft_free_strjoin(temp, ft_substr(arg, (i +1), (ft_strlen(arg) - i)));
-			malloc_error2(&temp2);
-			temp = ft_strjoin(temp2, "\"");
-			ft_nullfree(&temp2);
-			malloc_error2(&temp);
-			temp2 = ft_strdup("declare -x ");
-			malloc_error2(&temp2);
-			temp2 = ft_free_strjoin(temp2, ft_substr(arg, 0, (i +1)));
-			malloc_error2(&temp2);
-			change_exp_var(&utils, temp2, temp);
-			ft_nullfree(&temp);
-			ft_nullfree(&temp2);
+			ms->temp2 = ft_substr(arg, 0, (i +1));
+			malloc_check(&ms->temp2, ms);
+			change_env_var(&ms->utils, ms->temp2, arg, ms);
+			ms->temp = jointhree("declare -x ", ms->temp2, "\"");
+			ft_nullfree(&ms->temp2);
+			malloc_check(&ms->temp, ms);
+			ms->temp2 = ft_free_strjoin(ms->temp, ft_substr(arg, (i +1), (ft_strlen(arg) - i)));
+			malloc_check(&ms->temp2, ms);
+			ms->temp = ft_strjoin(ms->temp2, "\"");
+			ft_nullfree(&ms->temp2);
+			malloc_check(&ms->temp, ms);
+			ms->temp2 = ft_strdup("declare -x ");
+			malloc_check(&ms->temp2, ms);
+			ms->temp2 = ft_free_strjoin(ms->temp2, ft_substr(arg, 0, (i +1)));
+			malloc_check(&ms->temp2, ms);
+			change_exp_var(&ms->utils, ms->temp2, ms->temp, ms);
+			ft_nullfree(&ms->temp);
+			ft_nullfree(&ms->temp2);
 			break ;
 		}
 		if (arg[++i] == '\0')
 		{
-			temp = ft_strjoin("declare -x ", arg);
-			malloc_error2(&temp);
-			add_exp_var(&utils, temp);
-			ft_nullfree(&temp);
+			ms->temp = ft_strjoin("declare -x ", arg);
+			malloc_check(&ms->temp, ms);
+			add_exp_var(&ms->utils, ms->temp, ms); // not done
+			ft_nullfree(&ms->temp);
 		}
 	}
 }
 
-int	export(t_utils *utils, char **arg)
+int	export(t_utils *utils, char **arg, t_ms *ms)
 {
 	int		i;
 	bool	quote;
@@ -147,7 +144,7 @@ int	export(t_utils *utils, char **arg)
 	{
 		if (export_error(arg[i]) != 0)
 			return (1);
-		export_loop(arg[i], utils, quote, dquote);
+		export_loop(arg[i], ms, quote, dquote);
 		i++;
 	}
 	sort_export(utils);

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:44:05 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/28 14:39:05 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 11:51:03 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int	pipe_error(int *tokens, int *err_code, int i)
 	}
 	if (tokens[i +1] == 0)
 	{
-		ft_putendl_fd("empty pipe", 2); // does it need implementation?
+		ft_putendl_fd("empty pipe", 2); //does it need implementations?
 		*err_code = 258;
 		return (1);
 	}

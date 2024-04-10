@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 18:58:14 by clundber          #+#    #+#             */
-/*   Updated: 2024/03/28 14:32:28 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 14:57:30 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void	remove_out(t_pipe *pipe, int i, int app)
 	}
 }
 
-int	make_tokens(t_pipe *pipe, int i)
+void	make_tokens(t_pipe *pipe, int i)
 {
 	while (pipe->args[i])
 	{
@@ -92,5 +92,4 @@ int	make_tokens(t_pipe *pipe, int i)
 			remove_out(pipe, i, 1);
 		i++;
 	}
-	return (0);
 }
