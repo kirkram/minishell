@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/05 15:44:37 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 00:07:12 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,15 +99,15 @@ void	quote_remover(t_pipe *pipe)
 	}
 }
 
-int	parsing(char **line_read, t_pipe ***pipe, t_utils *utils)
+int	parsing(t_ms *ms)//t_pipe ***pipe, t_utils *utils)
 {
 	char	**array;
 	int		*tokens;
 
 	array = NULL;
-	if (lexer(line_read, utils) == 1)
+	if (lexer(ms) == 1)
 		return (1);
-	if (*line_read == NULL || (*line_read)[0] == '\0')
+	if (ms->line == NULL || ms->line[0] == '\0')
 		return (1);
 	array = ms_split(*line_read);
 	free(*line_read);

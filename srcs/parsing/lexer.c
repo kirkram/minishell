@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:21:44 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/03 11:39:12 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/09 00:07:06 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,26 +46,29 @@ void	combine_str(char **new_str, char *temp)
 	free (ptr);
 }
 
-void	remove_space(char **str, int i, t_utils *utils)
+void	remove_space(int i, t_ms *ms)
 {
 	int		end;
 	char	*temp;
 
 	temp = NULL;
-	while ((*str)[i])
+	while (ms->line[i])
 		i++;
 	if (i > 0)
 		i--;
 	end = i;
-	while ((*str)[i] == ' ')
+	while (ms->line[i] == ' ')
 		i--;
 	if (i != end && i > 0)
 	{
-		temp = ft_substr((*str), 0, i +1);
-		if (!temp)
-			lex_merror(utils, str);
-		free (*str);
-		(*str) = temp;
+		temp = ft_substr(ms->line[i], 0, i +1);
+		malloc_check(&temp, ms);
+		//if (!temp)
+		//	lex_merror(utils, str);
+		ft_nullfree(&ms->line);
+		//free (*str);
+		ms->line = temp;
+		//(*str) = temp;
 	}
 }
 
@@ -91,7 +94,7 @@ int	check_quote(char **str, bool quote, bool dquote, int *err_code)
 	return (0);
 }
 
-int	lexer(char **str, t_utils *utils)
+int	lexer(t_ms *ms)//t_utils *utils)
 {
 	bool	quote;
 	bool	dquote;
@@ -100,19 +103,20 @@ int	lexer(char **str, t_utils *utils)
 	i = 0;
 	quote = false;
 	dquote = false;
-	if (check_quote(str, quote, dquote, &utils->err_code) == 1)
+	if (check_quote(&ms->line, quote, dquote, ms->utils->err_code) == 1)
 		return (1);
-	remove_space(str, i, utils);
-	while ((*str)[i])
+	//remove_space(str, i, ms);
+	remove_space(i, ms);
+	while (ms->line[i])
 	{
-		if ((*str)[i] == '$')
+		if (ms->line[i] == '$')
 		{
-			env_variable(str, utils, quote, dquote);
+			env_variable(str, utils, quote, dquote); //to do
 			break ;
 		}
 		i++;
 	}
 	i = 0;
-	*str = separator(*(str), quote, dquote, i);
+	*str = separator(*(str), quote, dquote, i); //to do
 	return (0);
 }

@@ -31,18 +31,21 @@ int	main(int ac, char **av, char **sys_envp)
 
 int	interactive_mode_loop(char **sys_envp)
 {
-	char	*line_read;
+	t_pipe	**_pipe;
 	int		i;
 	t_ms	ms;
 
-	intialize_utils(sys_envp, &ms.utils);
-	line_read = NULL;
+	ms.line  = NULL;
+	intialize_utils(sys_envp, &(ms.utils));
+
 	while (1)
 	{
 		g_signal = 0;
 		ms.utils->syntax_err = false;
-		line_read = rl_gets(line_read, ms.utils);
-		if (line_read && parsing(&line_read, &(ms.pipe), ms.utils) != 1)
+		//line_read = rl_gets(line_read, hist_fd, ms.utils);
+		ms.line = rl_gets(ms.line, hist_fd, ms.utils);
+		//if (line_read && parsing(&line_read, &ms) != 1)
+		if (ms.line && parsing(&ms) != 1)
 		{
 			i = -1;
 			while (ms.pipe[++i])
@@ -132,6 +135,7 @@ char	*shell_level(char *str)
 
 void	intialize_utils(char **sys_envp, t_utils **utils)
 {
+	// mallloc error needs to bee fixed
 	int		i;
 
 	*(utils) = malloc(sizeof(t_utils));
