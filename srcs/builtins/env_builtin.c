@@ -168,23 +168,12 @@ int	env(t_utils *utils)
 
 int	pwd(t_utils *utils)
 {
-	int		i;
-	char	*temp;
+	(void)utils;
+	char	cwd[4096];
 
-	temp = NULL;
-	i = 0;
-	if (!utils->envp)
-		return (0);
-	while (utils->envp[i])
-	{
-		if (strncmp(utils->envp[i], "PWD=", 4) == 0)
-		{
-			temp = ft_substr(utils->envp[i], 4, ft_strlen(utils->envp[i]) -4);
-			printf("%s\n", temp);
-			free (temp);
-		}
-		i++;
-	}
+	if (!getcwd(cwd, -1))
+		return (1);
+	printf("%s\n", cwd);
 	return (0);
 }
 void	unset_env(t_utils *utils, char **arg)

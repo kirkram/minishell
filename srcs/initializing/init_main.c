@@ -3,9 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
+
 /*   Updated: 2024/04/10 13:37:31 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -19,31 +20,19 @@ int	main(int ac, char **av, char **sys_envp)
 {
 
 	(void)ac;
+	(void)av;
 	int		ret;
 	g_signal = 0;
 
 	signal_handler();
 	ret = 0;
-	ret = rl_loop(ac, av, sys_envp);
+	ret = interactive_mode_loop(sys_envp);
 	return (ret);
 }
 
-int	rl_loop(int ac, char **av, char **sys_envp)
+int	interactive_mode_loop(char **sys_envp)
 {
-	int			hist_fd;
-	(void)ac;
-	(void)av;
-	//on a specific signal send command to delete the file with unlink()
-	//so that it be wiped like we closed the terminal
-	hist_fd = -1;
-	hist_fd = open_history_file(hist_fd);
-	if (hist_fd < 0)
-		return (1);
-	return (interactive_mode_loop(hist_fd, sys_envp));
-}
 
-int	interactive_mode_loop(int hist_fd, char **sys_envp)
-{
 	int		i;
 	t_ms	ms;
 
@@ -51,6 +40,7 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 	ms.temp = NULL;
 	ms.temp2 = NULL;
 	intialize_utils(sys_envp, &ms.utils, &ms);
+
 
 	while (1)
 	{
@@ -60,14 +50,16 @@ int	interactive_mode_loop(int hist_fd, char **sys_envp)
 		{
 			i = -1;
 			while (ms.pipe[++i])
+
 				ms.pipe[i]->cmd_with_path = assign_scmd_path(ms.pipe[i]->noio_args[0], ms.utils->envp);//&ms);
 			ms.utils->err_code = execute(ms.utils, ms.pipe, &ms);   //(&ms); //just for compiling
+
 		}
-		free_pipes_utils_and_exit(ms.pipe, NULL, -42);
+		free_pipes_utils_and_exit(&ms.pipe, NULL, -42);
 	}
-	free_pipes_utils_and_exit(NULL, ms.utils, -42);
+
 	free (ms.line);
-	close(hist_fd);
+	free_pipes_utils_and_exit(NULL, &ms.utils, -42);
 	return (0);
 }
 
@@ -191,36 +183,7 @@ void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms)
 	sort_export(*utils);
 }
 
-int	open_history_file(int hist_fd)
-{
-	int		err_check;
-	char	*gnl_line;
-
-	gnl_line = NULL;
-	err_check = 0;
-	if (access("/tmp/.mshell_hist", F_OK) == -1)
-		hist_fd = open("/tmp/.mshell_hist", O_CREAT | O_RDWR, 0644);
-	else
-	{
-		hist_fd = open("/tmp/.mshell_hist", O_RDWR | O_APPEND, 0644);
-		while (1)
-		{
-			// find the newline number 10 from the bottom
-			// and then read the amount of data until that
-			err_check = get_next_line_nonewline(&gnl_line, hist_fd);
-			if (!gnl_line && err_check == 0)
-				break;
-			else if (!gnl_line && err_check == 1)
-				malloc_error(1);
-			add_history(gnl_line);
-			free (gnl_line);
-			gnl_line = NULL;
-		}
-	}
-	return (hist_fd);
-}
-
-char *rl_gets(char *line_read, int hist_file, t_utils *utils)
+char *rl_gets(char *line_read, t_utils *utils)
 {
 	int	savestdio;
 
@@ -247,7 +210,6 @@ char *rl_gets(char *line_read, int hist_file, t_utils *utils)
 	if (line_read && *line_read && g_signal != 130)
 	{
 		add_history(line_read);
-		ft_putendl_fd(line_read, hist_file);
 		utils->was_prev_line_null = 0;
 	}
 	close (savestdio);

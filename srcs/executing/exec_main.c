@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/08 15:21:45 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/10 13:34:04 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ char	*assign_scmd_path(char *scmd, char **envp)
 	int		i;
 
 	//should move it function up so that it doesnt waste resources every time
-	if (!scmd)
+	if (!scmd || scmd[0] == '\0')
 		return (NULL);
 	env_paths = find_path_and_pwd(envp, scmd);
 	if (!env_paths)
@@ -62,11 +62,7 @@ char	**find_path_and_pwd(char **envp, char *scmd)
 {
 	t_paths	vars;
 
-	vars.paths = NULL;
-	vars.i = 0;
-	vars.path = NULL;
-	vars.pwd = NULL;
-	vars.should_skip_pwd = false;
+	ft_bzero(&vars, sizeof(t_paths));
 	if (!ft_strnstr(scmd, "./", -1))
 		vars.should_skip_pwd = true;
 	while (envp[vars.i])
@@ -79,23 +75,14 @@ char	**find_path_and_pwd(char **envp, char *scmd)
 	}
 	vars.bigpath = jointhree(vars.path, ":", vars.pwd);
 	if (vars.bigpath && !vars.should_skip_pwd)
-	{
 		vars.paths = ft_split(vars.bigpath, ':');
-		if (!vars.paths)
-			malloc_error(1);
-	}
 	else if (vars.path)
-	{
 		vars.paths = ft_split(vars.path, ':');
-		if (!vars.paths)
-			malloc_error(1);
-	}
 	else if (!vars.should_skip_pwd)
-	{
 		vars.paths = ft_split(vars.pwd, ':');
-		if (!vars.paths)
-			malloc_error(1);
-	}
+	if(((vars.bigpath && !vars.should_skip_pwd) || (!vars.bigpath && vars.path) || \
+	(!vars.path && !vars.should_skip_pwd)) && !vars.paths)
+		malloc_error(1);
 	free (vars.bigpath);
 	return (vars.paths);
 }
@@ -139,12 +126,10 @@ int	exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2], char **infile, char 
 		}
 		else if (tokens[j] == SKIP_OUT || tokens[j] == OUT || tokens[j] == OUT_AP)
 		{
-			//HAVE TO CLOSE EVERY ONE!
 			if (tokens[j] == SKIP_OUT)
 			{
 				(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY, 0644);
 				close ((*fd)[1]);
-				ft_putendl_fd("closing skip out", 2);
 			}
 			else if (tokens[j] == OUT)
 				(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY | O_TRUNC, 0644);
@@ -168,35 +153,37 @@ int	exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2], char **infile, char 
 	return (has_fd_failed);
 }
 
-//if exit code is -42 doesn't exit
-void	free_pipes_utils_and_exit(t_pipe **_pipe, t_utils *utils, int child_exit_code)
+//if exit code is -42 then it doesn't exit
+void	free_pipes_utils_and_exit(t_pipe ***_pipe, t_utils **utils, int child_exit_code)
 {
 	int i;
 
 	i = 0;
-	while (_pipe[i])
+	if (_pipe && *_pipe)
 	{
-		ft_arrfree(_pipe[i]->args);
-		ft_arrfree(_pipe[i]->noio_args);
-		free(_pipe[i]->tokens);
-		free(_pipe[i]->cmd_with_path);
-		free(_pipe[i]);
-		i ++;
+		while ((*_pipe)[i])
+		{
+			ft_arrfree((*_pipe)[i]->args);
+			ft_arrfree((*_pipe)[i]->noio_args);
+			free((*_pipe)[i]->tokens);
+			free((*_pipe)[i]->cmd_with_path);
+			free((*_pipe)[i]);
+			i ++;
+		}
 	}
-	if (_pipe[i])
-		free(_pipe[i]);
-	free (_pipe);
-	if (utils)
+	if (*_pipe && (*_pipe)[i])
+		free((*_pipe)[i]);
+	(*_pipe) = NULL;
+	if (utils && *utils)
 	{
-		ft_arrfree(utils->envp);
-		ft_arrfree(utils->export);
-		free(utils);
+		ft_arrfree((*utils)->envp);
+		ft_arrfree((*utils)->export);
 	}
 	if (child_exit_code != -42)
 		exit (child_exit_code);
 }
 
-int	execute(t_utils *utils, t_pipe **_pipe)
+int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 {
 	int			fd[2];
 	int			savestdio[2];
@@ -245,15 +232,12 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 		has_fd_failed = exec_assign_redirections(_pipe[i], &fd, &infile, &outfile);
 		if (has_fd_failed)
 		{
-			//ft_putendl_fd("Fd has failed", 2);
 			close(fd[0]);
 			close(fd[1]);
 			fd[0] = -1;
 			fd[1] = -2;
 			utils->err_code = 1;
 		}
-		//ft_putendl_fd(ft_strjoin("---The fd[0] is ", ft_itoa(fd[0])), 2);
-		//ft_putendl_fd(ft_strjoin("---The fd[1] is ", ft_itoa(fd[1])), 2);
 		//PIPING
 		if (i != num_of_pipes - 1)
 			pipe(pipefd);
@@ -271,16 +255,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				if (i != num_of_pipes - 1 && fd[1] < 0)
 					dup2(pipefd[1], STDOUT_FILENO);
 				else if (fd[1] > -1)
-				{
-					//ft_putendl_fd("redirect output", 2);
-					//ft_putendl_fd(ft_itoa(fd[1]), 2);
-					if (dup2(fd[1], STDOUT_FILENO) < 0)
-					{
-						///ft_putendl_fd("dup2 failed", 2);
-						ft_putendl_fd(strerror(errno), 2);
-					}
-
-				}
+					dup2(fd[1], STDOUT_FILENO);
 				close (fd[0]);
 				close (tempfd_0);
 				close(pipefd[0]);
@@ -293,7 +268,7 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				}
 				else if ((_pipe)[i]->noio_args[0])
 					child_exit_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
-				free_pipes_utils_and_exit(_pipe, utils, child_exit_code);
+				free_pipes_utils_and_exit(&_pipe, &utils, child_exit_code);
 			}
 			else
 			{
@@ -319,18 +294,14 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				if (i != num_of_pipes - 1 && fd[1] < 0)
 					dup2(pipefd[1], STDOUT_FILENO);
 				else if (fd[1] > -1)
-				{
-					//ft_putendl_fd("redirect output", 2);
-					//ft_putendl_fd(ft_itoa(fd[1]), 2);
 					dup2(fd[1], STDOUT_FILENO);
-				}
 				close (fd[0]);
 				close(tempfd_0);
 				close(pipefd[1]);
 				close(pipefd[0]);
 				close(fd[1]);
-				utils->err_code = exec_builtin(_pipe, utils, i);
-				free_pipes_utils_and_exit(_pipe, utils, utils->err_code);
+				utils->err_code = exec_builtin(_pipe, utils, i, ms);
+				free_pipes_utils_and_exit(&_pipe, &utils, utils->err_code);
 			}
 			else
 			{
@@ -343,7 +314,6 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				close(fd[0]);
 				close(fd[1]);
 			}
-
 		}
 		else if (!has_fd_failed & !_pipe[1])
 		{
@@ -351,30 +321,22 @@ int	execute(t_utils *utils, t_pipe **_pipe)
 				dup2(fd[0], STDIN_FILENO);
 			close(fd[0]);
 			if (fd[1] > -1)
-			{
-				//ft_putendl_fd("redirect output in no pipe and bulitn", 2);
 				dup2(fd[1], STDOUT_FILENO);
-			}
 			close(fd[1]);
-			//ft_putendl_fd("no pipe and builtin", 2);
-			utils->err_code = exec_builtin(_pipe, utils, i);
+			utils->err_code = exec_builtin(_pipe, utils, i, ms);
 		}
-
+		else if (has_fd_failed)
+		{
+			if (_pipe[1] && i != num_of_pipes - 1)
+				tempfd_0 = dup(pipefd[0]);
+			close(pipefd[0]);
+			close(pipefd[1]);
+			close(fd[0]);
+			close(fd[1]);
+		}
 		i ++;
 	}
-	// close (pipefd[0]);
-	// close (pipefd[1]);
 	close(tempfd_0);
-
-	//printf("123\n");
-	//dup2(savestdio[0], STDIN_FILENO);
-	//dup2(savestdio[1], STDOUT_FILENO);
-	//ft_putendl_fd("Restoring the STDIO", 2);
-	//close(savestdio[0]);
-	//close(savestdio[1]);
-	//printf("The cild exit code is %d\n", child_exit_code);
-
-
 	return (waitpid_and_close_exec(_pipe, &pid, savestdio, utils, has_fd_failed));
 }
 
@@ -468,46 +430,48 @@ int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
 int		handle_execve_errors(char *failed_cmd)
 {
 	DIR	*dir;
-	//ft_putendl_fd(failed_cmd, 2);
-	//ACCESS() looks for a command as if it is ./
+
 	if (failed_cmd[0] == 0)
-		return (msg_stderr("minishell: permission denied: ", failed_cmd, 126));
+		return (msg_stderr("minishell: : command not found", NULL, 127));
 	else if (failed_cmd[0] == '.' && failed_cmd[1] == 0)
 		return (msg_stderr(".: not enough arguments", NULL, 1));
 	else if (access(failed_cmd, F_OK) == -1 && ft_strchr(failed_cmd, '/'))
 	{
-		return (msg_stderr("minishell: no such file or directory: ", failed_cmd, 127));
+		return (msg_stderr(failed_cmd, ": No such file or directory", 127));
 	}
 	else if (access(failed_cmd, F_OK) == -1)
-		return (msg_stderr("minishell: command not found: ", failed_cmd, 127));
-	else if (access(failed_cmd, X_OK) == -1 || access(failed_cmd, R_OK) == -1 || \
-	ft_strncmp(failed_cmd, "./", 3) == 0)
-		return (msg_stderr("minishell: permission denied: ", failed_cmd, 126));
+		return (msg_stderr(failed_cmd, ": command not found", 127));
+	else if ((access(failed_cmd, X_OK) == -1 || access(failed_cmd, R_OK) == -1 || \
+	ft_strncmp(failed_cmd, "./", 3) == 0) && ft_strnstr(failed_cmd, "/", -1))
+		return (msg_stderr(failed_cmd, ": Permission denied", 126));
 	// else if (!closedir(opendir(failed_cmd)))
 	dir = opendir(failed_cmd);
 	if (dir)
 	{
 		closedir(dir);
 		if (ft_strnstr(failed_cmd, "../", -1))
-			return (msg_stderr("minishell: is a directory: ", ft_strnstr(failed_cmd, "../", -1), 126));
+			return (msg_stderr(ft_strnstr(failed_cmd, "../", -1), ": is a directory", 126));
 		else if (ft_strnstr(failed_cmd, "./", -1))
-			return (msg_stderr("minishell: is a directory: ", ft_strnstr(failed_cmd, "./", -1), 126));
+			return (msg_stderr(ft_strnstr(failed_cmd, "./", -1), ": is a directory", 126));
+		else if (ft_strnstr(failed_cmd, "/", -1))
+			return (msg_stderr(failed_cmd, ": is a directory", 126));
 		else
-			return (msg_stderr("minishell: is a directory: ", failed_cmd, 126));
+			return (msg_stderr(failed_cmd, ": command not found", 127));
 	}
 	else if (ft_strrchr(failed_cmd, '/') && (ft_strrchr(failed_cmd, '/'))[1] == '\0')
-			return (msg_stderr("minishell: Not a directory: ", failed_cmd, 127));
+			return (msg_stderr(failed_cmd, ": not a directory", 127));
 	else
-		return (msg_stderr("minishell: command not found: ", failed_cmd, 127));
+		return (msg_stderr(failed_cmd, ": command not found", 127));
 	return (127);
 }
 
-int	msg_stderr(char *message, char *cmd, int err_code)
+int	msg_stderr(char *cmd, char *message, int err_code)
 {
-	if (message)
-		ft_putstr_fd(message, 2);
+	ft_putstr_fd("minishell: ", 2);
 	if (cmd)
 		ft_putstr_fd(cmd, 2);
+	if (message)
+		ft_putstr_fd(message, 2);
 	ft_putstr_fd("\n", 2);
 	return (err_code);
 }
