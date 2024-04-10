@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/10 13:37:32 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 13:59:22 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,11 @@
 # include "./minishell.h"
 # include "./readline/readline.h"
 # include "./readline/history.h"
-//# include <readline/readline.h>
-//# include <readline/history.h>
+
 # include <signal.h>
 # include <dirent.h>
 
 extern int	g_signal;
-
-//# include </usr/include/readline/readline.h> //needed for Linux
-//# include </usr/include/readline/history.h> // needed for Linux
-
 
 
 typedef struct s_paths
@@ -79,23 +74,18 @@ char	*rl_gets(char *line_read, t_utils *utils);
 
 void	lex_merror(t_utils *utils, char **str);
 int		check_quote(char **str, bool quote, bool dquote, int *err_code);
-//int		lexer(char **str, t_utils *utils);
 int		lexer(t_ms *ms);
-//void	env_variable(char **str, t_utils *utils, bool quote, bool dquote);
 void	env_variable(t_ms *ms, bool quote, bool dquote);
 char	**array_copy(char **array);
-//char	*get_variable(char *temp, char **envp, int err_code);
 char	*get_variable(t_ms *ms);
 int		*tokenizer(char **array);
 int		get_token(char *str);
 
 char	*separator(t_ms *ms, bool quote, bool dquote, int i);
-//void	remove_space(char **str, int i, t_utils *utils);
 void	remove_space(int i, t_ms *ms);
 void	init_token(t_pipe *pipe);
 void	remove_in(t_pipe *pipe, int i, int hd);
 void	remove_out(t_pipe *pipe, int i, int app);
-//int		make_tokens(t_pipe *pipe, int i);
 void	make_tokens(t_pipe *pipe, int i);
 int		env_error(char **temp, t_ms *ms);
 void	combine_str(char **new_str, char *temp);
@@ -105,7 +95,6 @@ void	init_tokenarr(int **tokens, char **array, t_ms *ms);
 void	quote_remover(t_pipe *pipe);
 // PARSER
 
-//int		parsing(char **line_read, t_pipe ***pipe, t_utils *utils);
 int		parsing(t_ms *ms);
 char	**get_cmd(char **cmds, int start, int end, t_ms *ms);
 void	pre_parse(char **array, t_pipe ***pipe, t_ms *ms);
@@ -127,7 +116,6 @@ int			pipe_error(int *tokens, int *err_code, int i);
 
 //EXECUTE
 char	*assign_scmd_path(char *scmd, char **envp);
-//int		execute(t_utils *utils, t_pipe **_pipe);
 int		execute(t_utils *utils, t_pipe **_pipe, t_ms *ms);
 char	*jointhree(char const *s1, char const *s2, char const *s3);
 int		handle_execve_errors(char *failed_cmd);
@@ -141,39 +129,31 @@ void	free_pipes_utils_and_exit(t_pipe ***_pipe, t_utils **utils, int child_exit_
 int		waitpid_and_close_exec(t_pipe **_pipe, pid_t (*pid)[256], int savestdio[2], t_utils *utils, int has_fd_failed);
 
 // BUILTINS
-//int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms);
 int		change_env_var(t_utils **utils, char *env_name, char *newstr, t_ms *ms);
 int		echo_builtin(char **noio_args, t_utils *utils);
 int		add_exp_var(t_utils **utils, char *newstr, t_ms *ms);
-//int		change_exp_var(t_utils **utils, char *env_name, char *newstr);
 int		change_exp_var(t_utils **utils, char *env_name, char *newstr, t_ms *ms);
 void	print_exp(t_utils *utils, int fd);
 void	sort_export(t_utils *utils);
-//int		export(t_utils *utils, char **arg);
 int		export(t_utils *utils, char **arg, t_ms *ms);
 int		env(t_utils *utils);
 int		pwd(t_utils *utils);
 int		remove_env(t_utils *utils, int i, int x, int y);
 int		remove_exp(t_utils *utils, int i, int x, int y);
 int		unset(t_utils *utils, char **arg);
-//int		cd_builtin(t_pipe **_pipe, t_utils *utils, int i);
 int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms);
 int		exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
 
-//int		update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd);
 int		update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd, t_ms *ms);
-//int		update_pwd_oldpwd_env(t_utils *utils, char *cwd);
 int		update_pwd_oldpwd_env(t_utils *utils, char *cwd, t_ms *ms);
 int		export_error(char *arg);
-//void	export_loop(char *arg, t_utils *utils, bool quote, bool dquote);
 void	export_loop(char *arg, t_ms *ms, bool quote, bool dquote);
 void	unset_exp(t_utils *utils, char **arg, int j, int i);
 void	unset_env(t_utils *utils, char **arg);
 //MS SPLIT
 
 int		str_count(char *str);
-//char	**ms_splitter(char *str, char **array, bool quote, bool dquote);
 int		ms_splitter(char *str, char ***array, bool quote, bool dquote);
 char	**ms_split(char *str, t_ms *ms);
 char	**free_reverse(int i, char **array);
@@ -203,4 +183,6 @@ void	malloc_check(char **str, t_ms *ms);
 # define NOT_MS 12 // operator that is not implemented in minishell
 # define NOT_DEF 13 // undefined token
 
+# define YEL "\e[0;33m"
+# define CRESET "\e[0m"
 #endif

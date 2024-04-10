@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/10 13:34:04 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/10 13:51:33 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -398,19 +398,19 @@ the changes will go away when the child exits. For this built it functions, call
 execute instead of forking a new process
 All builtins return an exit status of 2 to indicate incorrect usage, generally invalid options or missing arguments.
 */
-int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i)
+int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms)
 {
 
 	if (!ft_strncmp((_pipe)[i]->noio_args[0], "echo", -1))
 		return (echo_builtin((_pipe)[i]->noio_args, utils));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "cd", -1))
-		return (cd_builtin(_pipe, utils, i));
+		return (cd_builtin(_pipe, utils, i, ms));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "pwd", -1))
 		return (pwd(utils));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "export", -1))
 	{
 		if (_pipe[0] && !_pipe[1])
-			return (export(utils, (_pipe)[i]->noio_args));
+			return (export(utils, (_pipe)[i]->noio_args, ms));
 		else
 			return (0);
 	}

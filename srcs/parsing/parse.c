@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 15:06:28 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 13:50:59 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,7 @@ void	parser(char **array, t_pipe ***pipe, t_ms *ms)//int *err_code)
 	ft_arrfree(array); // is it on stack or heap
 	while ((*pipe)[x])
 	{
+		(*pipe)[x]->cmd_with_path = NULL;
 		init_token((*pipe)[x]);
 		make_tokens((*pipe)[x], i);
 		quote_remover((*pipe)[x]);
