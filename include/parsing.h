@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/10 18:08:04 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/11 17:00:59 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ typedef struct s_paths
 {
 	int		i;
 	char	*path;
-	char	*pwd;
+	char	pwd[4096];
 	char	*bigpath;
 	char	**paths;
 	bool	should_skip_pwd;
@@ -69,6 +69,7 @@ typedef struct s_exec
 	int		tempfd_0;
 	int		num_of_pipes;
 	int		has_fd_failed;
+	int		i;
 }	t_exec;
 
 // SIGNAL
@@ -126,12 +127,12 @@ int			not_ms(char **array, int *err_code, int i);
 int			pipe_error(int *tokens, int *err_code, int i);
 
 //EXECUTE
-char	*assign_scmd_path(char *scmd, char **envp);
+char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms);
 int		execute(t_utils *utils, t_pipe **_pipe, t_ms *ms);
 char	*jointhree(char const *s1, char const *s2, char const *s3);
 int		handle_execve_errors(char *failed_cmd);
 int		msg_stderr(char *message, char *cmd, int err_code);
-char	**find_path_and_pwd(char **envp, char *scmd);
+char	**find_path_and_pwd(char **envp, char *scmd, t_ms *ms);
 int		user_cmd_path(char **args, char *arg_cmd, char **paths);
 void	delete_pwd_path(char **paths);
 int		free_and_1(char **paths, int **end);
@@ -162,9 +163,11 @@ int		remove_env(t_utils *utils, int i, int x, int y);
 int		remove_exp(t_utils *utils, int i, int x, int y);
 int		unset(t_utils *utils, char **arg);
 int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms);
+int		cd_chdir_fail(t_pipe **_pipe, int index);
+int		cd_home_chdir_fail(char *home_path);
 int		exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
 
-int		update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd, t_ms *ms);
+int		update_pwd_oldpwd_env_exp(t_utils *utils, t_ms *ms);
 int		update_pwd_oldpwd_env(t_utils *utils, char *cwd, t_ms *ms);
 int		export_error(char *arg);
 void	export_loop(char *arg, t_ms *ms, bool quote, bool dquote);

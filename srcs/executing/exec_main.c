@@ -6,78 +6,69 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/10 18:12:44 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/11 13:51:41 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-char	*assign_scmd_path(char *scmd, char **envp)
+//If there is absolute path (scmd starts with '/') then check only once then break
+//otherwise look through env_paths and try to access
+char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms)
 {
 	char	**env_paths;
 	char	*cmd_path;
 	int		i;
 
-	//should move it function up so that it doesnt waste resources every time
 	if (!scmd || scmd[0] == '\0')
 		return (NULL);
-	env_paths = find_path_and_pwd(envp, scmd);
+	env_paths = find_path_and_pwd(envp, scmd, ms);
 	if (!env_paths)
 		return (NULL);
-	i = 0;
-	while (env_paths[i])
+	i = -1;
+	while (env_paths[++i])
 	{
-		if (scmd && scmd[0] == '/')
-		{
+		if (scmd[0] == '/')
 			cmd_path = ft_strdup(scmd);
-			if (!cmd_path)
-				malloc_error(1);
-			free_and_1(env_paths, NULL);
-			if (access(cmd_path, F_OK) == 0 && access(cmd_path, X_OK) == 0)
-				return (cmd_path);
-			else
-				return (NULL);
-		}
 		else
 			cmd_path = jointhree(env_paths[i], "/", scmd);
-		if (access(cmd_path, F_OK) == 0 && access(cmd_path, X_OK) == 0)
-		{
-			free_and_1(env_paths, NULL);
+		if (access(cmd_path, F_OK) == 0 && access(cmd_path, X_OK) == 0 && \
+		free_and_1(env_paths, NULL))
 			return (cmd_path);
-		}
 		free (cmd_path);
-		i ++;
+		if (scmd[0] == '/')
+			break ;
 	}
 	free_and_1(env_paths, NULL);
 	return (NULL);
 }
-
-char	**find_path_and_pwd(char **envp, char *scmd)
+//if there is a './' then skip adding pwd to the path
+char	**find_path_and_pwd(char **envp, char *scmd, t_ms *ms)
 {
 	t_paths	vars;
 
 	ft_bzero(&vars, sizeof(t_paths));
 	if (!ft_strnstr(scmd, "./", -1))
 		vars.should_skip_pwd = true;
-	while (envp[vars.i])
+	while (envp[++vars.i])
 	{
 		if (ft_strncmp(envp[vars.i], "PATH=", 5) == 0)
 			vars.path = envp[vars.i] + 5;
-		else if (ft_strncmp(envp[vars.i], "PWD=", 4) == 0)
-			vars.pwd = envp[vars.i] + 4;
-		vars.i ++;
 	}
+	getcwd(vars.pwd, 4096);
 	vars.bigpath = jointhree(vars.path, ":", vars.pwd);
+	if (vars.path)
+		malloc_check(&vars.bigpath, ms);
 	if (vars.bigpath && !vars.should_skip_pwd)
 		vars.paths = ft_split(vars.bigpath, ':');
 	else if (vars.path)
 		vars.paths = ft_split(vars.path, ':');
 	else if (!vars.should_skip_pwd)
 		vars.paths = ft_split(vars.pwd, ':');
+	free (vars.bigpath);
 	if(((vars.bigpath && !vars.should_skip_pwd) || (!vars.bigpath && vars.path) || \
 	(!vars.path && !vars.should_skip_pwd)) && !vars.paths)
-		malloc_error(1);
-	free (vars.bigpath);
+		malloc_check(vars.paths, ms);
 	return (vars.paths);
 }
 
@@ -324,33 +315,30 @@ int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 	return (waitpid_and_close_exec(ms, &xx));
 }
 
+//return exit code of last child if there was no fd failure and there was a pipe in the command
 int	waitpid_and_close_exec(t_ms *ms, t_exec *xx)
 {
-	int		i;
 	int		child_exit_code;
 
-	i = 0;
+	xx->i = 0;
 	child_exit_code = 0;
-	if (ms->pipe[i]->tokens && ms->pipe[i]->tokens[0] == BUILTIN && !ms->pipe[1])
-			i ++;
-	while (i < xx->num_of_pipes)
+	if (ms->pipe[xx->i]->tokens && ms->pipe[xx->i]->tokens[0] == BUILTIN && !ms->pipe[1])
+			xx->i ++;
+	while (xx->i < xx->num_of_pipes)
 	{
-		if (i == xx->num_of_pipes - 1)
-			waitpid(xx->pid[i], &child_exit_code, 0);
+		if (xx->i == xx->num_of_pipes - 1)
+			waitpid(xx->pid[xx->i], &child_exit_code, 0);
 		else
-			waitpid(xx->pid[i], NULL, 0);
-		i ++;
+			waitpid(xx->pid[xx->i], NULL, 0);
+		xx->i ++;
 	}
 	dup2(xx->savestdio[0], STDIN_FILENO);
 	dup2(xx->savestdio[1], STDOUT_FILENO);
 	close(xx->savestdio[0]);
 	close(xx->savestdio[1]);
-	if (g_signal == 130)
-	{
-		ft_putstr_fd("\n", STDOUT_FILENO);
+	if (g_signal == 130 && ft_putstr_fd("\n", STDOUT_FILENO) != -42)
 		return (130);
-	}
-	if (WIFEXITED(child_exit_code) && !xx->has_fd_failed && \
+	else if (WIFEXITED(child_exit_code) && !xx->has_fd_failed && \
 	!(ms->pipe[0]->tokens[0] == BUILTIN && !ms->pipe[1]))
 		return (WEXITSTATUS(child_exit_code));
 	else

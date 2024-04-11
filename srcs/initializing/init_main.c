@@ -38,7 +38,7 @@ int	interactive_mode_loop(char **sys_envp)
 	ms.line = NULL;
 	ms.temp = NULL;
 	ms.temp2 = NULL;
-	ft_bzero(ms.pipe, sizeof(t_pipe));
+	//ft_bzero(ms.pipe, sizeof(t_pipe));
 	ms.pipe = NULL;
 	intialize_utils(sys_envp, &ms.utils, &ms);
 	while (1)
@@ -49,7 +49,7 @@ int	interactive_mode_loop(char **sys_envp)
 		{
 			i = -1;
 			while (ms.pipe[++i])
-				ms.pipe[i]->cmd_with_path = assign_scmd_path(ms.pipe[i]->noio_args[0], ms.utils->envp);
+				ms.pipe[i]->cmd_with_path = assign_scmd_path(ms.pipe[i]->noio_args[0], ms.utils->envp, &ms);
 			ms.utils->err_code = execute(ms.utils, ms.pipe, &ms);
 		}
 		free_pipes_utils_and_exit(&ms.pipe, NULL, -42);
