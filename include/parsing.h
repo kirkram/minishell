@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/11 17:00:59 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/11 18:34:21 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,10 +164,11 @@ int		remove_exp(t_utils *utils, int i, int x, int y);
 int		unset(t_utils *utils, char **arg);
 int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms);
 int		cd_chdir_fail(t_pipe **_pipe, int index);
-int		cd_home_chdir_fail(char *home_path);
+int		cd_home_chdir_fail(char *home_path, t_utils *utils);
+char	*find_home_env(t_utils *utils);
 int		exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
 
-int		update_pwd_oldpwd_env_exp(t_utils *utils, t_ms *ms);
+int		update_pwd_oldpwd_env_exp(t_utils *utils, t_ms *ms, char cwd[4096]);
 int		update_pwd_oldpwd_env(t_utils *utils, char *cwd, t_ms *ms);
 int		export_error(char *arg);
 void	export_loop(char *arg, t_ms *ms, bool quote, bool dquote);

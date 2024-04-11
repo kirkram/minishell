@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:51:27 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 21:48:20 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/11 18:37:09 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	quote_status(bool *quote)
 
 void	malloc_error(int err)
 {
-	ft_putendl_fd("Malloc failed", 2);
+	ft_putendl_fd("minishell: Malloc failed", 2);
 	exit(err);
 }
 
