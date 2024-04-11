@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:21:44 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 23:31:06 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 18:50:45 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	combine_str(char **new_str, char *temp)
 	ft_nullfree(&ptr);
 }
 
-void	 remove_space(int i, t_ms *ms)
+void	remove_space(int i, t_ms *ms)
 {
 	int		end;
 	char	*temp;
@@ -58,14 +58,10 @@ void	 remove_space(int i, t_ms *ms)
 		i--;
 	if (i != end && i > 0)
 	{
-		temp = ft_substr(ms->line, 0, i +1);// ?????
+		temp = ft_substr(ms->line, 0, i +1);
 		malloc_check(&temp, ms);
-		//if (!temp)
-		//	lex_merror(utils, str);
 		ft_nullfree(&ms->line);
-		//free (*str);
 		ms->line = temp;
-		//(*str) = temp;
 	}
 }
 
@@ -90,7 +86,7 @@ int	check_quote(char **str, bool quote, bool dquote, int *err_code)
 	}
 	return (0);
 }
-//t_utils *utils)
+
 int	lexer(t_ms *ms)
 {
 	bool	quote;
@@ -102,14 +98,12 @@ int	lexer(t_ms *ms)
 	dquote = false;
 	if (check_quote(&ms->line, quote, dquote, &ms->utils->err_code) == 1)
 		return (1);
-	//remove_space(str, i, ms);
 	remove_space(i, ms);
 	while (ms->line[i])
 	{
 		if (ms->line[i] == '$')
 		{
-			//env_variable(str, utils, quote, dquote);
-			env_variable(ms, quote, dquote);
+			env_variable(ms, quote, dquote, &ms->line);
 			break ;
 		}
 		i++;

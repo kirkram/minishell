@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/13 11:18:05 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 20:22:31 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 19:25:34 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ char	**ms_split(char *str, t_ms *ms)
 	quote = false;
 	dquote = false;
 	array = NULL;
-
 	if (!str)
 		return (0);
 	if (str_count(str) == 0)
@@ -38,35 +37,6 @@ char	**ms_split(char *str, t_ms *ms)
 		return (array);
 	}
 	return (0);
-}
-
-char	*remove_quote(char *str, int i)
-{
-	int		x;
-	char	*temp;
-	bool	quote;
-	bool	dquote;
-
-	i = 0;
-	x = 0;
-	quote = false;
-	dquote = false;
-	temp = malloc((ft_strlen(str) - quote_count(str) +1) * sizeof(char));
-	if (!temp || !str)
-		return (NULL);
-	while (str[i])
-	{
-		quote_status2(&quote, &dquote, str[i]);
-		if (str[i] == '\'' && dquote == false)
-			i++;
-		else if (str[i] == '\"' && quote == false)
-			i++;
-		else
-			temp[x++] = str[i++];
-	}
-	temp[x] = '\0';
-	free (str);
-	return (temp);
 }
 
 int	quote_count(char *str)
@@ -112,10 +82,7 @@ int	ms_splitter(char *str, char ***array, bool quote, bool dquote)
 			x++;
 		start = x;
 		while (str[x] && (str[x] != ' ' || quote == true || dquote == true))
-		{
-			quote_status2(&quote, &dquote, str[x]);
-			x++;
-		}
+			quote_status2(&quote, &dquote, str[x++]);
 		(*array)[i] = ft_substr(str, start, (x - start));
 		if (!(*array)[i])
 		{

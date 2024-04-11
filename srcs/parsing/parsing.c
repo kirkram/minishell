@@ -6,38 +6,11 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 23:36:12 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 19:12:20 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-
-char	**array_copy(char **array)
-{
-	char	**new_array;
-	int		i;
-
-	i = 0;
-	new_array = NULL;
-	while (array[i])
-		i++;
-	new_array = malloc(sizeof(char *) * (i +1));
-	if (!new_array)
-		malloc_error(1);
-	i = 0;
-	while (array[i])
-	{
-		new_array[i] = ft_strdup(array[i]);
-		if (!new_array[i])
-		{
-			ft_arrfree(new_array);
-			malloc_error(1);
-		}
-		i++;
-	}
-	new_array[i] = NULL;
-	return (new_array);
-}
 
 char	**get_cmd(char **cmds, int start, int end, t_ms *ms)
 {
@@ -90,14 +63,44 @@ void	pre_parse(char **array, t_pipe ***pipe, t_ms *ms)
 	}
 }
 
-void	quote_remover(t_pipe *pipe)
+char	*remove_quote(char *str, int i, int x, t_ms *ms)
+{
+	char	*temp;
+	bool	quote;
+	bool	dquote;
+
+	i = 0;
+	quote = false;
+	dquote = false;
+	if (!str)
+		return (NULL);
+	temp = malloc((ft_strlen(str) - quote_count(str) +1) * sizeof(char));
+	malloc_check(&temp, ms);
+	while (str[i])
+	{
+		quote_status2(&quote, &dquote, str[i]);
+		if (str[i] == '\'' && dquote == false)
+			i++;
+		else if (str[i] == '\"' && quote == false)
+			i++;
+		else
+			temp[x++] = str[i++];
+	}
+	temp[x] = '\0';
+	ft_nullfree(&str);
+	return (temp);
+}
+
+void	quote_remover(t_pipe *pipe, t_ms *ms)
 {
 	int	i;
+	int	x;
 
+	x = 0;
 	i = 0;
 	while (pipe->args[i])
 	{
-		pipe->args[i] = remove_quote(pipe->args[i], i);
+		pipe->args[i] = remove_quote(pipe->args[i], i, x, ms);
 		i++;
 	}
 }
@@ -123,8 +126,7 @@ int	parsing(t_ms *ms)//t_pipe ***pipe, t_utils *utils)
 	pipeline_init(array, &ms->pipe, ms);
 	free (tokens);
 	parser(array, &ms->pipe, ms);
-	here_doc(&ms->pipe, ms->utils);
-	//ft_arrfree(array);
+	here_doc(&ms->pipe, ms->utils, ms);
 	if (ms->utils->syntax_err == TRUE)
 		return (1);
 	return (0);

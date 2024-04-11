@@ -6,13 +6,13 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 18:58:14 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 14:57:30 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 17:47:53 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	init_token(t_pipe *pipe)
+void	init_token(t_pipe *pipe, t_ms *ms)
 {
 	int	i;
 
@@ -21,7 +21,7 @@ void	init_token(t_pipe *pipe)
 		i++;
 	pipe->tokens = malloc (sizeof(int *) * (i +2));
 	if (!pipe->tokens)
-		malloc_error(1);
+		malloc_check(NULL, ms);
 	i = 0;
 	while (pipe->args[i])
 	{

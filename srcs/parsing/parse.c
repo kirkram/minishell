@@ -6,13 +6,13 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/10 13:50:59 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 19:06:43 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	init_remove_red(t_pipe *pipe, char ***temp, int **i_temp)
+void	init_remove_red(t_pipe *pipe, char ***temp, int **i_temp, t_ms *ms)
 {
 	int	i;
 	int	x;
@@ -27,13 +27,13 @@ void	init_remove_red(t_pipe *pipe, char ***temp, int **i_temp)
 	}
 	(*temp) = malloc(sizeof(char *) * (x +1));
 	if (!(*temp))
-		malloc_error(1);
+		malloc_check(NULL, ms);
 	(*i_temp) = malloc(sizeof(int *) * (x +1));
 	if (!(*i_temp))
-		malloc_error(1);
+		malloc_check(NULL, ms);
 }
 
-void	remove_red(t_pipe *pipe, int i)
+void	remove_red(t_pipe *pipe, int i, t_ms *ms)
 {
 	int		x;
 	char	**temp;
@@ -41,14 +41,14 @@ void	remove_red(t_pipe *pipe, int i)
 
 	x = 0;
 	i = 0;
-	init_remove_red(pipe, &temp, &i_temp);
+	init_remove_red(pipe, &temp, &i_temp, ms);
 	while (pipe->args[i])
 	{
 		if (pipe->tokens[i] != REMOVE)
 		{
 			temp[x] = ft_strdup(pipe->args[i]);
 			if (!temp[x])
-				malloc_error (1);
+				malloc_check(NULL, ms);
 			i_temp[x] = pipe->tokens[i];
 			x++;
 		}
@@ -113,14 +113,14 @@ void	parser(char **array, t_pipe ***pipe, t_ms *ms)//int *err_code)
 	i = 0;
 	x = 0;
 	pre_parse(array, pipe, ms);
-	ft_arrfree(array); // is it on stack or heap
+	ft_arrfree(array);
 	while ((*pipe)[x])
 	{
 		(*pipe)[x]->cmd_with_path = NULL;
-		init_token((*pipe)[x]);
+		init_token((*pipe)[x], ms);
 		make_tokens((*pipe)[x], i);
-		quote_remover((*pipe)[x]);
-		remove_red((*pipe)[x], i);
+		quote_remover((*pipe)[x], ms);
+		remove_red((*pipe)[x], i, ms);
 		final_args((*pipe)[x], i, ms);
 		x++;
 	}
