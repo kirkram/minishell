@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/10 18:59:57 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/11 15:15:35 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,28 +128,58 @@ void	free_pipes_utils_and_exit(t_pipe ***_pipe, t_utils **utils, int child_exit_
 int		waitpid_and_close_exec(t_pipe **_pipe, pid_t (*pid)[256], int savestdio[2], t_utils *utils, int has_fd_failed);
 
 // BUILTINS
-int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms);
-int		change_env_var(t_utils **utils, char *env_name, char *newstr, t_ms *ms);
-int		echo_builtin(char **noio_args, t_utils *utils);
-int		add_exp_var(t_utils **utils, char *newstr, t_ms *ms);
-int		change_exp_var(t_utils **utils, char *env_name, char *newstr, t_ms *ms);
-void	print_exp(t_utils *utils, int fd);
-void	sort_export(t_utils *utils);
-int		export(t_utils *utils, char **arg, t_ms *ms);
-int		env(t_utils *utils, char **noio_arg);
-int		pwd(t_utils *utils);
-int		remove_env(t_ms *ms, int i, int x, int y);
-int		remove_exp(t_ms *ms, int i, int x, int y);
-int		unset(t_utils *utils, char **arg, t_ms *ms);
-int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms);
-int		exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
+int			exec_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms);
 
-int		update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd, t_ms *ms);
-int		update_pwd_oldpwd_env(t_utils *utils, char *cwd, t_ms *ms);
-int		export_error(char *arg);
-void	export_loop(char *arg, t_ms *ms, bool quote, bool dquote);
-void	unset_exp(t_ms *ms, char **arg, int j, int i);
-void	unset_env(t_utils *utils, char **arg, t_ms *ms);
+// export
+int			export(t_utils *utils, char **arg, t_ms *ms);
+void		print_exp(t_utils *utils, int fd);
+void		sort_export(t_utils *utils);
+//static int	print_exp_error(char *arg);
+//static int	export_error(char *arg);
+//static void	export_loop2(char *arg, t_ms *ms, int *i);
+//static void export_loop(char *arg, t_ms *ms, bool quote, bool dquote);
+int			add_exp_var(t_utils **utils, char *newstr, t_ms *ms);
+
+// unset
+int			remove_env(t_ms *ms, int i, int x, int y);
+int			remove_exp(t_ms *ms, int i, int x, int y);
+int			unset(t_utils *utils, char **arg, t_ms *ms);
+void		unset_exp(t_ms *ms, char **arg, int j, int i);
+void		unset_env(t_utils *utils, char **arg, t_ms *ms);
+
+// env
+int			env(t_utils *utils, char **noio_arg);
+int			change_var(char ***array, char *env_name, char *newstr, t_ms *ms);
+
+// pwd
+int			pwd(t_utils *utils);
+int			update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd, t_ms *ms);
+int			update_pwd_oldpwd_env(t_utils *utils, char *cwd, t_ms *ms);
+
+// cd
+int			cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms);
+
+// exit
+int			exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
+
+// echo
+int			echo_builtin(char **noio_args, t_utils *utils);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //MS SPLIT
 
 int		str_count(char *str);

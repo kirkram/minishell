@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/10 18:31:38 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/11 12:52:40 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,45 +20,14 @@ returns -1 on malloc fail
 */
 extern int g_signal;
 
-int	change_env_var(t_utils **utils, char *env_name, char *newstr, t_ms *ms)
+int	pwd(t_utils *utils)
 {
-	int		i;
-	char	**tmp_arr;
+	char	cwd[4096];
 
-	i = 0;
-	if (!env_name || !newstr || !utils)
+	(void)utils;
+	if (!getcwd(cwd, -1))
 		return (1);
-	while ((*utils)->envp[i])
-	{
-		if (ft_strncmp((*utils)->envp[i], env_name, ft_strlen(env_name)) == 0)
-		{
-			free((*utils)->envp[i]);
-			(*utils)->envp[i] = ft_strdup(newstr);
-			malloc_check(&(*utils)->envp[i], ms);
-			return (0);
-		}
-		i ++;
-	}
-	tmp_arr = malloc((i + 2) * sizeof(char*));
-	if (!tmp_arr)
-		malloc_check(NULL, ms);
-	i = 0;
-	tmp_arr[0] = ft_strdup(newstr);
-	malloc_check(&tmp_arr[0], ms);
-	while ((*utils)->envp[i])
-	{
-		tmp_arr[i + 1] = ft_strdup((*utils)->envp[i]);
-		if (!tmp_arr[i +1])
-		{
-			free_reverse(i +1, tmp_arr);
-			malloc_check(NULL, ms);
-		}
-		free((*utils)->envp[i]);
-		i ++;
-	}
-	tmp_arr[i + 1] = NULL;
-	free((*utils)->envp);
-	(*utils)->envp = tmp_arr;
+	printf("%s\n", cwd);
 	return (0);
 }
 
@@ -239,86 +208,5 @@ int	is_only_digits_and_signs(char *str)
 		}
 		str ++;
 	}
-	return (1);
-}
-
-int	change_exp_var(t_utils **utils, char *env_name, char *newstr, t_ms *ms)
-{
-	int		i;
-	char	**tmp_arr;
-
-	i = 0;
-	while ((*utils)->export[i])
-	{
-		if (ft_strncmp((*utils)->export[i], env_name, ft_strlen(env_name)) == 0)
-		{
-			free((*utils)->export[i]);
-			(*utils)->export[i] = ft_strdup(newstr);
-			malloc_check(&(*utils)->export[i], ms);
-			return (0);
-		}
-		i ++;
-	}
-	tmp_arr = malloc((i + 2) * sizeof(char*));
-	if (!tmp_arr)
-		malloc_check(NULL, ms);
-	i = 0;
-	tmp_arr[0] = ft_strdup(newstr);
-	malloc_check(&tmp_arr[0], ms);
-	while ((*utils)->export[i])
-	{
-		tmp_arr[i + 1] = ft_strdup((*utils)->export[i]);
-		if (!tmp_arr[i + 1])
-		{
-			free_reverse(i +1, tmp_arr);
-			malloc_check(NULL, ms);
-		}
-		free((*utils)->export[i]);
-		i ++;
-	}
-	tmp_arr[i + 1] = NULL;
-	free((*utils)->export);
-	(*utils)->export = tmp_arr;
-	return (1);
-}
-
-int	add_exp_var(t_utils **utils, char *newstr, t_ms *ms)
-
-{
-	int		i;
-	char	**tmp_arr;
-
-	i = 0;
-	while ((*utils)->export[i])
-	{
-		if (ft_strncmp((*utils)->export[i], newstr, -1) == 0)
-		{
-			free((*utils)->export[i]);
-			(*utils)->export[i] = ft_strdup(newstr);
-			malloc_check(&(*utils)->export[i], ms);
-			return (0);
-		}
-		i ++;
-	}
-	tmp_arr = malloc((i + 2) * sizeof(char*));
-	if (!tmp_arr)
-		malloc_check(NULL, ms);
-	i = 0;
-	tmp_arr[0] = ft_strdup(newstr);
-	malloc_check(&tmp_arr[0], ms);
-	while ((*utils)->export[i])
-	{
-		tmp_arr[i + 1] = ft_strdup((*utils)->export[i]);
-		if (!tmp_arr[i + 1])
-		{
-			free_reverse(i +1, tmp_arr);
-			malloc_check(NULL, ms);
-		}
-		free((*utils)->export[i]);
-		i ++;
-	}
-	tmp_arr[i + 1] = NULL;
-	free((*utils)->export);
-	(*utils)->export = tmp_arr;
 	return (1);
 }

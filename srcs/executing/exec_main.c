@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/10 18:34:41 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/11 10:36:41 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,10 +170,10 @@ void	free_pipes_utils_and_exit(t_pipe ***_pipe, t_utils **utils, int child_exit_
 			free((*_pipe)[i]);
 			i ++;
 		}
-	}
-	if (*_pipe && (*_pipe)[i])
 		free((*_pipe)[i]);
-	(*_pipe) = NULL;
+		free(*_pipe);
+		(*_pipe) = NULL;
+	}
 	if (utils && *utils)
 	{
 		ft_arrfree((*utils)->envp);
