@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/11 18:34:21 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/12 17:30:27 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ typedef struct s_exec
 	int		pipefd[2];
 	int		tempfd_0;
 	int		num_of_pipes;
-	int		has_fd_failed;
+	int		fd_failed;
 	int		i;
 }	t_exec;
 
@@ -136,7 +136,7 @@ int		user_cmd_path(char **args, char *arg_cmd, char **paths);
 void	delete_pwd_path(char **paths);
 int		free_and_1(char **paths, int **end);
 int		exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2]);
-int		exec_redirections_in(t_pipe *_pipe_i, int (*fd)[2], int j, int *has_fd_failed);
+int		exec_redirections_in(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed);
 void	free_pipes_utils_and_exit(t_pipe ***_pipe, t_utils **utils, int child_exit_code);
 int		waitpid_and_close_exec(t_ms *ms, t_exec *xx);
 void	exec_child_system_function(t_pipe **_pipe, t_utils *utils, int i, t_exec *xx);
@@ -146,44 +146,43 @@ void	exec_fd_fail_pass_pipe(t_pipe **_pipe, int i, t_exec *xx);
 void	dup_and_close_child_process(int i, t_exec *xx);
 void	pipe_readend_and_close_parent(int i, t_pipe **_pipe, t_exec *xx);
 
-
 // BUILTINS
-int			exec_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms);
+int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms);
 
 // export
-int			export(t_utils *utils, char **arg, t_ms *ms);
-void		print_exp(t_utils *utils, int fd);
-void		sort_export(t_utils *utils);
+int		export(t_utils *utils, char **arg, t_ms *ms);
+void	print_exp(t_utils *utils, int fd);
+void	sort_export(t_utils *utils);
 //static int	print_exp_error(char *arg);
 //static int	export_error(char *arg);
 //static void	export_loop2(char *arg, t_ms *ms, int *i);
 //static void export_loop(char *arg, t_ms *ms, bool quote, bool dquote);
-int			add_exp_var(t_utils **utils, char *newstr, t_ms *ms);
+int		add_exp_var(t_utils **utils, char *newstr, t_ms *ms);
 
 // unset
-int			remove_env(t_ms *ms, int i, int x, int y);
-int			remove_exp(t_ms *ms, int i, int x, int y);
-int			unset(t_utils *utils, char **arg, t_ms *ms);
-void		unset_exp(t_ms *ms, char **arg, int j, int i);
-void		unset_env(t_utils *utils, char **arg, t_ms *ms);
+int		remove_env(t_ms *ms, int i, int x, int y);
+int		remove_exp(t_ms *ms, int i, int x, int y);
+int		unset(t_utils *utils, char **arg, t_ms *ms);
+void	unset_exp(t_ms *ms, char **arg, int j, int i);
+void	unset_env(t_utils *utils, char **arg, t_ms *ms);
 
 // env
-int			env(t_utils *utils, char **noio_arg);
-int			change_var(char ***array, char *env_name, char *newstr, t_ms *ms);
+int		env(t_utils *utils, char **noio_arg);
+int		change_var(char ***array, char *env_name, char *newstr, t_ms *ms);
 
 // pwd
-int			pwd(t_utils *utils);
-int			update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd, t_ms *ms);
-int			update_pwd_oldpwd_env(t_utils *utils, char *cwd, t_ms *ms);
+int		pwd(t_utils *utils);
+int		update_pwd_oldpwd_env_exp(t_utils *utils, t_ms *ms, char cwd[4096]);
+int		update_pwd_oldpwd_env(t_utils *utils, char *cwd, t_ms *ms);
 
 // cd
-int			cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms);
+int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms);
 
 // exit
-int			exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
+int		exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
 
 // echo
-int			echo_builtin(char **noio_args, t_utils *utils);
+int		echo_builtin(char **noio_args, t_utils *utils);
 
 //MS SPLIT
 
@@ -195,9 +194,9 @@ char	*remove_quote(char *str, int i, int x, t_ms *ms);
 int		quote_count(char *str);
 
 //HELPER
-void		ft_nullfree(char **str);
-int			is_only_digits_and_signs(char *str);
-char		*ft_free_strjoin(char *s1, char *s2);
+void	ft_nullfree(char **str);
+int		is_only_digits_and_signs(char *str);
+char	*ft_free_strjoin(char *s1, char *s2);
 
 // UTILS
 void	malloc_check(char **str, t_ms *ms);

@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/11 18:37:38 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/12 16:33:41 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ int		echo_builtin(char **noio_args, t_utils *utils)
 	return (0);
 }
 
-//the max length of the folder name is 255 chars in macOS Mojave (or mkdir limit)
+//max length of the mkdir name is 255 chars in this OS
 int	update_pwd_oldpwd_env_exp(t_utils *utils, t_ms *ms, char cwd[4096])
 {
 	char	**export_args;
