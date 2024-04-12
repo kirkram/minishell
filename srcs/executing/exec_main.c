@@ -6,13 +6,14 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/11 18:36:55 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/12 17:31:44 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-//If there is absolute path (scmd starts with '/') then check only once then break
+//If there is absolute path (scmd starts with '/')
+//then check only once then break
 //otherwise look through env_paths and try to access
 char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms)
 {
@@ -72,7 +73,7 @@ char	**find_path_and_pwd(char **envp, char *scmd, t_ms *ms)
 	return (vars.paths);
 }
 
-int	exec_redirections_out(t_pipe *_pipe_i, int (*fd)[2], int j, int *has_fd_failed)
+int	exec_redirections_out(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed)
 {
 	if (_pipe_i->tokens[j] == SKIP_OUT)
 	{
@@ -88,12 +89,12 @@ int	exec_redirections_out(t_pipe *_pipe_i, int (*fd)[2], int j, int *has_fd_fail
 		ft_putstr_fd("minishell: ", 2);
 		ft_putstr_fd(_pipe_i->args[j], 2);
 		ft_putendl_fd(": Permission denied", 2);
-		*has_fd_failed = 1;
+		*fd_failed = 1;
 		return (1);
 	}
 	return (0);
 }
-int	exec_redirections_in(t_pipe *_pipe_i, int (*fd)[2], int j, int *has_fd_failed)
+int	exec_redirections_in(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed)
 {
 	if (_pipe_i->tokens[j] == IN_FD)
 		(*fd)[0] = open (_pipe_i->args[j], O_RDONLY);
@@ -108,7 +109,7 @@ int	exec_redirections_in(t_pipe *_pipe_i, int (*fd)[2], int j, int *has_fd_faile
 			ft_putendl_fd(": No such file or directory", 2);
 		else if (access(_pipe_i->args[j], R_OK) == -1)
 			ft_putendl_fd(": Permission denied", 2);
-		*has_fd_failed = 1;
+		*fd_failed = 1;
 		return (1);
 	}
 	return (0);
@@ -117,28 +118,28 @@ int	exec_redirections_in(t_pipe *_pipe_i, int (*fd)[2], int j, int *has_fd_faile
 //OPEN INFILE, OPEN/CREATE OUTFILE AND TRY TO ACCESS
 int	exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2])
 {
-	int	has_fd_failed;
+	int	fd_failed;
 	int	*tokens;
 	int	j;
 
 	tokens = _pipe_i->tokens;
-	has_fd_failed = 0;
+	fd_failed = 0;
 	j = 0;
 	while(_pipe_i->args[j] && tokens[j] != 0)
 	{
 		if (tokens[j] == SKIP_IN || tokens[j] == IN_FD || tokens[j] == IN_HD)
 		{
-			if (exec_redirections_in(_pipe_i, fd, j, &has_fd_failed) == 1)
+			if (exec_redirections_in(_pipe_i, fd, j, &fd_failed) == 1)
 				break ;
 		}
 		else if (tokens[j] == SKIP_OUT || tokens[j] == OUT || tokens[j] == OUT_AP)
 		{
-			if (exec_redirections_out(_pipe_i, fd, j, &has_fd_failed) == 1)
+			if (exec_redirections_out(_pipe_i, fd, j, &fd_failed) == 1)
 				break ;
 		}
 		j ++;
 	}
-	return (has_fd_failed);
+	return (fd_failed);
 }
 
 void	dup_and_close_child_process(int i, t_exec *xx)
@@ -284,9 +285,9 @@ int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 			break;
 		xx.fd[0] = -1;
 		xx.fd[1] = -2;
-		xx.has_fd_failed = 0;
-		xx.has_fd_failed = exec_assign_redirections(ms->pipe[i], &xx.fd);
-		if (xx.has_fd_failed)
+		xx.fd_failed = 0;
+		xx.fd_failed = exec_assign_redirections(ms->pipe[i], &xx.fd);
+		if (xx.fd_failed)
 		{
 			close(xx.fd[0]);
 			close(xx.fd[1]);
@@ -296,13 +297,13 @@ int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 		}
 		if (i != xx.num_of_pipes - 1)
 			pipe(xx.pipefd);
-		if (!xx.has_fd_failed && _pipe[i]->tokens && _pipe[i]->tokens[0] != BUILTIN)
+		if (!xx.fd_failed && _pipe[i]->tokens && _pipe[i]->tokens[0] != BUILTIN)
 			exec_child_system_function(_pipe, utils, i, &xx);
-		else if (!xx.has_fd_failed && _pipe[1] && _pipe[i]->tokens[0] == BUILTIN)
+		else if (!xx.fd_failed && _pipe[1] && _pipe[i]->tokens[0] == BUILTIN)
 			exec_child_builtin_function(ms, i, &xx);
-		else if (!xx.has_fd_failed && !_pipe[1])
+		else if (!xx.fd_failed && !_pipe[1])
 			exec_builtin_no_pipes(ms, i, &xx);
-		else if (xx.has_fd_failed)
+		else if (xx.fd_failed)
 			exec_fd_fail_pass_pipe(_pipe, i, &xx);
 		i ++;
 	}
@@ -338,7 +339,7 @@ int	waitpid_and_close_exec(t_ms *ms, t_exec *xx)
 	close(xx->savestdio[1]);
 	if (g_signal == 130 && ft_putstr_fd("\n", STDOUT_FILENO) != -42)
 		return (130);
-	else if (WIFEXITED(child_exit_code) && !xx->has_fd_failed && \
+	else if (WIFEXITED(child_exit_code) && !xx->fd_failed && \
 	!(ms->pipe[0]->tokens[0] == BUILTIN && !ms->pipe[1]))
 		return (WEXITSTATUS(child_exit_code));
 	else
