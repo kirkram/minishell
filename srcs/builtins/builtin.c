@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/11 12:52:40 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/11 18:37:38 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,20 +48,18 @@ int		echo_builtin(char **noio_args, t_utils *utils)
 	}
 	while (noio_args[i])
 	{
-		if (ft_putstr_fd(noio_args[i], 1) == -1)
-			return (2);
+		ft_putstr_fd(noio_args[i], 1);
 		if (noio_args[i + 1])
-			if (!write(1, " ", 1))
-				return (2);
+			write(1, " ", 1);
 		i ++;
 	}
 	if (is_newlined)
-		if (!write(1, "\n", 1))
-			return (2);
+		write(1, "\n", 1);
 	return (0);
 }
 
-int	update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd, t_ms *ms)
+//the max length of the folder name is 255 chars in macOS Mojave (or mkdir limit)
+int	update_pwd_oldpwd_env_exp(t_utils *utils, t_ms *ms, char cwd[4096])
 {
 	char	**export_args;
 
@@ -69,107 +67,112 @@ int	update_pwd_oldpwd_env_exp(t_utils *utils, char *cwd, t_ms *ms)
 	if (!export_args)
 		malloc_check(NULL, ms);
 	export_args[0] = ft_strdup("export");
-	malloc_check(&export_args[0], ms);
+	if (!export_args[0])
+		malloc_check(NULL, ms);
 	export_args[1] = ft_strjoin("OLDPWD=", cwd);
-	malloc_check(&export_args[1], ms);
-	getcwd(cwd, 4095);
+	if (!export_args[1])
+		malloc_check(NULL, ms);
+	getcwd(cwd, 4096);
 	export_args[2] = ft_strjoin("PWD=", cwd);
-	malloc_check(&export_args[2], ms);
+	if (!export_args[2])
+		malloc_check(NULL, ms);
 	export_args[3] = NULL;
 	export(utils, export_args, ms);
 	ft_arrfree(export_args);
 	return (0);
 }
-
-//should not work if you have a pipe!
-//also the output of the cd command doesnt get redirected to the outfile
-//i guess becuase its just stderr
-// cd ./testfiles/ ; echo "hehe" will not change dir
-// cd ./testfiles/folder_no_x/ | echo "hehe" will print an error as usual
-int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms)
+char	*find_home_env(t_utils *utils)
 {
-	int		i;
 	char	*home_path;
-	//char	*pwd;
-	char	cwd[4096]; //windows limit is 32767, usually 4096 for unix
-	DIR		*directory;
+	int		i;
 
-
-	char **noio_args;
-	home_path = NULL;
-	//pwd = NULL;
-	i = 0;
-	noio_args = (_pipe)[index]->noio_args;
-
-	while (utils->envp[i])
+	i = -1;
+	while (utils->envp[++i])
 	{
 		if (!ft_strncmp(utils->envp[i], "HOME=", 5))
-			home_path = utils->envp[i] + 5;
-		i ++;
-	}
-	getcwd(cwd, 4095);
-	if (!noio_args[1] || !ft_strncmp(noio_args[1], "~", -1))
-	{
-		//this condition is needed to check if there is a pipe in the pipeline
-		if (chdir(home_path) == -1)
 		{
-			directory = opendir(home_path);
-			if (access(home_path, F_OK) == -1)
-			{
-				ft_putstr_fd("minishell: cd: ", 2);
-				ft_putendl_fd("HOME not set", 2);
-			}
-			else if (access(home_path, X_OK) == -1)
-			{
-				ft_putstr_fd("minishell: cd: ", 2);
-				ft_putstr_fd(home_path, 2);
-				ft_putendl_fd(": Permission denied", 2);
-			}
-			if (directory)
-				closedir(directory);
-			return (2);
+			home_path = utils->envp[i] + 5;
+			return (home_path);
 		}
-		update_pwd_oldpwd_env_exp(utils, cwd, ms);
+	}
+	return (NULL);
+}
+int	cd_home_chdir_fail(char *home_path, t_utils *utils)
+{
+	if (access(home_path, F_OK) == -1 && !find_home_env(utils))
+	{
+		ft_putstr_fd("minishell: cd: ", 2);
+		ft_putendl_fd("HOME not set", 2);
+	}
+	else if (access(home_path, F_OK) == -1)
+	{
+		ft_putstr_fd("minishell: cd: ", 2);
+		ft_putstr_fd(home_path, 2);
+		ft_putendl_fd(": Not a directory", 2);
+	}
+	else if (access(home_path, X_OK) == -1)
+	{
+		ft_putstr_fd("minishell: cd: ", 2);
+		ft_putstr_fd(home_path, 2);
+		ft_putendl_fd(": Permission denied", 2);
+	}
+	free (home_path);
+	return (1);
+}
+int	cd_chdir_fail(t_pipe **_pipe, int index)
+{
+	DIR		*directory;
+
+	directory = opendir((_pipe)[index]->noio_args[1]);
+	if (access((_pipe)[index]->noio_args[1], F_OK) == -1)
+	{
+		ft_putstr_fd("minishell: cd: ", 2);
+		ft_putstr_fd((_pipe)[index]->noio_args[1], 2);
+		ft_putendl_fd(": No such file or directory", 2);
+	}
+	else if (!directory)
+	{
+		ft_putstr_fd("minishell: cd: ", 2);
+		ft_putstr_fd((_pipe)[index]->noio_args[1], 2);
+		ft_putendl_fd(": Not a directory", 2);
+	}
+	else if (access((_pipe)[index]->noio_args[1], X_OK) == -1)
+	{
+		ft_putstr_fd("minishell: cd: ", 2);
+		ft_putstr_fd((_pipe)[index]->noio_args[1], 2);
+		ft_putendl_fd(": Permission denied", 2);
+	}
+	if (directory)
+		closedir(directory);
+	return (1);
+}
+int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms)
+{
+	char	*home_path;
+	char	cwd[4096];
+
+	home_path = find_home_env(utils);
+	getcwd(cwd, 4096);
+	if (!(_pipe)[index]->noio_args[1] || !ft_strncmp((_pipe)[index]->noio_args[1], "~", 1))
+	{
+		if ((_pipe)[index]->noio_args[1] && !ft_strncmp((_pipe)[index]->noio_args[1], "~", 1))
+			home_path = jointhree(home_path, ft_strchr((_pipe)[index]->noio_args[1], '~') + 1, "/");
+		if (chdir(home_path) == -1)
+			return (cd_home_chdir_fail(home_path, utils));
 	}
 	else
 	{
-		if (chdir(noio_args[1]) == -1)
-		{
-			directory = opendir(noio_args[1]);
-			if (access(noio_args[1], F_OK) == -1)
-			{
-				ft_putstr_fd("minishell: cd: ", 2);
-				ft_putstr_fd(noio_args[1], 2);
-				ft_putendl_fd(": No such file or directory", 2);
-			}
-			else if (!directory)
-			{
-				ft_putstr_fd("minishell: cd: ", 2);
-				ft_putstr_fd(noio_args[1], 2);
-				ft_putendl_fd(": Not a directory", 2);
-			}
-			else if (access(noio_args[1], X_OK) == -1)
-			{
-				ft_putstr_fd("minishell: cd: ", 2);
-				ft_putstr_fd(noio_args[1], 2);
-				ft_putendl_fd(": Permission denied", 2);
-				closedir(directory);
-				return (127);
-			}
-			if (directory)
-				closedir(directory);
-			return (1);
-		}
-		update_pwd_oldpwd_env_exp(utils, cwd, ms);
+		if (chdir((_pipe)[index]->noio_args[1]) == -1)
+			return (cd_chdir_fail(_pipe, index));
 	}
-	//
+	update_pwd_oldpwd_env_exp(utils, ms, cwd);
 	return (0);
 }
 
 int	exit_builtin(t_pipe **_pipe, t_utils *utils, int i)
 {
 	(void)utils;
-	if (_pipe[1]) //if there is a pipe
+	if (_pipe[1])
 		return (0);
 	else if (!_pipe[i]->args[1])
 	{
