@@ -6,81 +6,59 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 18:44:51 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/09 23:30:07 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/10 19:06:19 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-//void	env_loop(char **str, char **new_str, int *start, int *i)
-void	env_loop(t_ms *ms, int *start, int *i)
+void	env_loop(t_ms *ms, int *start, int *i, char **str)
 {
 	{
 		if (!ms->temp)
-			ms->temp = ft_substr(ms->line, (*start), (*i));
+			ms->temp = ft_substr((*str), (*start), (*i));
 		else
-			combine_str(&ms->temp, ft_substr(ms->line, (*start), (*i) - (*start)));
+			combine_str(&ms->temp,
+				ft_substr((*str), (*start), (*i) - (*start)));
 		malloc_check(&ms->temp, ms);
 		(*i)++;
 		(*start) = (*i);
-		while (ms->line[(*i)] && ms->line[(*i)] != ' ' && ms->line[(*i)] != '\0'
-			&& ms->line[(*i)] != '$' && ms->line[(*i)] != '\'' && ms->line[(*i)]
-			!= '\"' && ms->line[(*i) - 1] != '?' && ms->line[(*i)] != '/'
-			&& ms->line[(*i)] != ':')
+		while ((*str)[(*i)] && (*str)[(*i)] != ' ' && (*str)[(*i)] != '\0'
+			&& (*str)[(*i)] != '$' && (*str)[(*i)] != '\'' && (*str)[(*i)]
+			!= '\"' && (*str)[(*i) - 1] != '?' && (*str)[(*i)] != '/'
+			&& (*str)[(*i)] != ':')
 			(*i)++;
 	}
 }
 
-/* //void	env_loop2(char **temp, char **new_str, t_utils *utils, char **str)
-void	env_loop2(t_ms *ms)
+void	env_util(t_ms *ms, int start, int i, char **str)
 {
-	combine_str(new_str, get_variable((*temp),
-			utils->envp, utils->err_code));
-	if (!(*new_str))
-	{
-		if (temp)
-			free (temp);
-		lex_merror(utils, str);
-	//	malloc_error (1);
-	}
-} */
-
-//void	env_util(char **new_str, char **str, int start, int i)
-void	env_util(t_ms *ms, int start, int i)
-{
-	//printf("is this the place?\n");
-	combine_str(&ms->temp, ft_substr(ms->line, start, i - start));
+	combine_str(&ms->temp, ft_substr((*str), start, i - start));
 	malloc_check(&ms->temp, ms);
-	ms->line = ft_strdup(ms->temp);
-	malloc_check(&ms->line, ms);
+	ft_nullfree (str);
+	(*str) = ft_strdup(ms->temp);
+	malloc_check(str, ms);
 	ft_nullfree(&ms->temp);
 }
 
-//void	env_variable(char **str, t_utils *utils, bool quote, bool dquote)
-void	env_variable(t_ms *ms, bool quote, bool dquote)
+void	env_variable(t_ms *ms, bool quote, bool dquote, char **str)
 {
 	int		start;
-	//char	*new_str;
-	//char	*temp;
 	int		i;
 
 	i = 0;
-	//temp = NULL;
-	//new_str = NULL;
 	start = 0;
-	while (ms->line && ms->line[i])
+	while ((*str) && (*str)[i])
 	{
-		quote_status2(&quote, &dquote, ms->line[i]);
-		if (ms->line[i] == '$' && quote == false && ms->line[i +1]
-			&& ms->line[i +1] != ' ' && ms->line[i +1] != '$'
-			&& (!(dquote == true && (ms->line[i +1] == '\''
-			|| ms->line[i +1] == '\"' || ms->line[i +1] == ' '))))
+		quote_status2(&quote, &dquote, (*str)[i]);
+		if ((*str)[i] == '$' && quote == false && (*str)[i +1]
+			&& (*str)[i +1] != ' ' && (*str)[i +1] != '$'
+			&& (!(dquote == true && ((*str)[i +1] == '\''
+			|| (*str)[i +1] == '\"' || (*str)[i +1] == ' '))))
 		{
-			//env_loop(str, &new_str, &start, &i); // to do
-			env_loop(ms, &start, &i);
-			ms->temp2 = ft_substr(ms->line, start, i - start);
+			env_loop(ms, &start, &i, str);
+			ms->temp2 = ft_substr((*str), start, i - start);
 			malloc_check(&ms->temp2, ms);
-			//env_loop2(&temp, &new_str, utils, str);
 			combine_str(&ms->temp, get_variable(ms));
 			malloc_check(&ms->temp, ms);
 			start = i;
@@ -89,11 +67,9 @@ void	env_variable(t_ms *ms, bool quote, bool dquote)
 			i++;
 	}
 	if (ms->temp)
-		env_util(ms, start, i);
-		//env_util(&new_str, str, start, i);
+		env_util(ms, start, i, str);
 }
 
-//char	*get_variable(char *temp, char **envp, int err_code)
 char	*get_variable(t_ms *ms)
 {
 	int		i;

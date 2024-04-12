@@ -8,13 +8,13 @@ SRCS = \
  ./srcs/parsing/lexer.c ./srcs/parsing/lexer2.c ./srcs/parsing/parse.c \
  ./srcs/parsing/parsing.c ./srcs/parsing/ms_split.c ./srcs/parsing/parsing_utils.c \
  ./srcs/parsing/here_doc.c ./srcs/parsing/syntax_check.c ./srcs/parsing/parse_env.c \
- ./srcs/parsing/ms_split_utils.c ./srcs/parsing/tokens.c ./srcs/parsing/parsing_init.c \
- ./srcs/parsing/error_free.c \
+ ./srcs/parsing/tokens.c ./srcs/parsing/parsing_init.c \
  ./srcs/initializing/init_main.c \
  ./srcs/signal/signal.c \
  ./srcs/executing/exec_main.c \
  ./lib/get_next_line/get_next_line.c ./lib/get_next_line/get_next_line_utils.c \
- ./srcs/builtins/env_builtin.c ./srcs/builtins/builtin.c  \
+ ./srcs/builtins/env.c ./srcs/builtins/builtin.c ./srcs/builtins/export.c \
+ ./srcs/builtins/export_utils.c ./srcs/builtins/unset.c \
  ./srcs/utils/malloc_error.c
 OBJCTS = $(SRCS:.c=.o)
 RM = rm -f
@@ -43,9 +43,8 @@ clean:
 fclean: clean
 	make -C $(LIBFT_PATH) fclean
 	$(RM) $(NAME)
-	$(RM) debug.out
 	$(RM) .debug
-	$(RM) -r debug.out.dSYM
+	$(RM) -r minishell.dSYM
 
 
 re: fclean all

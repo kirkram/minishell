@@ -38,19 +38,11 @@ void	quote_status(bool *quote)
 		(*quote) = false;
 }
 
+// TO BE DELETED
 void	malloc_error(int err)
 {
 	ft_putendl_fd("minishell: Malloc failed", 2);
 	exit(err);
-}
-
-void	malloc_error2(char **str)
-{
-	if (!(*str))
-	{
-		ft_putendl_fd("Malloc failed", 2);
-		exit(1);
-	}
 }
 
 int	get_token(char *str)
@@ -118,14 +110,4 @@ char	*ft_free_strjoin(char *s1, char *s2)
 	free (s1);
 	free (s2);
 	return (str);
-}
-
-void ft_nullfree(char **str)
-{
-	if (*str)
-	{
-		free (*str);
-		(*str) = NULL;
-	}
-
 }

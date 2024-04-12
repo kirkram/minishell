@@ -195,10 +195,10 @@ void	free_pipes_utils_and_exit(t_pipe ***_pipe, t_utils **utils, int child_exit_
 			free((*_pipe)[i]);
 			i ++;
 		}
-	}
-	if (*_pipe && (*_pipe)[i])
 		free((*_pipe)[i]);
-	(*_pipe) = NULL;
+		free(*_pipe);
+		(*_pipe) = NULL;
+	}
 	if (utils && *utils)
 	{
 		ft_arrfree((*utils)->envp);
@@ -361,9 +361,9 @@ int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms)
 			return (0);
 	}
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "unset", -1))
-			return (unset(utils, (_pipe)[i]->noio_args));
+			return (unset(utils, (_pipe)[i]->noio_args, ms));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "env", -1))
-		return (env(utils));
+		return (env(utils, (_pipe)[i]->noio_args));
 	else if (!ft_strncmp((_pipe)[i]->noio_args[0], "exit", -1))
 		return (exit_builtin(_pipe, utils, i));
 	return (42);
