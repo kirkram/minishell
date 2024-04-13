@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/13 15:55:12 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/13 16:21:19 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,13 +119,13 @@ void	final_args(t_pipe *pipe, int i, t_ms *ms);
 void	remove_red(t_pipe *pipe, int i, t_ms *ms);
 
 // LEXER/PARSER UTILS
-int			is_builtin(char *str);
-int			syntax_err(char **array, int *err_code, int i);
-void		malloc_error(int err); // DELETE ONCE NOT IN USE AT EXECUTING
-void		quote_status2(bool *quote, bool *dquote, char c);
-void		quote_status(bool *quote);
-int			not_ms(char **array, int *err_code, int i);
-int			pipe_error(int *tokens, int *err_code, int i);
+int		is_builtin(char *str);
+int		syntax_err(char **array, int *err_code, int i);
+void	malloc_error(int err); // DELETE ONCE NOT IN USE AT EXECUTING
+void	quote_status2(bool *quote, bool *dquote, char c);
+void	quote_status(bool *quote);
+int		not_ms(char **array, int *err_code, int i);
+int		pipe_error(int *tokens, int *err_code, int i);
 
 //EXECUTE
 char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms);
@@ -140,9 +140,8 @@ int		free_and_1(char **paths, int **end);
 int		exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2]);
 int		exec_redir_in(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed);
 int		exec_redir_out(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed);
-void	free_pipes_utils_and_exit(t_pipe ***_pipe, t_utils **utils, int child_exit_code);
 int		waitpid_and_close_exec(t_ms *ms, t_exec *xx);
-void	exec_child_system_function(t_pipe **_pipe, t_utils *utils, int i, t_exec *xx);
+void	exec_child_system_function(t_ms *ms, int i, t_exec *xx);
 void	exec_child_builtin_function(t_ms *ms, int i, t_exec *xx);
 void	exec_builtin_no_pipes(t_ms *ms, int i, t_exec *xx);
 void	exec_fd_fail_pass_pipe(t_pipe **_pipe, int i, t_exec *xx);
@@ -199,13 +198,13 @@ char	**free_reverse(int i, char **array);
 char	*remove_quote(char *str, int i, int x, t_ms *ms);
 int		quote_count(char *str);
 
-//HELPER
+//UTILS
 void	ft_nullfree(char **str);
 int		is_only_digits_and_signs(char *str);
 char	*ft_free_strjoin(char *s1, char *s2);
-
-// UTILS
 void	malloc_check(char **str, t_ms *ms);
+void	free_and_exit(t_pipe ***_pipe, t_utils **utils, t_ms *ms, int ex_code);
+
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2
@@ -213,11 +212,11 @@ void	malloc_check(char **str, t_ms *ms);
 # define IN_HD 4 // Should bee the FD to read from using Here_doc
 # define OUT 5 // Output should go here
 # define OUT_AP 6 // output should go here and append
-# define SKIP_IN 7 // should be read and error given if unable to / but info not passed on
+# define SKIP_IN 7 // read and error given if unable to / but data not passed on
 # define BUILTIN 8 // builtin functions made by us
 # define REMOVE 9
 # define SKIP_OUT 10 // should be created, but no information written to it
-# define SKIP_HD 11 // should activate Here_doc, but information should not be passed on
+# define SKIP_HD 11 // activate Here_doc, but data should not be passed on
 # define NOT_MS 12 // operator that is not implemented in minishell
 # define NOT_DEF 13 // undefined token
 

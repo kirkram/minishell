@@ -18,10 +18,10 @@ int	g_signal;
 
 int	main(int ac, char **av, char **sys_envp)
 {
+	int		ret;
 
 	(void)ac;
 	(void)av;
-	int		ret;
 	g_signal = 0;
 
 	signal_handler();
@@ -38,7 +38,6 @@ int	interactive_mode_loop(char **sys_envp)
 	ms.line = NULL;
 	ms.temp = NULL;
 	ms.temp2 = NULL;
-	//ft_bzero(ms.pipe, sizeof(t_pipe));
 	ms.pipe = NULL;
 	intialize_utils(sys_envp, &ms.utils, &ms);
 	while (1)
@@ -49,17 +48,19 @@ int	interactive_mode_loop(char **sys_envp)
 		{
 			i = -1;
 			while (ms.pipe[++i])
-				ms.pipe[i]->cmd_with_path = assign_scmd_path(ms.pipe[i]->noio_args[0], ms.utils->envp, &ms);
+				ms.pipe[i]->cmd_with_path = \
+				assign_scmd_path(ms.pipe[i]->noio_args[0], ms.utils->envp, &ms);
 			ms.utils->err_code = execute(ms.utils, ms.pipe, &ms);
 		}
-		free_pipes_utils_and_exit(&ms.pipe, NULL, -42);
+		free_and_exit(&ms.pipe, NULL, NULL, -42);
 	}
 	free (ms.line);
-	free_pipes_utils_and_exit(NULL, &ms.utils, -42);
+	ms.line = NULL;
+	free_and_exit(NULL, &ms.utils, &ms, -42);
 	return (0);
 }
 
-char *exp_init(char *str1, char *str2, t_ms *ms)
+char	*exp_init(char *str1, char *str2, t_ms *ms)
 {
 	int		i;
 	int		x;
@@ -72,7 +73,7 @@ char *exp_init(char *str1, char *str2, t_ms *ms)
 	temp = NULL;
 	temp = malloc(sizeof(char) * (ft_strlen(str1) + ft_strlen(str2) + 3));
 	malloc_check(&temp, ms);
-	while(str1[i])
+	while (str1[i])
 	{
 		temp[i] = str1[i];
 		i++;
@@ -100,7 +101,7 @@ char *exp_init(char *str1, char *str2, t_ms *ms)
 	return (temp);
 }
 
-char *rl_gets(char *line_read, t_utils *utils)
+char	*rl_gets(char *line_read, t_utils *utils)
 {
 	int	savestdio;
 
@@ -112,8 +113,7 @@ char *rl_gets(char *line_read, t_utils *utils)
 	}
 	g_signal = 0;
 	line_read = readline(YEL"MINISHELL-0.7$ "CRESET);
-	if (!
-	line_read && g_signal != 130)
+	if (!line_read && g_signal != 130)
 	{
 		ft_putendl_fd("exit", STDOUT_FILENO);
 		exit (utils->err_code);

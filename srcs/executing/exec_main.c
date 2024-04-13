@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/13 15:58:30 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/13 16:20:50 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,53 +50,28 @@ void	pipe_readend_and_close_parent(int i, t_pipe **_pipe, t_exec *xx)
 	close(xx->fd[1]);
 }
 
-//if exit code is -42 then it doesn't exit
-void	free_pipes_utils_and_exit(t_pipe ***_pipe, t_utils **utils, int child_exit_code)
+void	exec_child_system_function(t_ms *ms, int i, t_exec *xx)
 {
-	int i;
+	t_pipe	**ppe;
+	t_utils	*utils;
 
-	i = 0;
-	if (_pipe && *_pipe)
-	{
-		while ((*_pipe)[i])
-		{
-			ft_arrfree((*_pipe)[i]->args);
-			ft_arrfree((*_pipe)[i]->noio_args);
-			free((*_pipe)[i]->tokens);
-			free((*_pipe)[i]->cmd_with_path);
-			free((*_pipe)[i]);
-			i ++;
-		}
-		free((*_pipe)[i]);
-		free(*_pipe);
-		(*_pipe) = NULL;
-	}
-	if (utils && *utils)
-	{
-		ft_arrfree((*utils)->envp);
-		ft_arrfree((*utils)->export);
-	}
-	if (child_exit_code != -42)
-		exit (child_exit_code);
-}
-
-void	exec_child_system_function(t_pipe **_pipe, t_utils *utils, int i, t_exec *xx)
-{
+	ppe = ms->pipe;
+	utils = ms->utils;
 	xx->pid[i] = fork();
 	if (xx->pid[i] == 0)
 	{
 		dup_and_close_child_process(i, xx);
-		if ((_pipe)[i]->cmd_with_path != NULL)
+		if ((ppe)[i]->cmd_with_path != NULL)
 		{
-			execve((_pipe)[i]->cmd_with_path, (_pipe)[i]->noio_args, utils->envp);
-			utils->err_code = handle_execve_errors((_pipe)[i]->cmd_with_path);
+			execve((ppe)[i]->cmd_with_path, (ppe)[i]->noio_args, utils->envp);
+			utils->err_code = handle_execve_errors((ppe)[i]->cmd_with_path);
 		}
-		else if ((_pipe)[i]->noio_args[0])
-			utils->err_code = handle_execve_errors((_pipe)[i]->noio_args[0]);
-		free_pipes_utils_and_exit(&_pipe, &utils, utils->err_code);
+		else if ((ppe)[i]->noio_args[0])
+			utils->err_code = handle_execve_errors((ppe)[i]->noio_args[0]);
+		free_and_exit(&ppe, &utils, ms, utils->err_code);
 	}
 	else
-		pipe_readend_and_close_parent(i, _pipe, xx);
+		pipe_readend_and_close_parent(i, ppe, xx);
 }
 
 void	exec_child_builtin_function(t_ms *ms, int i, t_exec *xx)
@@ -106,13 +81,13 @@ void	exec_child_builtin_function(t_ms *ms, int i, t_exec *xx)
 	{
 		dup_and_close_child_process(i, xx);
 		ms->utils->err_code = exec_builtin(ms->pipe, ms->utils, i, ms);
-		free_pipes_utils_and_exit(&ms->pipe, &ms->utils, ms->utils->err_code);
+		free_and_exit(&ms->pipe, &ms->utils, ms, ms->utils->err_code);
 	}
 	else
 		pipe_readend_and_close_parent(i, ms->pipe, xx);
 }
 
-void exec_builtin_no_pipes(t_ms *ms, int i, t_exec *xx)
+void	exec_builtin_no_pipes(t_ms *ms, int i, t_exec *xx)
 {
 	if (xx->fd[0] > -1)
 		dup2(xx->fd[0], STDIN_FILENO);
@@ -153,7 +128,7 @@ int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 	while (i < xx.num_of_pipes && i < 256)
 	{
 		if (g_signal == 130)
-			break;
+			break ;
 		xx.fd[0] = -1;
 		xx.fd[1] = -2;
 		xx.fd_failed = 0;
@@ -169,7 +144,7 @@ int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 		if (i != xx.num_of_pipes - 1)
 			pipe(xx.pipefd);
 		if (!xx.fd_failed && _pipe[i]->tokens && _pipe[i]->tokens[0] != BUILTIN)
-			exec_child_system_function(_pipe, utils, i, &xx);
+			exec_child_system_function(ms, i, &xx);
 		else if (!xx.fd_failed && _pipe[1] && _pipe[i]->tokens[0] == BUILTIN)
 			exec_child_builtin_function(ms, i, &xx);
 		else if (!xx.fd_failed && !_pipe[1])
