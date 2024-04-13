@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/13 16:21:19 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/13 18:01:45 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 # include <dirent.h>
 
 extern int	g_signal;
-
 
 typedef struct s_paths
 {
@@ -70,6 +69,7 @@ typedef struct s_exec
 	int		num_of_pipes;
 	int		fd_failed;
 	int		i;
+	int		child_exit_code;
 }	t_exec;
 
 // SIGNAL
@@ -84,6 +84,7 @@ char	*rl_gets(char *line_read, t_utils *utils);
 void	copy_utils_change_shellvars(char **sys_envp, t_utils **ut, t_ms *ms);
 char	*init_exp(char *str1, char *str2, t_ms *ms);
 char	*shell_level(char *str, t_ms *ms);
+char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms);
 
 // LEXER
 int		check_quote(char **str, bool quote, bool dquote, int *err_code);
@@ -128,14 +129,12 @@ int		not_ms(char **array, int *err_code, int i);
 int		pipe_error(int *tokens, int *err_code, int i);
 
 //EXECUTE
-char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms);
 int		execute(t_utils *utils, t_pipe **_pipe, t_ms *ms);
+int		execute_loop(t_utils *utils, t_pipe **_pipe, t_ms *ms, t_exec *xx);
 char	*jointhree(char const *s1, char const *s2, char const *s3);
 int		handle_execve_errors(char *failed_cmd);
 int		msg_stderr(char *message, char *cmd, int err_code);
 char	**find_path_and_pwd(char **envp, char *scmd, t_ms *ms);
-int		user_cmd_path(char **args, char *arg_cmd, char **paths);
-void	delete_pwd_path(char **paths);
 int		free_and_1(char **paths, int **end);
 int		exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2]);
 int		exec_redir_in(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed);
@@ -147,6 +146,7 @@ void	exec_builtin_no_pipes(t_ms *ms, int i, t_exec *xx);
 void	exec_fd_fail_pass_pipe(t_pipe **_pipe, int i, t_exec *xx);
 void	dup_and_close_child_process(int i, t_exec *xx);
 void	pipe_readend_and_close_parent(int i, t_pipe **_pipe, t_exec *xx);
+int		handle_execve_errors_dir(char *failed_cmd, DIR *dir);
 
 // BUILTINS
 int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms);
@@ -155,10 +155,6 @@ int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms);
 int		export(t_utils *utils, char **arg, t_ms *ms);
 void	print_exp(t_utils *utils, int fd);
 void	sort_export(t_utils *utils);
-//static int	print_exp_error(char *arg);
-//static int	export_error(char *arg);
-//static void	export_loop2(char *arg, t_ms *ms, int *i);
-//static void export_loop(char *arg, t_ms *ms, bool quote, bool dquote);
 int		add_exp_var(t_utils **utils, char *newstr, t_ms *ms);
 
 // unset
@@ -204,7 +200,7 @@ int		is_only_digits_and_signs(char *str);
 char	*ft_free_strjoin(char *s1, char *s2);
 void	malloc_check(char **str, t_ms *ms);
 void	free_and_exit(t_pipe ***_pipe, t_utils **utils, t_ms *ms, int ex_code);
-
+void	free_one_pipe(t_pipe *_pipe);
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2

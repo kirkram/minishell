@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:00:28 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/12 18:42:14 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/13 18:08:33 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 //If there is absolute path (scmd starts with '/')
 //then check only once then break
 //otherwise look through env_paths and try to access
-extern int	g_signal;
 
 char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms)
 {

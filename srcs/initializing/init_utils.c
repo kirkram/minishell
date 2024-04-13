@@ -6,13 +6,11 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:22:46 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/12 18:41:41 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/13 18:10:30 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-
-extern int	g_signal;
 
 void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms)
 {
@@ -78,8 +76,8 @@ char	*shell_level(char *str, t_ms *ms)
 	temp = NULL;
 	lvl = 0;
 	start = 0;
-	i = 0;
-	while (str[i])
+	i = -1;
+	while (str[++i])
 	{
 		if (str[i] >= '0' && str[i] <= '9')
 		{
@@ -93,7 +91,6 @@ char	*shell_level(char *str, t_ms *ms)
 			lvl++;
 			return (ft_free_strjoin(ft_substr(str, 0, start), ft_itoa(lvl)));
 		}
-		i++;
 	}
 	return (ft_strdup(str));
 }

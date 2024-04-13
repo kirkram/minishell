@@ -6,19 +6,11 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/13 15:57:47 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/13 17:49:01 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-
-
-/*
-env name in the format of [NAME]=
-will strjoin the env name and the newstr
-returns -1 on malloc fail
-*/
-extern int g_signal;
 
 int	pwd(t_utils *utils)
 {
@@ -31,7 +23,7 @@ int	pwd(t_utils *utils)
 	return (0);
 }
 
-int		echo_builtin(char **noio_args, t_utils *utils)
+int	echo_builtin(char **noio_args, t_utils *utils)
 {
 	int	i;
 	int	is_newlined;
@@ -82,13 +74,10 @@ int	update_pwd_oldpwd_env_exp(t_utils *utils, t_ms *ms, char cwd[4096])
 	return (0);
 }
 
-
 int	exit_builtin(t_pipe **_pipe, t_utils *utils, int i)
 {
 	(void)utils;
-	if (_pipe[1])
-		return (0);
-	else if (!_pipe[i]->args[1])
+	if (!_pipe[i]->args[1])
 	{
 		ft_putendl_fd("exit", 1);
 		exit(0);
@@ -113,5 +102,3 @@ int	exit_builtin(t_pipe **_pipe, t_utils *utils, int i)
 		exit(ft_atoi(_pipe[i]->args[1]));
 	}
 }
-
-

@@ -7,7 +7,8 @@ DEBUGFLAGS = -g -fsanitize=address,undefined,integer
 SRCS = \
  ./srcs/builtins/builtin.c ./srcs/builtins/cd_builtin.c ./srcs/builtins/env.c \
  ./srcs/builtins/export.c ./srcs/builtins/export_utils.c ./srcs/builtins/unset.c \
- ./srcs/executing/exec_main.c ./srcs/executing/exec_redir.c \
+ ./srcs/executing/exec_main.c ./srcs/executing/exec_redir.c ./srcs/executing/exec_execve_1.c \
+ ./srcs/executing/exec_execve_2.c ./srcs/executing/exec_builtins.c \
  ./srcs/initializing/init_findpath.c ./srcs/initializing/init_main.c ./srcs/initializing/init_utils.c \
  ./srcs/parsing/here_doc.c  ./srcs/parsing/lexer.c ./srcs/parsing/lexer2.c \
  ./srcs/parsing/ms_split.c ./srcs/parsing/parse_env.c \
