@@ -5,17 +5,16 @@ CFLAGS = -Wall -Wextra -Werror
 HEADERS	= -I ./include -L/usr/local/lib -L${HOME}/.brew/opt/readline/lib -I/usr/local/include #-lreadline
 DEBUGFLAGS = -g -fsanitize=address,undefined,integer
 SRCS = \
- ./srcs/parsing/lexer.c ./srcs/parsing/lexer2.c ./srcs/parsing/parse.c \
- ./srcs/parsing/parsing.c ./srcs/parsing/ms_split.c ./srcs/parsing/parsing_utils.c \
- ./srcs/parsing/here_doc.c ./srcs/parsing/syntax_check.c ./srcs/parsing/parse_env.c \
- ./srcs/parsing/tokens.c ./srcs/parsing/parsing_init.c \
- ./srcs/initializing/init_main.c \
+ ./srcs/builtins/builtin.c ./srcs/builtins/cd_builtin.c ./srcs/builtins/env.c \
+ ./srcs/builtins/export.c ./srcs/builtins/export_utils.c ./srcs/builtins/unset.c \
+ ./srcs/executing/exec_main.c ./srcs/executing/exec_redir.c \
+ ./srcs/initializing/init_findpath.c ./srcs/initializing/init_main.c ./srcs/initializing/init_utils.c \
+ ./srcs/parsing/here_doc.c  ./srcs/parsing/lexer.c ./srcs/parsing/lexer2.c \
+ ./srcs/parsing/ms_split.c ./srcs/parsing/parse_env.c \
+ ./srcs/parsing/parse.c  ./srcs/parsing/parsing_init.c ./srcs/parsing/parsing_utils.c \
+ ./srcs/parsing/parsing.c ./srcs/parsing/syntax_check.c ./srcs/parsing/tokens.c \
  ./srcs/signal/signal.c \
- ./srcs/executing/exec_main.c \
- ./lib/get_next_line/get_next_line.c ./lib/get_next_line/get_next_line_utils.c \
- ./srcs/builtins/env.c ./srcs/builtins/builtin.c ./srcs/builtins/export.c \
- ./srcs/builtins/export_utils.c ./srcs/builtins/unset.c \
- ./srcs/utils/malloc_error.c
+ ./srcs/utils/malloc_error.c ./srcs/utils/utils.c  
 OBJCTS = $(SRCS:.c=.o)
 RM = rm -f
 
