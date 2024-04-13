@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/12 17:30:27 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/13 15:55:12 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ typedef struct s_paths
 	char	pwd[4096];
 	char	*bigpath;
 	char	**paths;
-	bool	should_skip_pwd;
+	bool	skip_pwd;
 }	t_paths;
 
 typedef struct s_pipe
@@ -76,14 +76,16 @@ typedef struct s_exec
 void	signal_handler(void);
 void	handle_sigint(int sig);
 void	handle_sigquit(int sig);
-// INIT
 
+// INIT
 void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms);
 int		interactive_mode_loop(char **envp);
 char	*rl_gets(char *line_read, t_utils *utils);
+void	copy_utils_change_shellvars(char **sys_envp, t_utils **ut, t_ms *ms);
+char	*init_exp(char *str1, char *str2, t_ms *ms);
+char	*shell_level(char *str, t_ms *ms);
 
 // LEXER
-
 int		check_quote(char **str, bool quote, bool dquote, int *err_code);
 int		lexer(t_ms *ms);
 void	env_variable(t_ms *ms, bool quote, bool dquote, char **str);
@@ -104,8 +106,8 @@ void	combine_str(char **new_str, char *temp);
 void	pipeline_init(char **array, t_pipe ***pipe, t_ms *ms);
 void	init_tokenarr(int **tokens, char **array, t_ms *ms);
 void	quote_remover(t_pipe *pipe, t_ms *ms);
-// PARSER
 
+// PARSER
 int		parsing(t_ms *ms);
 char	**get_cmd(char **cmds, int start, int end, t_ms *ms);
 void	pre_parse(char **array, t_pipe ***pipe, t_ms *ms);
@@ -136,7 +138,8 @@ int		user_cmd_path(char **args, char *arg_cmd, char **paths);
 void	delete_pwd_path(char **paths);
 int		free_and_1(char **paths, int **end);
 int		exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2]);
-int		exec_redirections_in(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed);
+int		exec_redir_in(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed);
+int		exec_redir_out(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed);
 void	free_pipes_utils_and_exit(t_pipe ***_pipe, t_utils **utils, int child_exit_code);
 int		waitpid_and_close_exec(t_ms *ms, t_exec *xx);
 void	exec_child_system_function(t_pipe **_pipe, t_utils *utils, int i, t_exec *xx);
@@ -177,6 +180,9 @@ int		update_pwd_oldpwd_env(t_utils *utils, char *cwd, t_ms *ms);
 
 // cd
 int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms);
+int		cd_home_chdir_fail(char *home_path, t_utils *utils);
+int		cd_chdir_fail(t_pipe **_pipe, int index);
+char	*find_home_env(t_utils *utils);
 
 // exit
 int		exit_builtin(t_pipe **_pipe, t_utils *utils, int i);

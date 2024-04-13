@@ -6,141 +6,12 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/12 17:31:44 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/13 15:58:30 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-//If there is absolute path (scmd starts with '/')
-//then check only once then break
-//otherwise look through env_paths and try to access
-char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms)
-{
-	char	**env_paths;
-	char	*cmd_path;
-	int		i;
-
-	if (!scmd || scmd[0] == '\0')
-		return (NULL);
-	env_paths = find_path_and_pwd(envp, scmd, ms);
-	if (!env_paths)
-		return (NULL);
-	i = -1;
-	while (env_paths[++i])
-	{
-		if (scmd[0] == '/')
-			cmd_path = ft_strdup(scmd);
-		else
-			cmd_path = jointhree(env_paths[i], "/", scmd);
-		if (access(cmd_path, F_OK) == 0 && access(cmd_path, X_OK) == 0 && \
-		free_and_1(env_paths, NULL))
-			return (cmd_path);
-		free (cmd_path);
-		if (scmd[0] == '/')
-			break ;
-	}
-	free_and_1(env_paths, NULL);
-	return (NULL);
-}
-//if there is a './' then skip adding pwd to the path
-char	**find_path_and_pwd(char **envp, char *scmd, t_ms *ms)
-{
-	t_paths	vars;
-
-	ft_bzero(&vars, sizeof(t_paths));
-	if (!ft_strnstr(scmd, "./", -1))
-		vars.should_skip_pwd = true;
-	while (envp[++vars.i])
-	{
-		if (ft_strncmp(envp[vars.i], "PATH=", 5) == 0)
-			vars.path = envp[vars.i] + 5;
-	}
-	getcwd(vars.pwd, 4096);
-	vars.bigpath = jointhree(vars.path, ":", vars.pwd);
-	if (vars.path)
-		malloc_check(&vars.bigpath, ms);
-	if (vars.bigpath && !vars.should_skip_pwd)
-		vars.paths = ft_split(vars.bigpath, ':');
-	else if (vars.path)
-		vars.paths = ft_split(vars.path, ':');
-	else if (!vars.should_skip_pwd)
-		vars.paths = ft_split(vars.pwd, ':');
-	free (vars.bigpath);
-	if(((vars.bigpath && !vars.should_skip_pwd) || (!vars.bigpath && vars.path) || \
-	(!vars.path && !vars.should_skip_pwd)) && !vars.paths)
-		malloc_check(vars.paths, ms);
-	return (vars.paths);
-}
-
-int	exec_redirections_out(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed)
-{
-	if (_pipe_i->tokens[j] == SKIP_OUT)
-	{
-		(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY, 0644);
-		close ((*fd)[1]);
-	}
-	else if (_pipe_i->tokens[j] == OUT)
-		(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY | O_TRUNC, 0644);
-	else if (_pipe_i->tokens[j] == OUT_AP)
-		(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY | O_APPEND, 0644);
-	if ((*fd)[1] < 0)
-	{
-		ft_putstr_fd("minishell: ", 2);
-		ft_putstr_fd(_pipe_i->args[j], 2);
-		ft_putendl_fd(": Permission denied", 2);
-		*fd_failed = 1;
-		return (1);
-	}
-	return (0);
-}
-int	exec_redirections_in(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed)
-{
-	if (_pipe_i->tokens[j] == IN_FD)
-		(*fd)[0] = open (_pipe_i->args[j], O_RDONLY);
-	else if (_pipe_i->tokens[j] == IN_HD)
-		(*fd)[0] = _pipe_i->hd_fd[0];
-	if (_pipe_i->tokens[j] != IN_HD && \
-	(access(_pipe_i->args[j], F_OK) == -1 || access(_pipe_i->args[j], R_OK) == -1))
-	{
-		ft_putstr_fd("minishell: ", 2);
-		ft_putstr_fd(_pipe_i->args[j], 2);
-		if (access(_pipe_i->args[j], F_OK) == -1)
-			ft_putendl_fd(": No such file or directory", 2);
-		else if (access(_pipe_i->args[j], R_OK) == -1)
-			ft_putendl_fd(": Permission denied", 2);
-		*fd_failed = 1;
-		return (1);
-	}
-	return (0);
-}
-
-//OPEN INFILE, OPEN/CREATE OUTFILE AND TRY TO ACCESS
-int	exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2])
-{
-	int	fd_failed;
-	int	*tokens;
-	int	j;
-
-	tokens = _pipe_i->tokens;
-	fd_failed = 0;
-	j = 0;
-	while(_pipe_i->args[j] && tokens[j] != 0)
-	{
-		if (tokens[j] == SKIP_IN || tokens[j] == IN_FD || tokens[j] == IN_HD)
-		{
-			if (exec_redirections_in(_pipe_i, fd, j, &fd_failed) == 1)
-				break ;
-		}
-		else if (tokens[j] == SKIP_OUT || tokens[j] == OUT || tokens[j] == OUT_AP)
-		{
-			if (exec_redirections_out(_pipe_i, fd, j, &fd_failed) == 1)
-				break ;
-		}
-		j ++;
-	}
-	return (fd_failed);
-}
 
 void	dup_and_close_child_process(int i, t_exec *xx)
 {
@@ -405,35 +276,6 @@ int		handle_execve_errors(char *failed_cmd)
 	return (127);
 }
 
-int	msg_stderr(char *cmd, char *message, int err_code)
-{
-	ft_putstr_fd("minishell: ", 2);
-	if (cmd)
-		ft_putstr_fd(cmd, 2);
-	if (message)
-		ft_putstr_fd(message, 2);
-	ft_putstr_fd("\n", 2);
-	return (err_code);
-}
-
-char	*jointhree(char const *s1, char const *s2, char const *s3)
-{
-	char	*newstr;
-
-	if (s1 && s2 && s3)
-	{
-		newstr = malloc(((ft_strlen(s1) + ft_strlen(s2) \
-		+ ft_strlen(s3)) + 1) * sizeof(char));
-		if (newstr == NULL)
-			malloc_error(1);
-		ft_strlcpy(newstr, (char *)s1, -1);
-		ft_strlcpy(newstr + ft_strlen(newstr), (char *)s2, -1);
-		ft_strlcpy(newstr + ft_strlen(newstr), (char *)s3, -1);
-		return (newstr);
-	}
-	return (NULL);
-}
-
 int	user_cmd_path(char **args, char *arg_cmd, char **paths)
 {
 	int	i;
@@ -470,25 +312,4 @@ void	delete_pwd_path(char **paths)
 	free (paths[i]);
 	paths[i] = NULL;
 }
-int	free_and_1(char **paths, int **end)
-{
-	int	i;
 
-	i = 0;
-	if (paths && *paths)
-	{
-		while (paths[i])
-		{
-			free (paths[i]);
-			i ++;
-		}
-		*paths = NULL;
-		free (paths);
-	}
-	if (end)
-	{
-		free (*end);
-		(*end) = NULL;
-	}
-	return (1);
-}
