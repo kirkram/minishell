@@ -6,13 +6,11 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:27:21 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/13 15:51:01 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/13 17:49:05 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-
-extern int	g_signal;
 
 int	cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms)
 {
@@ -90,6 +88,7 @@ int	cd_chdir_fail(t_pipe **_pipe, int index)
 		closedir(directory);
 	return (1);
 }
+
 char	*find_home_env(t_utils *utils)
 {
 	char	*home_path;

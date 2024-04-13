@@ -6,8 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-
-/*   Updated: 2024/04/10 13:37:31 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/13 18:09:04 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +22,6 @@ int	main(int ac, char **av, char **sys_envp)
 	(void)ac;
 	(void)av;
 	g_signal = 0;
-
 	signal_handler();
 	ret = 0;
 	ret = interactive_mode_loop(sys_envp);
@@ -54,51 +52,8 @@ int	interactive_mode_loop(char **sys_envp)
 		}
 		free_and_exit(&ms.pipe, NULL, NULL, -42);
 	}
-	free (ms.line);
-	ms.line = NULL;
 	free_and_exit(NULL, &ms.utils, &ms, -42);
 	return (0);
-}
-
-char	*exp_init(char *str1, char *str2, t_ms *ms)
-{
-	int		i;
-	int		x;
-	bool	equal;
-	char	*temp;
-
-	i = 0;
-	x = 0;
-	equal = false;
-	temp = NULL;
-	temp = malloc(sizeof(char) * (ft_strlen(str1) + ft_strlen(str2) + 3));
-	malloc_check(&temp, ms);
-	while (str1[i])
-	{
-		temp[i] = str1[i];
-		i++;
-	}
-	while (str2[x])
-	{
-		if (str2[x] == '=' && equal == false)
-		{
-			equal = true;
-			temp[i] = str2[x];
-			temp[i +1] = '\"';
-			i += 2;
-			x++;
-		}
-		else
-		{
-			temp[i] = str2[x];
-			x++;
-			i++;
-		}
-	}
-	if (equal == true)
-		temp[i++] = '\"';
-	temp[i] = '\0';
-	return (temp);
 }
 
 char	*rl_gets(char *line_read, t_utils *utils)

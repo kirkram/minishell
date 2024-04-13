@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/04/13 17:03:41 by klukiano          #+#    #+#             */
+/*   Updated: 2024/04/13 17:04:01 by klukiano         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -11,19 +22,13 @@
 # include <fcntl.h>      // for open, unlink
 # include <dirent.h>     // for opendir, readdir, closedir
 # include <string.h>     // for strerror
-// # include <termios.h>    // for tcsetattr, tcgetattr
-// # include <curses.h>     // for tg*** and tputs
-// # include <sys/ioctl.h>  // for ioctl
 # include <sys/wait.h>   // for wait, waitpid, wait3, wait4
 # include <stdbool.h>
 
 # include "../lib/libft/libft.h"
-# include "../lib/get_next_line/get_next_line.h"
 # include "./parsing.h"
 
 # define TRUE 1
 # define FALSE 0
-
-void	sort_export(t_utils *utils);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:11:38 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/13 16:02:56 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/13 18:10:11 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,4 +55,28 @@ int	is_only_digits_and_signs(char *str)
 	return (1);
 }
 
+char	*ft_free_strjoin(char *s1, char *s2)
+{
+	char	*str;
+	int		i;
+	int		j;
 
+	i = 0;
+	j = 0;
+	if (!s1 || !s2)
+		return (0);
+	str = malloc ((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
+	if (!str)
+		return (0);
+	while (s1[i])
+	{
+		str[i] = s1[i];
+		i++;
+	}
+	while (s2[j])
+		str[i++] = s2[j++];
+	str[i] = '\0';
+	free (s1);
+	free (s2);
+	return (str);
+}

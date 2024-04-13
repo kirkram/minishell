@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/08 15:55:33 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/10 19:11:13 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/13 17:01:39 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,22 +16,13 @@ void	malloc_check(char **str, t_ms *ms)
 {
 	int	i;
 
-	i = 0;
+	i = -1;
 	if ((str && *str))
 		return ;
 	if (ms->pipe)
 	{
-		while (ms->pipe[i])
-		{
-			ft_arrfree(ms->pipe[i]->args);
-			ft_arrfree(ms->pipe[i]->noio_args);
-			free(ms->pipe[i]->tokens);
-			free(ms->pipe[i]->cmd_with_path);
-			free(ms->pipe[i]);
-			i++;
-		}
-		if (ms->pipe[i])
-			free(ms->pipe[i]);
+		while (ms->pipe[++i])
+			free_one_pipe(ms->pipe[i]);
 		free (ms->pipe);
 	}
 	if (ms->utils)
@@ -50,7 +41,7 @@ void	malloc_check(char **str, t_ms *ms)
 	exit (1);
 }
 
-void ft_nullfree(char **str)
+void	ft_nullfree(char **str)
 {
 	if (*str)
 	{
