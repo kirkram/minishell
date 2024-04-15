@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/13 18:09:04 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 11:00:34 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,23 +56,23 @@ int	interactive_mode_loop(char **sys_envp)
 	return (0);
 }
 
+static void	rl_gets_error(t_utils *utils)
+{
+	ft_putendl_fd("exit", STDOUT_FILENO);
+	exit (utils->err_code);
+}
+
 char	*rl_gets(char *line_read, t_utils *utils)
 {
 	int	savestdio;
 
 	savestdio = dup(STDIN_FILENO);
 	if (line_read)
-	{
-		free (line_read);
-		line_read = NULL;
-	}
+		ft_nullfree(&line_read);
 	g_signal = 0;
 	line_read = readline(YEL"MINISHELL-0.7$ "CRESET);
 	if (!line_read && g_signal != 130)
-	{
-		ft_putendl_fd("exit", STDOUT_FILENO);
-		exit (utils->err_code);
-	}
+		rl_gets_error(utils);
 	else if (!line_read && g_signal == 130)
 	{
 		dup2 (savestdio, STDIN_FILENO);
