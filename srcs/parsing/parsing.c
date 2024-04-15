@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/13 16:36:27 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 16:50:32 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ void	quote_remover(t_pipe *pipe, t_ms *ms)
 	}
 }
 
-int	parsing(t_ms *ms)//t_pipe ***pipe, t_utils *utils)
+int	parsing(t_ms *ms)
 {
 	char	**array;
 	int		*tokens;

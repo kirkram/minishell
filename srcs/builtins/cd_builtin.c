@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd_builtin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:27:21 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/13 17:49:05 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 17:02:27 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ int	cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms)
 		if ((_pipe)[index]->noio_args[1] && \
 		!ft_strncmp((_pipe)[index]->noio_args[1], "~", 1))
 			home_path = jointhree \
-			(home_path, ft_strchr((_pipe)[index]->noio_args[1], '~') + 1, "/");
+			(home_path, \
+			ft_strchr((_pipe)[index]->noio_args[1], '~') + 1, "/", ms);
 		if (chdir(home_path) == -1)
 			return (cd_home_chdir_fail(home_path, utils));
 	}

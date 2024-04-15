@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/13 17:49:01 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 16:27:10 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	pwd(t_utils *utils)
 	char	cwd[4096];
 
 	(void)utils;
-	if (!getcwd(cwd, -1))
+	if (!getcwd(cwd, 4096))
 		return (1);
 	printf("%s\n", cwd);
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/10 19:06:43 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/15 16:50:16 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ void	final_args(t_pipe *pipe, int i, t_ms *ms)
 	pipe->noio_args[x] = NULL;
 }
 
-void	parser(char **array, t_pipe ***pipe, t_ms *ms)//int *err_code)
+void	parser(char **array, t_pipe ***pipe, t_ms *ms)
 {
 	int	x;
 	int	i;

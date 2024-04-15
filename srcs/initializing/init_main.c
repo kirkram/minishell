@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 16:03:39 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 17:14:14 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ char	*rl_gets(char *line_read, t_utils *utils)
 	if (line_read)
 		ft_nullfree(&line_read);
 	g_signal = 0;
-	line_read = readline(YEL"MINISHELL-0.7$ "CRESET);
+	line_read = readline(YEL"MINISHELL-1.0$ "CRESET);
 	if (!line_read && g_signal != 130)
 		rl_gets_error(utils);
 	else if (!line_read && g_signal == 130)

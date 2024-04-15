@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:11:38 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 15:27:15 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 17:04:06 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	msg_stderr(char *cmd, char *message, int err_code)
 	return (err_code);
 }
 
-char	*jointhree(char const *s1, char const *s2, char const *s3)
+char	*jointhree(char const *s1, char const *s2, char const *s3, t_ms *ms)
 {
 	char	*newstr;
 
@@ -32,7 +32,7 @@ char	*jointhree(char const *s1, char const *s2, char const *s3)
 		newstr = malloc(((ft_strlen(s1) + ft_strlen(s2) \
 		+ ft_strlen(s3)) + 1) * sizeof(char));
 		if (newstr == NULL)
-			malloc_error(1);
+			malloc_check(NULL, ms);
 		ft_strlcpy(newstr, (char *)s1, -1);
 		ft_strlcpy(newstr + ft_strlen(newstr), (char *)s2, -1);
 		ft_strlcpy(newstr + ft_strlen(newstr), (char *)s3, -1);

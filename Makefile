@@ -2,8 +2,8 @@ NAME = minishell
 LIBFT_PATH = ./lib/libft
 LIBFT = $(LIBFT_PATH)/libft.a
 CFLAGS = -Wall -Wextra -Werror
-HEADERS	= -I ./include -L/usr/local/lib -L${HOME}/.brew/opt/readline/lib -I/usr/local/include #-lreadline
-DEBUGFLAGS = -g -fsanitize=address,undefined,integer
+HEADERS	= -I ./include -L/usr/local/lib -L${HOME}/.brew/opt/readline/lib -I/usr/local/include
+DEBUGFLAGS = -g -fsanitize=address,undefined
 SRCS = \
  ./srcs/builtins/builtin.c ./srcs/builtins/cd_builtin.c ./srcs/builtins/env.c \
  ./srcs/builtins/export.c ./srcs/builtins/export_utils.c ./srcs/builtins/unset.c \
@@ -38,7 +38,7 @@ debug: .debug
 
 clean: 
 	make clean -C $(LIBFT_PATH)
-	$(RM) $(OBJCTS) $(BONUS_OBJCTS) $(PRINTF_OBJCTS)
+	$(RM) $(OBJCTS) $(PRINTF_OBJCTS)
 	
 fclean: clean
 	make -C $(LIBFT_PATH) fclean
@@ -49,4 +49,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re bonus both debug
+.PHONY: all clean fclean re debug

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 12:10:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/11 15:16:47 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/15 17:03:09 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ static void	export_loop2(char *arg, t_ms *ms, int *i)
 	ms->temp2 = ft_substr(arg, 0, ((*i) + 1));
 	malloc_check(&ms->temp2, ms);
 	change_var(&ms->utils->envp, ms->temp2, arg, ms);
-	ms->temp = jointhree("declare -x ", ms->temp2, "\"");
+	ms->temp = jointhree("declare -x ", ms->temp2, "\"", ms);
 	ft_nullfree(&ms->temp2);
 	malloc_check(&ms->temp, ms);
 	ms->temp2 = ft_free_strjoin(ms->temp, ft_substr(arg,
