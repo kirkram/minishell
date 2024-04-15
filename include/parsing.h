@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 10:29:34 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/13 18:01:45 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 15:26:58 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,6 +201,7 @@ char	*ft_free_strjoin(char *s1, char *s2);
 void	malloc_check(char **str, t_ms *ms);
 void	free_and_exit(t_pipe ***_pipe, t_utils **utils, t_ms *ms, int ex_code);
 void	free_one_pipe(t_pipe *_pipe);
+int		close_if_valid_fd(int fd);
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2

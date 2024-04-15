@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:11:38 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/13 18:10:11 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 15:27:15 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,4 +79,11 @@ char	*ft_free_strjoin(char *s1, char *s2)
 	free (s1);
 	free (s2);
 	return (str);
+}
+
+int	close_if_valid_fd(int fd)
+{
+	if (fd > -1)
+		close(fd);
+	return (0);
 }

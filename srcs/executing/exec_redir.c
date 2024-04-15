@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 17:58:15 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/13 15:45:08 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 15:25:01 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	exec_redir_out(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed)
 	if (_pipe_i->tokens[j] == SKIP_OUT)
 	{
 		(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY, 0644);
-		close ((*fd)[1]);
+		close_if_valid_fd((*fd)[1]);
 	}
 	else if (_pipe_i->tokens[j] == OUT)
 		(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY | O_TRUNC, 0644);

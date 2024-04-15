@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:47:29 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/13 17:53:22 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 15:22:56 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@ void	exec_fd_fail_pass_pipe(t_pipe **_pipe, int i, t_exec *xx)
 		xx->tempfd_0 = dup(xx->pipefd[0]);
 	close(xx->pipefd[0]);
 	close(xx->pipefd[1]);
-	close(xx->fd[0]);
-	close(xx->fd[1]);
+	close_if_valid_fd(xx->fd[0]);
+	close_if_valid_fd(xx->fd[1]);
 }
 
 int	handle_execve_errors(char *failed_cmd)

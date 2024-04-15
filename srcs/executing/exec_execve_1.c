@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:41:54 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/13 18:08:13 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 15:24:22 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,11 @@ void	dup_and_close_child_process(int i, t_exec *xx)
 		;
 	else if (xx->fd[1] > -1 && dup2(xx->fd[1], STDOUT_FILENO) == -1)
 		;
-	close (xx->fd[0]);
-	close (xx->tempfd_0);
-	close (xx->pipefd[0]);
-	close (xx->pipefd[1]);
-	close (xx->fd[1]);
+	close_if_valid_fd(xx->fd[0]);
+	close_if_valid_fd(xx->tempfd_0);
+	close(xx->pipefd[0]);
+	close(xx->pipefd[1]);
+	close_if_valid_fd(xx->fd[1]);
 }
 
 void	pipe_readend_and_close_parent(int i, t_pipe **_pipe, t_exec *xx)
@@ -64,11 +64,11 @@ void	pipe_readend_and_close_parent(int i, t_pipe **_pipe, t_exec *xx)
 		j ++;
 	num_of_pipes = j;
 	if (i != 0)
-		close(xx->tempfd_0);
+		close_if_valid_fd(xx->tempfd_0);
 	if (_pipe[1] && i != num_of_pipes - 1)
 		xx->tempfd_0 = dup(xx->pipefd[0]);
 	close(xx->pipefd[0]);
 	close(xx->pipefd[1]);
-	close(xx->fd[0]);
-	close(xx->fd[1]);
+	close_if_valid_fd(xx->fd[0]);
+	close_if_valid_fd(xx->fd[1]);
 }

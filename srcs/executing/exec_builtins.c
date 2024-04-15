@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:50:51 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/13 17:53:40 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 15:24:40 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,10 @@ void	exec_builtin_no_pipes(t_ms *ms, int i, t_exec *xx)
 {
 	if (xx->fd[0] > -1)
 		dup2(xx->fd[0], STDIN_FILENO);
-	close(xx->fd[0]);
+	close_if_valid_fd(xx->fd[0]);
 	if (xx->fd[1] > -1)
 		dup2(xx->fd[1], STDOUT_FILENO);
-	close(xx->fd[1]);
+	close_if_valid_fd(xx->fd[1]);
 	ms->utils->err_code = exec_builtin(ms->pipe, ms->utils, i, ms);
 }
 

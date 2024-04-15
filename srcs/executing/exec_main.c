@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/13 18:08:26 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 15:27:01 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 	}
 	if (xx.i == 256)
 		exit (42);
-	close(xx.tempfd_0);
+	close_if_valid_fd(xx.tempfd_0);
 	return (waitpid_and_close_exec(ms, &xx));
 }
 
@@ -50,8 +50,8 @@ int	execute_loop(t_utils *utils, t_pipe **_pipe, t_ms *ms, t_exec *xx)
 	xx->fd_failed = exec_assign_redirections(ms->pipe[xx->i], &xx->fd);
 	if (xx->fd_failed)
 	{
-		close(xx->fd[0]);
-		close(xx->fd[1]);
+		close_if_valid_fd(xx->fd[0]);
+		close_if_valid_fd(xx->fd[1]);
 		xx->fd[0] = -1;
 		xx->fd[1] = -2;
 		utils->err_code = 1;
