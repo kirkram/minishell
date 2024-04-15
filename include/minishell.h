@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:03:41 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 17:05:24 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/15 19:21:28 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,7 +191,7 @@ int		cd_chdir_fail(t_pipe **_pipe, int index);
 char	*find_home_env(t_utils *utils);
 
 // exit
-int		exit_builtin(t_pipe **_pipe, t_utils *utils, int i);
+int		exit_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms);
 
 // echo
 int		echo_builtin(char **noio_args, t_utils *utils);
