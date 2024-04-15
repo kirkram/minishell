@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_execve_2.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:47:29 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 15:22:56 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 16:14:42 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ void	exec_fd_fail_pass_pipe(t_pipe **_pipe, int i, t_exec *xx)
 {
 	if (_pipe[1] && i != xx->num_of_pipes - 1)
 		xx->tempfd_0 = dup(xx->pipefd[0]);
-	close(xx->pipefd[0]);
-	close(xx->pipefd[1]);
+	close_if_valid_fd(xx->pipefd[0]);
+	close_if_valid_fd(xx->pipefd[1]);
 	close_if_valid_fd(xx->fd[0]);
 	close_if_valid_fd(xx->fd[1]);
 }
