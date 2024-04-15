@@ -6,12 +6,11 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 15:29:30 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 16:03:39 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-#include "../../lib/get_next_line/get_next_line.h"
 
 int	g_signal;
 
@@ -56,23 +55,23 @@ int	interactive_mode_loop(char **sys_envp)
 	return (0);
 }
 
+static void	rl_gets_error(t_utils *utils)
+{
+	ft_putendl_fd("exit", STDOUT_FILENO);
+	exit (utils->err_code);
+}
+
 char	*rl_gets(char *line_read, t_utils *utils)
 {
 	int	savestdio;
 
 	savestdio = dup(STDIN_FILENO);
 	if (line_read)
-	{
-		free (line_read);
-		line_read = NULL;
-	}
+		ft_nullfree(&line_read);
 	g_signal = 0;
 	line_read = readline(YEL"MINISHELL-0.7$ "CRESET);
 	if (!line_read && g_signal != 130)
-	{
-		ft_putendl_fd("exit", STDOUT_FILENO);
-		exit (utils->err_code);
-	}
+		rl_gets_error(utils);
 	else if (!line_read && g_signal == 130)
 	{
 		dup2 (savestdio, STDIN_FILENO);

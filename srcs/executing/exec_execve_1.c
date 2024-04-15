@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:41:54 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 15:24:22 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/15 16:03:53 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,14 @@ void	exec_child_system_function(t_ms *ms, int i, t_exec *xx)
 void	dup_and_close_child_process(int i, t_exec *xx)
 {
 	if (i != 0 && xx->fd[0] < 0 && dup2(xx->tempfd_0, STDIN_FILENO) == -1)
-		;
+		i = i;
 	else if (xx->fd[0] > -1 && dup2(xx->fd[0], STDIN_FILENO) == -1)
-		;
+		i = i;
 	if (i != xx->num_of_pipes - 1 && xx->fd[1] < 0 && \
 	dup2(xx->pipefd[1], STDOUT_FILENO) == -1)
-		;
+		i = i;
 	else if (xx->fd[1] > -1 && dup2(xx->fd[1], STDOUT_FILENO) == -1)
-		;
+		i = i;
 	close_if_valid_fd(xx->fd[0]);
 	close_if_valid_fd(xx->tempfd_0);
 	close(xx->pipefd[0]);
