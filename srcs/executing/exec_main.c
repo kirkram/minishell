@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 15:27:01 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/16 17:07:10 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,9 @@ int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 		xx.i ++;
 	}
 	if (xx.i == 256)
-		exit (42);
+		ft_putendl_fd("Max amount of pipes reached", 2);
+	if (xx.i == 256)
+		utils->err_code = 255;
 	close_if_valid_fd(xx.tempfd_0);
 	return (waitpid_and_close_exec(ms, &xx));
 }
