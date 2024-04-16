@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:22:46 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/16 14:19:02 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/16 15:16:54 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,6 @@ void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms)
 	copy_utils_change_shellvars(sys_envp, utils, ms);
 	(*utils)->syntax_err = false;
 	(*utils)->was_prev_line_null = false;
-	(*utils)->envp[i] = NULL;
-	(*utils)->export[i] = NULL;
 	(*utils)->err_code = 0;
 	sort_export(*utils);
 
@@ -57,64 +55,6 @@ void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms)
 		//(*utils)->export[i] = NULL;
 		//sort_export(*utils);
 	}
-}
-
-void	copy_utils_change_shellvars(char **sys_envp, t_utils **ut, t_ms *ms)
-{
-	int	i;
-
-	i = 0;
-	while (sys_envp[i])
-	{
-		if (ft_strncmp("SHELL=", sys_envp[i], 6) == 0)
-		{
-			(*ut)->envp[i] = ft_strjoin("SHELL=", "minishell");
-			malloc_check(&(*ut)->envp[i], ms);
-			(*ut)->export[i] = init_exp("declare -x ", (*ut)->envp[i], ms);
-		}
-		else if (ft_strncmp("SHLVL=", sys_envp[i], 6) == 0)
-		{
-			(*ut)->envp[i] = shell_level(sys_envp[i], ms);
-			malloc_check(&(*ut)->envp[i], ms);
-			(*ut)->export[i] = init_exp("declare -x ", (*ut)->envp[i], ms);
-		}
-		else
-		{
-			(*ut)->envp[i] = ft_strdup(sys_envp[i]);
-			malloc_check(&(*ut)->envp[i], ms);
-			(*ut)->export[i] = init_exp("declare -x ", sys_envp[i], ms);
-		}
-		i ++;
-	}
-}
-
-char	*shell_level(char *str, t_ms *ms)
-{
-	int		i;
-	int		start;
-	int		lvl;
-	char	*temp;
-
-	temp = NULL;
-	lvl = 0;
-	start = 0;
-	i = -1;
-	while (str[++i])
-	{
-		if (str[i] >= '0' && str[i] <= '9')
-		{
-			start = i;
-			while (str[i])
-				i++;
-			temp = ft_substr(str, start, i - start);
-			malloc_check(&temp, ms);
-			lvl = ft_atoi(temp);
-			ft_nullfree(&temp);
-			lvl++;
-			return (ft_free_strjoin(ft_substr(str, 0, start), ft_itoa(lvl)));
-		}
-	}
-	return (ft_strdup(str));
 }
 
 static void	init_exp_variable(char **temp, int *i, char **str2, int *x)
