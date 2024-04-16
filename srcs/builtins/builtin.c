@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 19:28:48 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/16 13:15:02 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,30 +47,6 @@ int	echo_builtin(char **noio_args, t_utils *utils)
 	}
 	if (is_newlined)
 		write(1, "\n", 1);
-	return (0);
-}
-
-//max length of the mkdir name is 255 chars in this OS
-int	update_pwd_oldpwd_env_exp(t_utils *utils, t_ms *ms, char cwd[4096])
-{
-	char	**export_args;
-
-	export_args = malloc((3 + 1) * sizeof(char *));
-	if (!export_args)
-		malloc_check(NULL, ms);
-	export_args[0] = ft_strdup("export");
-	if (!export_args[0])
-		malloc_check(NULL, ms);
-	export_args[1] = ft_strjoin("OLDPWD=", cwd);
-	if (!export_args[1])
-		malloc_check(NULL, ms);
-	getcwd(cwd, 4096);
-	export_args[2] = ft_strjoin("PWD=", cwd);
-	if (!export_args[2])
-		malloc_check(NULL, ms);
-	export_args[3] = NULL;
-	export(utils, export_args, ms);
-	ft_arrfree(export_args);
 	return (0);
 }
 
