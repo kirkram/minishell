@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:03:41 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 19:21:28 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/16 13:55:17 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ int		interactive_mode_loop(char **envp);
 char	*rl_gets(char *line_read, t_utils *utils);
 void	copy_utils_change_shellvars(char **sys_envp, t_utils **ut, t_ms *ms);
 char	*init_exp(char *str1, char *str2, t_ms *ms);
-char	*shell_level(char *str, t_ms *ms);
+char	*shell_level(char *str, t_ms *ms, int i);
 char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms);
 
 // LEXER

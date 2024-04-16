@@ -10,6 +10,7 @@ SRCS = \
  ./srcs/executing/exec_main.c ./srcs/executing/exec_redir.c ./srcs/executing/exec_execve_1.c \
  ./srcs/executing/exec_execve_2.c ./srcs/executing/exec_builtins.c \
  ./srcs/initializing/init_findpath.c ./srcs/initializing/init_main.c ./srcs/initializing/init_utils.c \
+ ./srcs/initializing/init_shlvar.c \
  ./srcs/parsing/here_doc.c  ./srcs/parsing/lexer.c ./srcs/parsing/lexer2.c \
  ./srcs/parsing/ms_split.c ./srcs/parsing/parse_env.c \
  ./srcs/parsing/parse.c  ./srcs/parsing/parsing_init.c ./srcs/parsing/parsing_utils.c \
