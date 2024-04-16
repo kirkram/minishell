@@ -3,22 +3,50 @@
 /*                                                        :::      ::::::::   */
 /*   cd_builtin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:27:21 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 17:02:27 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/16 13:39:39 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
+static int	update_pwd_oldpwd_env_exp(t_utils *utils, t_ms *ms, char cwd[4096], int i)
+{
+	char	**export_args;
+	char	oldpwd[4096];
+
+	oldpwd[0] = '\0';
+	while (utils->envp[++i])
+	{
+		if (ft_strncmp(utils->envp[i], "PWD=", 4) == 0)
+			ft_strlcpy(oldpwd, utils->envp[i] + 4, 4096);
+	}
+	export_args = malloc((3 + 1) * sizeof(char *));
+	if (!export_args)
+		malloc_check(NULL, ms);
+	export_args[0] = ft_strdup("export");
+	if (!export_args[0])
+		malloc_check(NULL, ms);
+	export_args[1] = ft_strjoin("OLDPWD=", oldpwd);
+	if (!export_args[1])
+		malloc_check(NULL, ms);
+	export_args[2] = ft_strjoin("PWD=", cwd);
+	if (!export_args[2])
+		malloc_check(NULL, ms);
+	export_args[3] = NULL;
+	export(utils, export_args, ms);
+	ft_arrfree(export_args);
+	return (0);
+}
 int	cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms)
 {
 	char	*home_path;
 	char	cwd[4096];
+	int		i;
 
 	home_path = find_home_env(utils);
-	getcwd(cwd, 4096);
 	if (!(_pipe)[index]->noio_args[1] || \
 	!ft_strncmp((_pipe)[index]->noio_args[1], "~", 1))
 	{
@@ -35,7 +63,9 @@ int	cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms)
 		if (chdir((_pipe)[index]->noio_args[1]) == -1)
 			return (cd_chdir_fail(_pipe, index));
 	}
-	update_pwd_oldpwd_env_exp(utils, ms, cwd);
+	i = -1;
+	getcwd(cwd, 4096);
+	update_pwd_oldpwd_env_exp(utils, ms, cwd, i);
 	return (0);
 }
 
@@ -106,3 +136,6 @@ char	*find_home_env(t_utils *utils)
 	}
 	return (NULL);
 }
+//max length of the mkdir name is 255 chars in this OS
+
+

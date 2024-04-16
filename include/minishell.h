@@ -103,9 +103,9 @@ char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms);
 int		check_quote(char **str, bool quote, bool dquote, int *err_code);
 int		lexer(t_ms *ms);
 void	env_variable(t_ms *ms, bool quote, bool dquote, char **str);
-char	**array_copy(char **array);
+//char	**array_copy(char **array);
 char	*get_variable(t_ms *ms);
-int		*tokenizer(char **array);
+//int		*tokenizer(char **array);
 int		get_token(char *str);
 
 char	*separator(t_ms *ms, bool quote, bool dquote, int i);
@@ -182,7 +182,6 @@ int		change_var(char ***array, char *env_name, char *newstr, t_ms *ms);
 
 // pwd
 int		pwd(t_utils *utils);
-int		update_pwd_oldpwd_env_exp(t_utils *utils, t_ms *ms, char cwd[4096]);
 
 // cd
 int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms);
