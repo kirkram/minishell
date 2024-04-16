@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_execve_2.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:47:29 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 16:14:42 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/16 16:39:39 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	handle_execve_errors(char *failed_cmd)
 	DIR	*dir;
 
 	if (failed_cmd[0] == 0)
-		return (msg_stderr("minishell: : command not found", NULL, 127));
+		return (msg_stderr(": command not found", failed_cmd, 127));
 	else if (failed_cmd[0] == '.' && failed_cmd[1] == 0)
 		return (msg_stderr(".: not enough arguments", NULL, 1));
 	else if (access(failed_cmd, F_OK) == -1 && ft_strchr(failed_cmd, '/'))

@@ -6,11 +6,37 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:22:46 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/16 15:16:54 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/16 16:22:44 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+
+static	void	init_look_for_pwd(char **sys_envp, t_utils **utils, t_ms *ms)
+{
+	int		i;
+	char	cwd[4096];
+	char	*pwd;
+
+	i = 0;
+	pwd = NULL;
+	while ((*utils)->envp[i])
+	{
+		if (ft_strncmp("PWD=", (*utils)->envp[i], 4) == 0)
+			pwd = sys_envp[i];
+		i ++;
+	}
+	if (!pwd)
+	{
+		getcwd(cwd, 4096);
+		pwd = ft_strjoin("PWD=", cwd);
+		change_var(&(*utils)->envp, "PWD=", pwd, ms);
+		free(pwd);
+		pwd = ft_strjoin("declare -x PWD=", cwd);
+		change_var(&(*utils)->export, "PWD=", pwd, ms);
+		free (pwd);
+	}
+}
 
 void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms)
 {
@@ -33,28 +59,7 @@ void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms)
 	(*utils)->was_prev_line_null = false;
 	(*utils)->err_code = 0;
 	sort_export(*utils);
-
-	char	cwd[4096];
-	char	*pwd;
-	i = 0;
-	pwd = NULL;
-	while ((*utils)->envp[i])
-	{
-		if (ft_strncmp("PWD=", sys_envp[i], 4) == 0)
-		pwd = sys_envp[i];
-		i ++;
-	}
-	if (!pwd)
-	{
-		getcwd(cwd, 4096);
-		pwd = ft_strjoin("PWD=", cwd);
-		change_var(&(*utils)->envp, "PWD=", pwd, ms);
-		//(*utils)->export[i] = init_exp("declare -x ", cwd, ms);
-		(*utils)->envp[++i] = NULL;
-		free (pwd);
-		//(*utils)->export[i] = NULL;
-		//sort_export(*utils);
-	}
+	init_look_for_pwd(sys_envp, utils, ms);
 }
 
 static void	init_exp_variable(char **temp, int *i, char **str2, int *x)

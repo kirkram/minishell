@@ -6,13 +6,13 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:27:21 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/16 13:39:39 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/16 16:31:32 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-static int	update_pwd_oldpwd_env_exp(t_utils *utils, t_ms *ms, char cwd[4096], int i)
+static int	update_pwd_oldpwd(t_utils *utils, t_ms *ms, char cwd[4096], int i)
 {
 	char	**export_args;
 	char	oldpwd[4096];
@@ -40,6 +40,7 @@ static int	update_pwd_oldpwd_env_exp(t_utils *utils, t_ms *ms, char cwd[4096], i
 	ft_arrfree(export_args);
 	return (0);
 }
+
 int	cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms)
 {
 	char	*home_path;
@@ -65,7 +66,7 @@ int	cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms)
 	}
 	i = -1;
 	getcwd(cwd, 4096);
-	update_pwd_oldpwd_env_exp(utils, ms, cwd, i);
+	update_pwd_oldpwd(utils, ms, cwd, i);
 	return (0);
 }
 
@@ -136,6 +137,3 @@ char	*find_home_env(t_utils *utils)
 	}
 	return (NULL);
 }
-//max length of the mkdir name is 255 chars in this OS
-
-

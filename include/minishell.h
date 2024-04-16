@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:03:41 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/16 13:55:17 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/16 16:29:04 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,9 +103,7 @@ char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms);
 int		check_quote(char **str, bool quote, bool dquote, int *err_code);
 int		lexer(t_ms *ms);
 void	env_variable(t_ms *ms, bool quote, bool dquote, char **str);
-//char	**array_copy(char **array);
 char	*get_variable(t_ms *ms);
-//int		*tokenizer(char **array);
 int		get_token(char *str);
 
 char	*separator(t_ms *ms, bool quote, bool dquote, int i);

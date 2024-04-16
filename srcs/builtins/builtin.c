@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/16 15:16:27 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/16 16:29:42 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,33 @@ static long long	ft_atol(const char *str)
 	return (num * sign);
 }
 
-int	exit_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms)
+static void	exit_builtin_success(int i, t_ms *ms)
 {
 	long long	exit_code;
+	t_pipe		**_pipe;
+	t_utils		*utils;
 
+	_pipe = ms->pipe;
+	utils = ms->utils;
+	ft_putendl_fd("exit", 1);
+	if (!ft_strncmp(_pipe[i]->args[1], "-9223372036854775808", -1))
+		free_and_exit(&_pipe, &utils, ms, 0);
+	exit_code = ft_atol(_pipe[i]->args[1]);
+	if ((exit_code == 0 && _pipe[i]->args[1][0] != '0') || \
+	(exit_code == -1 && _pipe[i]->args[1][0] != '-'))
+	{
+		ft_putstr_fd("minishell: exit: ", 2);
+		ft_putstr_fd(_pipe[i]->args[1], 2);
+		ft_putendl_fd(": numeric argument required", 2);
+		free_and_exit(&_pipe, &utils, ms, -42);
+		exit (255);
+	}
+	else
+		free_and_exit(&_pipe, &utils, ms, exit_code);
+}
+
+int	exit_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms)
+{
 	(void)utils;
 	if (!_pipe[i]->args[1])
 	{
@@ -102,22 +125,6 @@ int	exit_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms)
 		return (1);
 	}
 	else
-	{
-		ft_putendl_fd("exit", 1);
-		if (!ft_strncmp(_pipe[i]->args[1], "-9223372036854775808", -1))
-			free_and_exit(&_pipe, &utils, ms, 0);
-		exit_code = ft_atol(_pipe[i]->args[1]);
-		if ((exit_code == 0 && _pipe[i]->args[1][0] != '0') || \
-		(exit_code == -1 && _pipe[i]->args[1][0] != '-'))
-		{
-			ft_putstr_fd("minishell: exit: ", 2);
-			ft_putstr_fd(_pipe[i]->args[1], 2);
-			ft_putendl_fd(": numeric argument required", 2);
-			free_and_exit(&_pipe, &utils, ms, -42);
-			exit (255);
-		}
-		else
-			free_and_exit(&_pipe, &utils, ms, exit_code);
-	}
+		exit_builtin_success(i, ms);
 	return (1);
 }
