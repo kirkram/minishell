@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 12:10:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/15 17:03:09 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/17 13:52:00 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static int	print_exp_error(char *arg)
 	return (1);
 }
 
-static int	export_error(char *arg)
+int	export_error(char *arg)
 {
 	int	x;
 
@@ -106,9 +106,8 @@ int	export(t_utils *utils, char **arg, t_ms *ms)
 	}
 	while (arg[0] && arg[i])
 	{
-		if (export_error(arg[i]) != 0)
-			return (1);
-		export_loop(arg[i], ms, quote, dquote);
+		if (export_error(arg[i]) == 0)
+			export_loop(arg[i], ms, quote, dquote);
 		i++;
 	}
 	sort_export(utils);
