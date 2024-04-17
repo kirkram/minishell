@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:03:41 by klukiano          #+#    #+#             */
 /*   Updated: 2024/04/17 18:40:29 by klukiano         ###   ########.fr       */
@@ -89,6 +89,7 @@ typedef struct s_exec
 // SIGNAL
 void	signal_handler(void);
 void	handle_sigint(int sig);
+void	handle_sigquit(bool active);
 
 // INIT
 void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms);
@@ -165,13 +166,14 @@ int		export(t_utils *utils, char **arg, t_ms *ms);
 void	print_exp(t_utils *utils, int fd);
 void	sort_export(t_utils *utils);
 int		add_exp_var(t_utils **utils, char *newstr, t_ms *ms);
+int		export_error(char *arg);
 
 // unset
 int		remove_env(t_ms *ms, int i, int x, int y);
 int		remove_exp(t_ms *ms, int i, int x, int y);
 int		unset(t_utils *utils, char **arg, t_ms *ms);
-void	unset_exp(t_ms *ms, char **arg, int j, int i);
-void	unset_env(t_utils *utils, char **arg, t_ms *ms);
+void	unset_exp(t_ms *ms, char *arg, int i);
+void	unset_env(t_utils *utils, char *arg, t_ms *ms);
 
 // env
 int		env(t_utils *utils, char **noio_arg);

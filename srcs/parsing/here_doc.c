@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:06:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/10 18:46:38 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/17 18:29:18 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ void	here_doc(t_pipe ***pipe, t_utils *utils, t_ms *ms)
 		i = 0;
 		while ((*pipe)[x]->args[i])
 		{
+			handle_sigquit(true);
 			if ((*pipe)[x]->tokens[i] == SKIP_HD)
 			{
 				here_doc_open((*pipe)[x]->args[i], (*pipe)[x], utils, ms);
@@ -30,7 +31,8 @@ void	here_doc(t_pipe ***pipe, t_utils *utils, t_ms *ms)
 			}
 			else if ((*pipe)[x]->tokens[i] == IN_HD)
 				here_doc_open((*pipe)[x]->args[i], (*pipe)[x], utils, ms);
-			if (g_signal == 130)
+			handle_sigquit(false);
+			if (g_signal != 0)
 				return ;
 			i++;
 		}
@@ -58,7 +60,7 @@ void	here_doc_open(char *eof, t_pipe *_pipe, t_utils *utils, t_ms *ms)
 	while (1)
 	{
 		buff = readline("> ");
-		if (g_signal == 130)
+		if (g_signal != 0)
 		{
 			dup2 (save_stdin, STDIN_FILENO);
 			close (save_stdin);

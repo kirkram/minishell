@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/16 17:07:10 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/17 18:31:39 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 {
 	t_exec	xx;
 
-	if (g_signal == 130)
-		return (130);
+	if (g_signal != 0)
+		return (128 + g_signal);
 	xx.savestdio[0] = dup(STDIN_FILENO);
 	xx.savestdio[1] = dup(STDOUT_FILENO);
 	xx.i = 0;
@@ -44,7 +44,7 @@ int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 
 int	execute_loop(t_utils *utils, t_pipe **_pipe, t_ms *ms, t_exec *xx)
 {
-	if (g_signal == 130)
+	if (g_signal != 0)
 		return (1);
 	xx->fd[0] = -1;
 	xx->fd[1] = -2;
@@ -92,8 +92,8 @@ int	waitpid_and_close_exec(t_ms *ms, t_exec *xx)
 	dup2(xx->savestdio[1], STDOUT_FILENO);
 	close(xx->savestdio[0]);
 	close(xx->savestdio[1]);
-	if (g_signal == 130 && ft_putstr_fd("\n", STDOUT_FILENO) != -42)
-		return (130);
+	if (g_signal != 0 && ft_putstr_fd("\n", STDOUT_FILENO) != -42)
+		return (128 + g_signal);
 	else if (WIFEXITED(xx->child_exit_code) && !xx->fd_failed && \
 	!(ms->pipe[0]->tokens[0] == BUILTIN && !ms->pipe[1]))
 		return (WEXITSTATUS(xx->child_exit_code));
