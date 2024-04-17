@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/17 17:08:34 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/17 18:29:08 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,16 +69,9 @@ char	*rl_gets(char *line_read, t_utils *utils)
 	if (line_read)
 		ft_nullfree(&line_read);
 	g_signal = 0;
-
-	//struct sigaction	sa1;
-	//sa1.sa_handler = SIG_IGN;
-	//sigaction(SIGQUIT, &sa1, NULL);
 	handle_sigquit(true);
 	line_read = readline(YEL"MINISHELL-1.0$ "CRESET);
 	handle_sigquit(false);
-	//sa1.sa_handler = SIG_DFL;
-	//sa1.sa_handler = &handle_sigint;
-	//sigaction(SIGQUIT, &sa1, NULL);
 	if (!line_read && g_signal == 0)
 		rl_gets_error(utils);
 	else if (!line_read && g_signal != 0)
