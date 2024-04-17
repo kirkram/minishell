@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 12:10:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/17 18:31:36 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/17 19:14:53 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,9 +91,11 @@ int	export(t_utils *utils, char **arg, t_ms *ms)
 	int		i;
 	bool	quote;
 	bool	dquote;
+	int		ret;
 
 	quote = false;
 	dquote = false;
+	ret = 0;
 	i = 1;
 	if (!utils)
 		return (1);
@@ -108,8 +110,10 @@ int	export(t_utils *utils, char **arg, t_ms *ms)
 	{
 		if (export_error(arg[i]) == 0)
 			export_loop(arg[i], ms, quote, dquote);
+		else
+			ret = 1;
 		i++;
 	}
 	sort_export(utils);
-	return (0);
+	return (ret);
 }

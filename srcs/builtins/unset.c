@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 12:22:53 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/17 14:12:38 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/17 19:16:08 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,10 @@ void	unset_exp(t_ms *ms, char *arg, int i)
 
 int	unset(t_utils *utils, char **arg, t_ms *ms)
 {
-	int		i;
+	int	i;
+	int	ret;
 
+	ret = 0;
 	i = 0;
 	if (!arg || !arg[1] || !arg[1][0])
 		return (0);
@@ -76,9 +78,11 @@ int	unset(t_utils *utils, char **arg, t_ms *ms)
 			unset_env(utils, arg[i], ms);
 			unset_exp(ms, arg[i], i);
 		}
+		else
+			ret = 1;
 		i++;
 	}
-	return (0);
+	return (ret);
 }
 
 int	remove_exp(t_ms *ms, int i, int x, int y)
