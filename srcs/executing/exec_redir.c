@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 17:58:15 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 15:25:01 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/17 18:48:23 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,13 @@ int	exec_redir_out(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed)
 		(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	else if (_pipe_i->tokens[j] == OUT_AP)
 		(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY | O_APPEND, 0644);
-	if ((*fd)[1] < 0)
+	if ((*fd)[1] < 0 && _pipe_i->args[j][0] == '\0')
+	{
+		ft_putendl_fd("minishell: : No such file or directory", 2);
+		*fd_failed = 1;
+		return (1);
+	}
+	else if ((*fd)[1] < 0)
 	{
 		ft_putstr_fd("minishell: ", 2);
 		ft_putstr_fd(_pipe_i->args[j], 2);

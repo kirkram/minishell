@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:03:41 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/17 18:31:35 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/17 18:40:29 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,7 @@ int		pipe_error(int *tokens, int *err_code, int i);
 int		execute(t_utils *utils, t_pipe **_pipe, t_ms *ms);
 int		execute_loop(t_utils *utils, t_pipe **_pipe, t_ms *ms, t_exec *xx);
 char	*jointhree(char const *s1, char const *s2, char const *s3, t_ms *ms);
-int		handle_execve_errors(char *failed_cmd);
+int		handle_execve_errors(char *failed_cmd, int found_path);
 int		msg_stderr(char *message, char *cmd, int err_code);
 char	**find_path_and_pwd(char **envp, char *scmd, t_ms *ms);
 int		free_and_1(char **paths, int **end);
@@ -157,7 +157,6 @@ void	exec_builtin_no_pipes(t_ms *ms, int i, t_exec *xx);
 void	exec_fd_fail_pass_pipe(t_pipe **_pipe, int i, t_exec *xx);
 void	dup_and_close_child_process(int i, t_exec *xx);
 void	pipe_readend_and_close_parent(int i, t_pipe **_pipe, t_exec *xx);
-int		handle_execve_errors_dir(char *failed_cmd, DIR *dir);
 
 // BUILTINS
 int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms);
