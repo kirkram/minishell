@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:22:46 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/16 16:22:44 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/17 14:54:45 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,11 @@ static	void	init_look_for_pwd(char **sys_envp, t_utils **utils, t_ms *ms)
 	{
 		getcwd(cwd, 4096);
 		pwd = ft_strjoin("PWD=", cwd);
+		malloc_check(&pwd, ms);
 		change_var(&(*utils)->envp, "PWD=", pwd, ms);
 		free(pwd);
 		pwd = ft_strjoin("declare -x PWD=", cwd);
+		malloc_check(&pwd, ms);
 		change_var(&(*utils)->export, "PWD=", pwd, ms);
 		free (pwd);
 	}

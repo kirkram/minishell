@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/16 16:29:42 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/17 15:10:27 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,15 +85,16 @@ static void	exit_builtin_success(int i, t_ms *ms)
 
 	_pipe = ms->pipe;
 	utils = ms->utils;
-	ft_putendl_fd("exit", 1);
-	if (!ft_strncmp(_pipe[i]->args[1], "-9223372036854775808", -1))
+	if (!_pipe[1])
+		ft_putendl_fd("exit", 2);
+	if (!ft_strncmp(_pipe[i]->noio_args[1], "-9223372036854775808", -1))
 		free_and_exit(&_pipe, &utils, ms, 0);
-	exit_code = ft_atol(_pipe[i]->args[1]);
-	if ((exit_code == 0 && _pipe[i]->args[1][0] != '0') || \
-	(exit_code == -1 && _pipe[i]->args[1][0] != '-'))
+	exit_code = ft_atol(_pipe[i]->noio_args[1]);
+	if ((exit_code == 0 && _pipe[i]->noio_args[1][0] != '0') || \
+	(exit_code == -1 && _pipe[i]->noio_args[1][0] != '-'))
 	{
 		ft_putstr_fd("minishell: exit: ", 2);
-		ft_putstr_fd(_pipe[i]->args[1], 2);
+		ft_putstr_fd(_pipe[i]->noio_args[1], 2);
 		ft_putendl_fd(": numeric argument required", 2);
 		free_and_exit(&_pipe, &utils, ms, -42);
 		exit (255);
@@ -105,22 +106,24 @@ static void	exit_builtin_success(int i, t_ms *ms)
 int	exit_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms)
 {
 	(void)utils;
-	if (!_pipe[i]->args[1])
+	if (!_pipe[1] && !_pipe[i]->noio_args[1])
 	{
-		ft_putendl_fd("exit", 1);
+		ft_putendl_fd("exit", 2);
 		exit(0);
 	}
-	else if (!is_only_digits_and_signs(_pipe[i]->args[1]))
+	else if (!is_only_digits_and_signs(_pipe[i]->noio_args[1]))
 	{
-		ft_putendl_fd("exit", 1);
+		if (!_pipe[1])
+			ft_putendl_fd("exit", 2);
 		ft_putstr_fd("minishell: exit: ", 2);
-		ft_putstr_fd(_pipe[i]->args[1], 2);
+		ft_putstr_fd(_pipe[i]->noio_args[1], 2);
 		ft_putendl_fd(": numeric argument required", 2);
 		exit (255);
 	}
-	else if (_pipe[i]->args[1] && _pipe[i]->args[2])
+	else if (_pipe[i]->noio_args[1] && _pipe[i]->noio_args[2])
 	{
-		ft_putendl_fd("exit", 1);
+		if (!_pipe[1])
+			ft_putendl_fd("exit", 2);
 		ft_putendl_fd("minishell: exit: too many arguments", 2);
 		return (1);
 	}

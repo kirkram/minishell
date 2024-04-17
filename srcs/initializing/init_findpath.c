@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_findpath.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:00:28 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 17:03:29 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/17 18:49:39 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,13 @@
 
 char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms)
 {
-	char	**env_paths;
-	char	*cmd_path;
-	int		i;
+	char		**env_paths;
+	char		*cmd_path;
+	int			i;
+	struct stat	buf;
+	bool		is_dir;
 
+	is_dir = false;
 	if (!scmd || scmd[0] == '\0')
 		return (NULL);
 	env_paths = find_path_and_pwd(envp, scmd, ms);
@@ -34,8 +37,11 @@ char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms)
 			cmd_path = ft_strdup(scmd);
 		else
 			cmd_path = jointhree(env_paths[i], "/", scmd, ms);
-		if (access(cmd_path, F_OK) == 0 && access(cmd_path, X_OK) == 0 && \
-		free_and_1(env_paths, NULL))
+		if (stat(cmd_path, &buf) != -1)
+			if (!S_ISREG(buf.st_mode))
+				is_dir = true;
+		if (access(cmd_path, F_OK) == 0 \
+		&& !is_dir && free_and_1(env_paths, NULL))
 			return (cmd_path);
 		free (cmd_path);
 		if (scmd[0] == '/')
