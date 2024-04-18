@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:41:54 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/17 18:33:46 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/18 15:39:58 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,12 @@ void	exec_child_system_function(t_ms *ms, int i, t_exec *xx)
 		if ((ppe)[i]->cmd_with_path != NULL)
 		{
 			execve((ppe)[i]->cmd_with_path, (ppe)[i]->noio_args, utils->envp);
-			utils->err_code = handle_execve_errors((ppe)[i]->cmd_with_path, 1);
+			utils->err_code = handle_execve_errors((ppe)[i]->cmd_with_path, 1, \
+			ms, i);
 		}
 		else if ((ppe)[i]->noio_args[0])
-			utils->err_code = handle_execve_errors((ppe)[i]->noio_args[0], 0);
+			utils->err_code = handle_execve_errors((ppe)[i]->noio_args[0], 0, \
+			ms, i);
 		free_and_exit(&ppe, &utils, ms, utils->err_code);
 	}
 	else

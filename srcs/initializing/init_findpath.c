@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:00:28 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/18 13:04:29 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/18 15:32:52 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ char	**find_path_and_pwd(char **envp, char *scmd, t_ms *ms)
 	t_paths	vars;
 
 	ft_bzero(&vars, sizeof(t_paths));
-	if (!ft_strnstr(scmd, "./", -1))
+	if (scmd[0] == '/' || !ft_strnstr(scmd, "./", -1))
 		vars.skip_pwd = true;
 	vars.i = -1;
 	while (envp[++vars.i])

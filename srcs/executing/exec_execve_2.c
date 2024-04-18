@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:47:29 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/18 13:04:43 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/18 15:43:31 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static int	handle_execve_errors_dir(char *failed_cmd)
 		return (msg_stderr(failed_cmd, ": command not found", 127));
 }
 
-int	handle_execve_errors(char *failed_cmd, int found_path)
+int	handle_execve_errors(char *failed_cmd, int found_path, t_ms *ms, int i)
 {
 	if (access(failed_cmd, F_OK) == -1 && ft_strchr(failed_cmd, '/'))
 		return (msg_stderr(failed_cmd, ": No such file or directory", 127));
@@ -46,7 +46,13 @@ int	handle_execve_errors(char *failed_cmd, int found_path)
 	(!ft_strchr(failed_cmd, '/') && !found_path))
 		return (msg_stderr(failed_cmd, ": command not found", 127));
 	else if (access(failed_cmd, X_OK) == -1)
+	{
+		if (!ft_strncmp(ms->pipe[i]->noio_args[0], "./", 2) || \
+			!ft_strncmp(ms->pipe[i]->noio_args[0], "../", 3))
+			return (msg_stderr(ms->pipe[i]->noio_args[0], \
+			": Permission denied", 126));
 		return (msg_stderr(failed_cmd, ": Permission denied", 126));
+	}
 	else if (ft_strrchr(failed_cmd, '/') && \
 	(ft_strrchr(failed_cmd, '/'))[1] == '\0')
 		return (msg_stderr(failed_cmd, ": not a directory", 127));

@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:03:41 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/18 13:03:37 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/18 15:38:50 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,13 @@
 # include <signal.h>     // for signal, sigaction, sigemptyset, sigaddset, kill
 # include <sys/stat.h>   // for stat, lstat, fstat
 # include <fcntl.h>      // for open, unlink
-# include <dirent.h>     // for opendir, readdir, closedir
-# include <string.h>     // for strerror
+//# include <dirent.h>     // for opendir, readdir, closedir
+//# include <string.h>     // for strerror
 # include <sys/wait.h>   // for wait, waitpid, wait3, wait4
 # include <stdbool.h>
 # include "../lib/libft/libft.h"
-# include "./readline/readline.h"
-# include "./readline/history.h"
+# include <readline/readline.h>
+# include <readline/history.h>
 
 # define YEL "\e[0;33m"
 # define CRESET "\e[0m"
@@ -141,7 +141,7 @@ int		pipe_error(int *tokens, int *err_code, int i);
 int		execute(t_utils *utils, t_pipe **_pipe, t_ms *ms);
 int		execute_loop(t_utils *utils, t_pipe **_pipe, t_ms *ms, t_exec *xx);
 char	*jointhree(char const *s1, char const *s2, char const *s3, t_ms *ms);
-int		handle_execve_errors(char *failed_cmd, int found_path);
+int		handle_execve_errors(char *failed_cmd, int found_path, t_ms *ms, int i);
 int		msg_stderr(char *message, char *cmd, int err_code);
 char	**find_path_and_pwd(char **envp, char *scmd, t_ms *ms);
 int		free_and_1(char **paths, int **end);
