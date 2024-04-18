@@ -3,14 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   exec_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/17 18:31:39 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/18 13:02:10 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+
+static int	init_exec_variables(t_ms *ms, t_exec *xx)
+{
+	xx->savestdio[0] = dup(STDIN_FILENO);
+	xx->savestdio[1] = dup(STDOUT_FILENO);
+	xx->i = 0;
+	while (ms->pipe[xx->i])
+		xx->i ++;
+	xx->num_of_pipes = xx->i;
+	xx->tempfd_0 = -1;
+	xx->pipefd[0] = -1;
+	xx->pipefd[1] = -2;
+	xx->i = 0;
+	return (0);
+}
 
 int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 {
@@ -18,16 +33,7 @@ int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 
 	if (g_signal != 0)
 		return (128 + g_signal);
-	xx.savestdio[0] = dup(STDIN_FILENO);
-	xx.savestdio[1] = dup(STDOUT_FILENO);
-	xx.i = 0;
-	while (ms->pipe[xx.i])
-		xx.i ++;
-	xx.num_of_pipes = xx.i;
-	xx.tempfd_0 = -1;
-	xx.pipefd[0] = -1;
-	xx.pipefd[1] = -2;
-	xx.i = 0;
+	init_exec_variables(ms, &xx);
 	while (xx.i < xx.num_of_pipes && xx.i < 256)
 	{
 		if (execute_loop(utils, _pipe, ms, &xx) == 1)

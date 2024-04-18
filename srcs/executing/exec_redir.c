@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 17:58:15 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/17 18:48:23 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/18 13:03:59 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,16 @@ int	exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2])
 	return (fd_failed);
 }
 
+static int	exec_redir_out_err(char *failed_fd, char *msg, int *fd_failed)
+{
+	ft_putstr_fd("minishell: ", 2);
+	if (failed_fd)
+		ft_putstr_fd(failed_fd, 2);
+	ft_putendl_fd(msg, 2);
+	*fd_failed = 1;
+	return (1);
+}
+
 int	exec_redir_out(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed)
 {
 	if (_pipe_i->tokens[j] == SKIP_OUT)
@@ -52,19 +62,14 @@ int	exec_redir_out(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed)
 	else if (_pipe_i->tokens[j] == OUT_AP)
 		(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY | O_APPEND, 0644);
 	if ((*fd)[1] < 0 && _pipe_i->args[j][0] == '\0')
-	{
-		ft_putendl_fd("minishell: : No such file or directory", 2);
-		*fd_failed = 1;
-		return (1);
-	}
+		return (exec_redir_out_err(NULL, \
+		": No such file or directory", fd_failed));
+	else if ((*fd)[1] < 0 && check_is_dir(_pipe_i->args[j]))
+		return (exec_redir_out_err(_pipe_i->args[j], \
+		": Is a directory", fd_failed));
 	else if ((*fd)[1] < 0)
-	{
-		ft_putstr_fd("minishell: ", 2);
-		ft_putstr_fd(_pipe_i->args[j], 2);
-		ft_putendl_fd(": Permission denied", 2);
-		*fd_failed = 1;
-		return (1);
-	}
+		return (exec_redir_out_err(_pipe_i->args[j], \
+		": Permission denied", fd_failed));
 	return (0);
 }
 

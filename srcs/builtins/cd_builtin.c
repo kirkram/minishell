@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:27:21 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/16 16:31:32 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/18 13:03:51 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,16 +95,13 @@ int	cd_home_chdir_fail(char *home_path, t_utils *utils)
 
 int	cd_chdir_fail(t_pipe **_pipe, int index)
 {
-	DIR		*directory;
-
-	directory = opendir((_pipe)[index]->noio_args[1]);
 	if (access((_pipe)[index]->noio_args[1], F_OK) == -1)
 	{
 		ft_putstr_fd("minishell: cd: ", 2);
 		ft_putstr_fd((_pipe)[index]->noio_args[1], 2);
 		ft_putendl_fd(": No such file or directory", 2);
 	}
-	else if (!directory)
+	else if (!check_is_dir((_pipe)[index]->noio_args[1]))
 	{
 		ft_putstr_fd("minishell: cd: ", 2);
 		ft_putstr_fd((_pipe)[index]->noio_args[1], 2);
@@ -116,8 +113,6 @@ int	cd_chdir_fail(t_pipe **_pipe, int index)
 		ft_putstr_fd((_pipe)[index]->noio_args[1], 2);
 		ft_putendl_fd(": Permission denied", 2);
 	}
-	if (directory)
-		closedir(directory);
 	return (1);
 }
 
