@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:47:29 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/17 18:54:27 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/18 13:04:43 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,16 +38,9 @@ static int	handle_execve_errors_dir(char *failed_cmd)
 
 int	handle_execve_errors(char *failed_cmd, int found_path)
 {
-	struct stat	buf;
-	bool		is_dir;
-
-	is_dir = false;
-	if (stat(failed_cmd, &buf) != -1)
-		if (!S_ISREG(buf.st_mode))
-			is_dir = true;
 	if (access(failed_cmd, F_OK) == -1 && ft_strchr(failed_cmd, '/'))
 		return (msg_stderr(failed_cmd, ": No such file or directory", 127));
-	else if (is_dir)
+	else if (check_is_dir(failed_cmd))
 		return (handle_execve_errors_dir(failed_cmd));
 	else if (access(failed_cmd, F_OK) == -1 || \
 	(!ft_strchr(failed_cmd, '/') && !found_path))
@@ -60,4 +53,16 @@ int	handle_execve_errors(char *failed_cmd, int found_path)
 	else
 		return (msg_stderr(failed_cmd, ": command not found", 127));
 	return (127);
+}
+
+int	check_is_dir(char *path)
+{
+	struct stat	buf;
+	bool		is_dir;
+
+	is_dir = false;
+	if (stat(path, &buf) != -1)
+		if (!S_ISREG(buf.st_mode))
+			is_dir = true;
+	return (is_dir);
 }

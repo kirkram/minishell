@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:03:41 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/18 11:21:06 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/18 13:03:37 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,6 +209,7 @@ void	malloc_check(char **str, t_ms *ms);
 void	free_and_exit(t_pipe ***_pipe, t_utils **utils, t_ms *ms, int ex_code);
 void	free_one_pipe(t_pipe *_pipe);
 int		close_if_valid_fd(int fd);
+int		check_is_dir(char *path);
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2

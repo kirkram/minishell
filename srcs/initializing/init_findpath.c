@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:00:28 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/17 18:49:39 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/18 13:04:29 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,12 @@
 //If there is absolute path (scmd starts with '/')
 //then check only once then break
 //otherwise look through env_paths and try to access
-
 char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms)
 {
 	char		**env_paths;
 	char		*cmd_path;
 	int			i;
-	struct stat	buf;
-	bool		is_dir;
 
-	is_dir = false;
 	if (!scmd || scmd[0] == '\0')
 		return (NULL);
 	env_paths = find_path_and_pwd(envp, scmd, ms);
@@ -37,11 +33,8 @@ char	*assign_scmd_path(char *scmd, char **envp, t_ms *ms)
 			cmd_path = ft_strdup(scmd);
 		else
 			cmd_path = jointhree(env_paths[i], "/", scmd, ms);
-		if (stat(cmd_path, &buf) != -1)
-			if (!S_ISREG(buf.st_mode))
-				is_dir = true;
 		if (access(cmd_path, F_OK) == 0 \
-		&& !is_dir && free_and_1(env_paths, NULL))
+		&& !check_is_dir(cmd_path) && free_and_1(env_paths, NULL))
 			return (cmd_path);
 		free (cmd_path);
 		if (scmd[0] == '/')
