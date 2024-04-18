@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 18:44:51 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/18 11:12:10 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/18 14:18:23 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,10 @@ void	env_variable(t_ms *ms, bool quote, bool dquote, char **str)
 	while ((*str) && (*str)[i])
 	{
 		quote_status2(&quote, &dquote, (*str)[i]);
-		if ((*str)[i] == '$' && quote == false && (*str)[i +1]
-			&& (*str)[i +1] != ' ' && (*str)[i +1] != '$'
-			&& (!(dquote == true && ((*str)[i +1] == '\''
-			|| (*str)[i +1] == '\"' || (*str)[i +1] == ' '))))
+		if ((*str)[i] == '$' && quote == false && (*str)[i +1] && (((*str)[i +1]
+			>= '0' && (*str)[i +1] <= '9') || ((*str)[i +1] >= 'a' && \
+			(*str)[i +1] <= 'z') || ((*str)[i +1] >= 'A' && (*str)[i +1] \
+			<= 'Z') || (*str)[i +1] == '_' || (*str)[i +1] == '?'))
 		{
 			env_loop(ms, &start, &i, str);
 			ms->temp2 = ft_substr((*str), start, i - start);
