@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 14:51:27 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/13 18:09:20 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/18 11:23:29 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,13 +36,6 @@ void	quote_status(bool *quote)
 		(*quote) = true;
 	else if ((*quote) == true)
 		(*quote) = false;
-}
-
-// TO BE DELETED
-void	malloc_error(int err)
-{
-	ft_putendl_fd("minishell: Malloc failed", 2);
-	exit(err);
 }
 
 int	get_token(char *str)

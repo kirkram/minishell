@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 12:10:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/17 19:14:53 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/18 11:17:17 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,10 +63,14 @@ static void	export_loop2(char *arg, t_ms *ms, int *i)
 	ft_nullfree(&ms->temp2);
 }
 
-static void	export_loop(char *arg, t_ms *ms, bool quote, bool dquote)
+static void	export_loop(char *arg, t_ms *ms)
 {
 	int		i;
+	bool	quote;
+	bool	dquote;
 
+	quote = false;
+	dquote = false;
 	i = 0;
 	while (arg[i])
 	{
@@ -89,12 +93,8 @@ static void	export_loop(char *arg, t_ms *ms, bool quote, bool dquote)
 int	export(t_utils *utils, char **arg, t_ms *ms)
 {
 	int		i;
-	bool	quote;
-	bool	dquote;
 	int		ret;
 
-	quote = false;
-	dquote = false;
 	ret = 0;
 	i = 1;
 	if (!utils)
@@ -109,7 +109,7 @@ int	export(t_utils *utils, char **arg, t_ms *ms)
 	while (arg[0] && arg[i])
 	{
 		if (export_error(arg[i]) == 0)
-			export_loop(arg[i], ms, quote, dquote);
+			export_loop(arg[i], ms);
 		else
 			ret = 1;
 		i++;

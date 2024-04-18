@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:03:41 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/17 18:40:29 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/18 11:21:06 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,6 @@ int		lexer(t_ms *ms);
 void	env_variable(t_ms *ms, bool quote, bool dquote, char **str);
 char	*get_variable(t_ms *ms);
 int		get_token(char *str);
-
 char	*separator(t_ms *ms, bool quote, bool dquote, int i);
 void	remove_space(int i, t_ms *ms);
 void	init_token(t_pipe *pipe, t_ms *ms);
@@ -115,7 +114,6 @@ void	remove_out(t_pipe *pipe, int i, int app);
 void	make_tokens(t_pipe *pipe, int i);
 int		env_error(char **temp, t_ms *ms);
 void	combine_str(char **new_str, char *temp);
-
 void	pipeline_init(char **array, t_pipe ***pipe, t_ms *ms);
 void	init_tokenarr(int **tokens, char **array, t_ms *ms);
 void	quote_remover(t_pipe *pipe, t_ms *ms);
