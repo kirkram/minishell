@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 12:22:53 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/17 19:16:08 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/19 12:11:01 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,10 @@ void	unset_env(t_utils *utils, char *arg, t_ms *ms)
 			else
 				break ;
 			if (arg[x] == '\0' && utils->envp[i][x] == '=')
+			{
 				remove_env(ms, i, x, y);
+				return ;
+			}
 		}
 		i++;
 	}
@@ -56,7 +59,10 @@ void	unset_exp(t_ms *ms, char *arg, int i)
 				break ;
 			if (arg[x] == '\0' && (ms->utils->export[i][y] == '='
 				|| ms->utils->export[i][y] == '\0'))
+			{
 				remove_exp(ms, i, x, y);
+				return ;
+			}
 		}
 		i++;
 	}
