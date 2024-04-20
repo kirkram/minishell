@@ -6,42 +6,43 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 12:10:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/18 11:17:17 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/20 12:03:27 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-static int	print_exp_error(char *arg)
+static void	check_equal(t_ms *ms, char *arg)
 {
-	ft_putstr_fd("export: `", 2);
-	ft_putstr_fd(arg, 2);
-	ft_putendl_fd("\': not a valid identifier", 2);
-	return (1);
-}
-
-int	export_error(char *arg)
-{
-	int	x;
+	char	*temp;
+	int		i;
+	int		len;
+	int		x;
 
 	x = 0;
-	while (arg[x] && (arg[x] == '\'' || arg[x] == '\"'))
-		x++;
-	if ((arg[x] >= '0' && arg[x] <= '9') || arg[x] == '=')
-		return (print_exp_error(arg));
-	while (arg[x] && arg[x] != '=')
+	len = 0;
+	i = 0;
+	temp = NULL;
+	temp = ft_strjoin("declare -x ", arg);
+	while (temp[len] && temp[len] != '=')
+		len++;
+	while (ms->utils->export[i])
 	{
-		if (!((arg[x] >= '0' && arg[x] <= '9') || (arg[x] >= 'a'
-					&& arg[x] <= 'z') || (arg[x] >= 'A'
-					&& arg[x] <= 'Z') || (arg[x] == '_')))
-			return (print_exp_error(arg));
-		x++;
+		if ((ft_strncmp(temp, ms->utils->export[i], len) == 0)
+			&& ms->utils->export[i][len] == '\0')
+		{
+			remove_exp(ms, i, x, len);
+			ft_nullfree(&temp);
+			return ;
+		}
+		i++;
 	}
-	return (0);
+	ft_nullfree(&temp);
 }
 
 static void	export_loop2(char *arg, t_ms *ms, int *i)
 {
+	check_equal(ms, arg);
 	ms->temp2 = ft_substr(arg, 0, ((*i) + 1));
 	malloc_check(&ms->temp2, ms);
 	change_var(&ms->utils->envp, ms->temp2, arg, ms);
@@ -108,7 +109,7 @@ int	export(t_utils *utils, char **arg, t_ms *ms)
 	}
 	while (arg[0] && arg[i])
 	{
-		if (export_error(arg[i]) == 0)
+		if (export_error(arg[i], 1) == 0)
 			export_loop(arg[i], ms);
 		else
 			ret = 1;
