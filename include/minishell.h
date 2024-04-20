@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:03:41 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/18 15:38:50 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/20 11:58:43 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,7 +164,7 @@ int		export(t_utils *utils, char **arg, t_ms *ms);
 void	print_exp(t_utils *utils, int fd);
 void	sort_export(t_utils *utils);
 int		add_exp_var(t_utils **utils, char *newstr, t_ms *ms);
-int		export_error(char *arg);
+int		export_error(char *arg, int prog);
 
 // unset
 int		remove_env(t_ms *ms, int i, int x, int y);

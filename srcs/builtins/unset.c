@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 12:22:53 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/19 12:11:01 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/20 11:58:44 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ int	unset(t_utils *utils, char **arg, t_ms *ms)
 		return (0);
 	while (arg[i])
 	{
-		if (export_error(arg[i]) == 0)
+		if (export_error(arg[i], 2) == 0)
 		{
 			unset_env(utils, arg[i], ms);
 			unset_exp(ms, arg[i], i);
