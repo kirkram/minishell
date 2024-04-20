@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:50:51 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/15 18:44:44 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/19 12:29:54 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,11 @@
 void	exec_child_builtin_function(t_ms *ms, int i, t_exec *xx)
 {
 	xx->pid[i] = fork();
+	if (xx->pid[i] == -1)
+	{
+		ft_putendl_fd("Failed to create a new process", 2);
+		free_and_exit(&ms->pipe, &ms->utils, ms, 9);
+	}
 	if (xx->pid[i] == 0)
 	{
 		dup_and_close_child_process(i, xx);

@@ -6,11 +6,21 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:41:54 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/18 15:39:58 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/19 12:46:27 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+
+static void	fork_process(t_exec *xx, t_ms *ms, int i)
+{
+	xx->pid[i] = fork();
+	if (xx->pid[i] == -1)
+	{
+		ft_putendl_fd("Failed to create a new process", 2);
+		free_and_exit(&ms->pipe, &ms->utils, ms, 9);
+	}
+}
 
 void	exec_child_system_function(t_ms *ms, int i, t_exec *xx)
 {
@@ -19,7 +29,7 @@ void	exec_child_system_function(t_ms *ms, int i, t_exec *xx)
 
 	ppe = ms->pipe;
 	utils = ms->utils;
-	xx->pid[i] = fork();
+	fork_process(xx, ms, i);
 	if (xx->pid[i] == 0)
 	{
 		dup_and_close_child_process(i, xx);

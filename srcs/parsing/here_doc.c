@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_doc.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:06:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/17 18:29:18 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/19 12:51:05 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,13 +50,22 @@ void	hd_env(char **buff, t_ms *ms)
 	env_variable(ms, quote, dquote, buff);
 }
 
-void	here_doc_open(char *eof, t_pipe *_pipe, t_utils *utils, t_ms *ms)
+static void	openpipehd_fd(t_pipe *_pipe_i, t_ms *ms)
+{
+	if (pipe(_pipe_i->hd_fd) == -1)
+	{
+		ft_putendl_fd("Pipe failed to open", 2);
+		free_and_exit(&ms->pipe, &ms->utils, ms, 10);
+	}
+}
+
+void	here_doc_open(char *eof, t_pipe *_pipe_i, t_utils *utils, t_ms *ms)
 {
 	char	*buff;
 	int		save_stdin;
 
 	save_stdin = dup(STDIN_FILENO);
-	pipe(_pipe->hd_fd);
+	openpipehd_fd(_pipe_i, ms);
 	while (1)
 	{
 		buff = readline("> ");
@@ -71,10 +80,10 @@ void	here_doc_open(char *eof, t_pipe *_pipe, t_utils *utils, t_ms *ms)
 		if (!buff || ft_strncmp(eof, buff, -1) == 0)
 			break ;
 		hd_env(&buff, ms);
-		ft_putendl_fd(buff, _pipe->hd_fd[1]);
+		ft_putendl_fd(buff, _pipe_i->hd_fd[1]);
 		free (buff);
 	}
-	close(_pipe->hd_fd[1]);
+	close(_pipe_i->hd_fd[1]);
 	close (save_stdin);
 	free(buff);
 }

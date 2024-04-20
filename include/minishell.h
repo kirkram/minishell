@@ -20,8 +20,6 @@
 # include <signal.h>     // for signal, sigaction, sigemptyset, sigaddset, kill
 # include <sys/stat.h>   // for stat, lstat, fstat
 # include <fcntl.h>      // for open, unlink
-//# include <dirent.h>     // for opendir, readdir, closedir
-//# include <string.h>     // for strerror
 # include <sys/wait.h>   // for wait, waitpid, wait3, wait4
 # include <stdbool.h>
 # include "../lib/libft/libft.h"
@@ -124,7 +122,7 @@ char	**get_cmd(char **cmds, int start, int end, t_ms *ms);
 void	pre_parse(char **array, t_pipe ***pipe, t_ms *ms);
 void	parser(char **array, t_pipe ***pipe, t_ms *ms);
 int		syntax_check(int *tokens, int *err_code, char **array);
-void	here_doc_open(char *eof, t_pipe *_pipe, t_utils *utils, t_ms *ms);
+void	here_doc_open(char *eof, t_pipe *_pipe_i, t_utils *utils, t_ms *ms);
 void	here_doc(t_pipe ***pipe, t_utils *utils, t_ms *ms);
 void	final_args(t_pipe *pipe, int i, t_ms *ms);
 void	remove_red(t_pipe *pipe, int i, t_ms *ms);
@@ -139,8 +137,6 @@ int		pipe_error(int *tokens, int *err_code, int i);
 
 //EXECUTE
 int		execute(t_utils *utils, t_pipe **_pipe, t_ms *ms);
-int		execute_loop(t_utils *utils, t_pipe **_pipe, t_ms *ms, t_exec *xx);
-char	*jointhree(char const *s1, char const *s2, char const *s3, t_ms *ms);
 int		handle_execve_errors(char *failed_cmd, int found_path, t_ms *ms, int i);
 int		msg_stderr(char *message, char *cmd, int err_code);
 char	**find_path_and_pwd(char **envp, char *scmd, t_ms *ms);
@@ -148,7 +144,6 @@ int		free_and_1(char **paths, int **end);
 int		exec_assign_redirections(t_pipe *_pipe_i, int (*fd)[2]);
 int		exec_redir_in(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed);
 int		exec_redir_out(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed);
-int		waitpid_and_close_exec(t_ms *ms, t_exec *xx);
 void	exec_child_system_function(t_ms *ms, int i, t_exec *xx);
 void	exec_child_builtin_function(t_ms *ms, int i, t_exec *xx);
 void	exec_builtin_no_pipes(t_ms *ms, int i, t_exec *xx);
@@ -210,6 +205,7 @@ void	free_and_exit(t_pipe ***_pipe, t_utils **utils, t_ms *ms, int ex_code);
 void	free_one_pipe(t_pipe *_pipe);
 int		close_if_valid_fd(int fd);
 int		check_is_dir(char *path);
+char	*jointhree(char const *s1, char const *s2, char const *s3, t_ms *ms);
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2

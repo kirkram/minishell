@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/18 13:02:10 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/19 12:38:49 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,28 +27,16 @@ static int	init_exec_variables(t_ms *ms, t_exec *xx)
 	return (0);
 }
 
-int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
+static void	openpipefd(t_ms *ms, t_exec *xx)
 {
-	t_exec	xx;
-
-	if (g_signal != 0)
-		return (128 + g_signal);
-	init_exec_variables(ms, &xx);
-	while (xx.i < xx.num_of_pipes && xx.i < 256)
+	if (pipe(xx->pipefd) == -1)
 	{
-		if (execute_loop(utils, _pipe, ms, &xx) == 1)
-			break ;
-		xx.i ++;
+		ft_putendl_fd("Pipe failed to open", 2);
+		free_and_exit(&ms->pipe, &ms->utils, ms, 10);
 	}
-	if (xx.i == 256)
-		ft_putendl_fd("Max amount of pipes reached", 2);
-	if (xx.i == 256)
-		utils->err_code = 255;
-	close_if_valid_fd(xx.tempfd_0);
-	return (waitpid_and_close_exec(ms, &xx));
 }
 
-int	execute_loop(t_utils *utils, t_pipe **_pipe, t_ms *ms, t_exec *xx)
+static int	execute_pipe(t_utils *utils, t_pipe **_pipe, t_ms *ms, t_exec *xx)
 {
 	if (g_signal != 0)
 		return (1);
@@ -65,7 +53,7 @@ int	execute_loop(t_utils *utils, t_pipe **_pipe, t_ms *ms, t_exec *xx)
 		utils->err_code = 1;
 	}
 	if (xx->i != xx->num_of_pipes - 1)
-		pipe(xx->pipefd);
+		openpipefd(ms, xx);
 	if (!xx->fd_failed && _pipe[xx->i]->tokens && _pipe[xx->i]->tokens[0] != 8)
 		exec_child_system_function(ms, xx->i, xx);
 	else if (!xx->fd_failed && _pipe[1] && _pipe[xx->i]->tokens[0] == BUILTIN)
@@ -79,7 +67,7 @@ int	execute_loop(t_utils *utils, t_pipe **_pipe, t_ms *ms, t_exec *xx)
 
 //return exit code of last child
 //if there was no fd failure and there was a pipe in the command
-int	waitpid_and_close_exec(t_ms *ms, t_exec *xx)
+static int	waitpid_and_close_exec(t_ms *ms, t_exec *xx)
 {
 	xx->i = 0;
 	xx->child_exit_code = 0;
@@ -105,4 +93,26 @@ int	waitpid_and_close_exec(t_ms *ms, t_exec *xx)
 		return (WEXITSTATUS(xx->child_exit_code));
 	else
 		return (ms->utils->err_code);
+}
+
+int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
+{
+	t_exec	xx;
+
+	if (g_signal != 0)
+		return (128 + g_signal);
+	init_exec_variables(ms, &xx);
+	while (xx.i < xx.num_of_pipes && xx.i < 256)
+	{
+		if (execute_pipe(utils, _pipe, ms, &xx) == 1)
+			break ;
+		xx.i ++;
+	}
+	if (xx.i == 256)
+	{
+		ft_putendl_fd("Max amount of pipes reached", 2);
+		utils->err_code = 255;
+	}
+	close_if_valid_fd(xx.tempfd_0);
+	return (waitpid_and_close_exec(ms, &xx));
 }

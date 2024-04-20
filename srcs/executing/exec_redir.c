@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 17:58:15 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/18 15:57:41 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/19 12:47:19 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int	exec_redir_out(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed)
 		(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	else if (_pipe_i->tokens[j] == OUT_AP)
 		(*fd)[1] = open(_pipe_i->args[j], O_CREAT | O_WRONLY | O_APPEND, 0644);
-	if ((*fd)[1] < 0 &&( _pipe_i->args[j][0] == '\0' || \
+	if ((*fd)[1] < 0 && (_pipe_i->args[j][0] == '\0' || \
 		access(_pipe_i->args[j], F_OK) == -1))
 		return (exec_redir_out_err(_pipe_i->args[j], \
 		": No such file or directory", fd_failed));
