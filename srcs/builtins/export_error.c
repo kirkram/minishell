@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 12:03:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/20 12:04:42 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/22 10:42:25 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@
 static int	print_exp_error(char *arg, int prog)
 {
 	if (prog == 1)
-		ft_putstr_fd("export: `", 2);
+		ft_putstr_fd("MINISHELL: export: `", 2);
 	else
-		ft_putstr_fd("unset: `", 2);
+		ft_putstr_fd("MINISHELL: unset: `", 2);
 	ft_putstr_fd(arg, 2);
 	ft_putendl_fd("\': not a valid identifier", 2);
 	return (1);
