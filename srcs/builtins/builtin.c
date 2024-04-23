@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 14:26:23 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/17 18:31:38 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/23 17:06:21 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,9 @@ int	echo_builtin(char **noio_args, t_utils *utils)
 
 static long long	ft_atol(const char *str)
 {
-	long long	num;
-	int			sign;
+	long long		num;
+	int				sign;
+	long long		check;
 
 	num = 0;
 	sign = 1;
@@ -65,8 +66,9 @@ static long long	ft_atol(const char *str)
 		str ++;
 	while (*str >= '0' && *str <= '9')
 	{
+		check = num;
 		num = num * 10 + *str - 48;
-		if (num < 0)
+		if (check > num || num < 0)
 		{
 			if (sign > 0)
 				return (-1);

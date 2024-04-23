@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/23 15:11:34 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/23 16:24:41 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static int	init_exec_variables(t_ms *ms, t_exec *xx)
 {
-	xx->savestdio[0] = dup(STDIN_FILENO);
+	xx->savestdio[0] = dup_and_check(STDIN_FILENO, ms);
 	xx->savestdio[1] = dup_and_check(STDOUT_FILENO, ms);
 	xx->i = 0;
 	while (ms->pipe[xx->i])
@@ -100,7 +100,7 @@ int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 	t_exec	xx;
 
 	if (g_signal != 0)
-		return (128 + g_signal);
+		return (g_signal);
 	init_exec_variables(ms, &xx);
 	while (xx.i < xx.num_of_pipes && xx.i < 256)
 	{

@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:03:41 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/23 15:07:26 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/23 16:12:24 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,8 +177,6 @@ int		pwd(t_utils *utils);
 
 // cd
 int		cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms);
-int		cd_home_chdir_fail(char *home_path, t_utils *utils);
-int		cd_chdir_fail(t_pipe **_pipe, int index);
 char	*find_home_env(t_utils *utils);
 
 // exit

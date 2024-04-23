@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:06:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/23 15:08:38 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/23 15:57:02 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void	here_doc_open(char *eof, t_pipe *_pipe_i, t_utils *utils, t_ms *ms)
 		if (g_signal != 0)
 		{
 			dup2_and_check(save_stdin, STDIN_FILENO, ms);
-			close (save_stdin);
+			close_if_valid_fd (save_stdin);
 			ft_putendl_fd(">", STDOUT_FILENO);
 			utils->was_prev_line_null = 1;
 			break ;
@@ -83,7 +83,7 @@ void	here_doc_open(char *eof, t_pipe *_pipe_i, t_utils *utils, t_ms *ms)
 		ft_putendl_fd(buff, _pipe_i->hd_fd[1]);
 		free (buff);
 	}
-	close(_pipe_i->hd_fd[1]);
-	close (save_stdin);
+	close_if_valid_fd(_pipe_i->hd_fd[1]);
+	close_if_valid_fd (save_stdin);
 	free(buff);
 }
