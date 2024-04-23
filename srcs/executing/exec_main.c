@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:59:27 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/19 12:38:49 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/23 16:24:41 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 static int	init_exec_variables(t_ms *ms, t_exec *xx)
 {
-	xx->savestdio[0] = dup(STDIN_FILENO);
-	xx->savestdio[1] = dup(STDOUT_FILENO);
+	xx->savestdio[0] = dup_and_check(STDIN_FILENO, ms);
+	xx->savestdio[1] = dup_and_check(STDOUT_FILENO, ms);
 	xx->i = 0;
 	while (ms->pipe[xx->i])
 		xx->i ++;
@@ -61,7 +61,7 @@ static int	execute_pipe(t_utils *utils, t_pipe **_pipe, t_ms *ms, t_exec *xx)
 	else if (!xx->fd_failed && !_pipe[1])
 		exec_builtin_no_pipes(ms, xx->i, xx);
 	else if (xx->fd_failed)
-		exec_fd_fail_pass_pipe(_pipe, xx->i, xx);
+		exec_fd_fail_pass_pipe(_pipe, xx->i, xx, ms);
 	return (0);
 }
 
@@ -82,10 +82,10 @@ static int	waitpid_and_close_exec(t_ms *ms, t_exec *xx)
 			waitpid(xx->pid[xx->i], NULL, 0);
 		xx->i ++;
 	}
-	dup2(xx->savestdio[0], STDIN_FILENO);
-	dup2(xx->savestdio[1], STDOUT_FILENO);
-	close(xx->savestdio[0]);
-	close(xx->savestdio[1]);
+	dup2_and_check(xx->savestdio[0], STDIN_FILENO, ms);
+	dup2_and_check(xx->savestdio[1], STDOUT_FILENO, ms);
+	close_if_valid_fd(xx->savestdio[0]);
+	close_if_valid_fd(xx->savestdio[1]);
 	if (g_signal != 0 && ft_putstr_fd("\n", STDOUT_FILENO) != -42)
 		return (128 + g_signal);
 	else if (WIFEXITED(xx->child_exit_code) && !xx->fd_failed && \
@@ -100,7 +100,7 @@ int	execute(t_utils *utils, t_pipe **_pipe, t_ms *ms)
 	t_exec	xx;
 
 	if (g_signal != 0)
-		return (128 + g_signal);
+		return (g_signal);
 	init_exec_variables(ms, &xx);
 	while (xx.i < xx.num_of_pipes && xx.i < 256)
 	{

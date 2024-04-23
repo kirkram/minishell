@@ -6,16 +6,16 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:47:29 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/18 15:43:31 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/23 15:01:28 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	exec_fd_fail_pass_pipe(t_pipe **_pipe, int i, t_exec *xx)
+void	exec_fd_fail_pass_pipe(t_pipe **_pipe, int i, t_exec *xx, t_ms *ms)
 {
 	if (_pipe[1] && i != xx->num_of_pipes - 1)
-		xx->tempfd_0 = dup(xx->pipefd[0]);
+		xx->tempfd_0 = dup_and_check(xx->pipefd[0], ms);
 	close_if_valid_fd(xx->pipefd[0]);
 	close_if_valid_fd(xx->pipefd[1]);
 	close_if_valid_fd(xx->fd[0]);

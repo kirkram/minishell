@@ -64,15 +64,15 @@ void	here_doc_open(char *eof, t_pipe *_pipe_i, t_utils *utils, t_ms *ms)
 	char	*buff;
 	int		save_stdin;
 
-	save_stdin = dup(STDIN_FILENO);
+	save_stdin = dup_and_check(STDIN_FILENO, ms);
 	openpipehd_fd(_pipe_i, ms);
 	while (1)
 	{
 		buff = readline("> ");
 		if (g_signal != 0)
 		{
-			dup2 (save_stdin, STDIN_FILENO);
-			close (save_stdin);
+			dup2_and_check(save_stdin, STDIN_FILENO, ms);
+			close_if_valid_fd (save_stdin);
 			ft_putendl_fd(">", STDOUT_FILENO);
 			utils->was_prev_line_null = 1;
 			utils->err_code = 1;
@@ -84,7 +84,7 @@ void	here_doc_open(char *eof, t_pipe *_pipe_i, t_utils *utils, t_ms *ms)
 		ft_putendl_fd(buff, _pipe_i->hd_fd[1]);
 		free (buff);
 	}
-	close(_pipe_i->hd_fd[1]);
-	close (save_stdin);
+	close_if_valid_fd(_pipe_i->hd_fd[1]);
+	close_if_valid_fd (save_stdin);
 	free(buff);
 }

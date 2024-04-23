@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:27:21 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/18 13:03:51 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/23 16:15:20 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,55 @@ static int	update_pwd_oldpwd(t_utils *utils, t_ms *ms, char cwd[4096], int i)
 	return (0);
 }
 
+static int	cd_home_chdir_fail(char *home_path, t_utils *utils)
+{
+	if (access(home_path, F_OK) == -1 && !find_home_env(utils))
+	{
+		ft_putstr_fd("minishell: cd: ", 2);
+		ft_putendl_fd("HOME not set", 2);
+	}
+	else if (access(home_path, F_OK) == -1)
+	{
+		ft_putstr_fd("minishell: cd: ", 2);
+		ft_putstr_fd(home_path, 2);
+		ft_putendl_fd(": Not a directory", 2);
+	}
+	else if (access(home_path, X_OK) == -1)
+	{
+		ft_putstr_fd("minishell: cd: ", 2);
+		ft_putstr_fd(home_path, 2);
+		ft_putendl_fd(": Permission denied", 2);
+	}
+	free (home_path);
+	return (1);
+}
+
+static int	cd_chdir_fail(t_pipe **_pipe, int index)
+{
+	if (access((_pipe)[index]->noio_args[1], F_OK) == -1)
+	{
+		if ((_pipe)[index]->noio_args[1][0] != '\0')
+		{
+			ft_putstr_fd("minishell: cd: ", 2);
+			ft_putstr_fd((_pipe)[index]->noio_args[1], 2);
+			ft_putendl_fd(": No such file or directory", 2);
+		}
+	}
+	else if (!check_is_dir((_pipe)[index]->noio_args[1]))
+	{
+		ft_putstr_fd("minishell: cd: ", 2);
+		ft_putstr_fd((_pipe)[index]->noio_args[1], 2);
+		ft_putendl_fd(": Not a directory", 2);
+	}
+	else if (access((_pipe)[index]->noio_args[1], X_OK) == -1)
+	{
+		ft_putstr_fd("minishell: cd: ", 2);
+		ft_putstr_fd((_pipe)[index]->noio_args[1], 2);
+		ft_putendl_fd(": Permission denied", 2);
+	}
+	return (1);
+}
+
 int	cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms)
 {
 	char	*home_path;
@@ -68,52 +117,6 @@ int	cd_builtin(t_pipe **_pipe, t_utils *utils, int index, t_ms *ms)
 	getcwd(cwd, 4096);
 	update_pwd_oldpwd(utils, ms, cwd, i);
 	return (0);
-}
-
-int	cd_home_chdir_fail(char *home_path, t_utils *utils)
-{
-	if (access(home_path, F_OK) == -1 && !find_home_env(utils))
-	{
-		ft_putstr_fd("minishell: cd: ", 2);
-		ft_putendl_fd("HOME not set", 2);
-	}
-	else if (access(home_path, F_OK) == -1)
-	{
-		ft_putstr_fd("minishell: cd: ", 2);
-		ft_putstr_fd(home_path, 2);
-		ft_putendl_fd(": Not a directory", 2);
-	}
-	else if (access(home_path, X_OK) == -1)
-	{
-		ft_putstr_fd("minishell: cd: ", 2);
-		ft_putstr_fd(home_path, 2);
-		ft_putendl_fd(": Permission denied", 2);
-	}
-	free (home_path);
-	return (1);
-}
-
-int	cd_chdir_fail(t_pipe **_pipe, int index)
-{
-	if (access((_pipe)[index]->noio_args[1], F_OK) == -1)
-	{
-		ft_putstr_fd("minishell: cd: ", 2);
-		ft_putstr_fd((_pipe)[index]->noio_args[1], 2);
-		ft_putendl_fd(": No such file or directory", 2);
-	}
-	else if (!check_is_dir((_pipe)[index]->noio_args[1]))
-	{
-		ft_putstr_fd("minishell: cd: ", 2);
-		ft_putstr_fd((_pipe)[index]->noio_args[1], 2);
-		ft_putendl_fd(": Not a directory", 2);
-	}
-	else if (access((_pipe)[index]->noio_args[1], X_OK) == -1)
-	{
-		ft_putstr_fd("minishell: cd: ", 2);
-		ft_putstr_fd((_pipe)[index]->noio_args[1], 2);
-		ft_putendl_fd(": Permission denied", 2);
-	}
-	return (1);
 }
 
 char	*find_home_env(t_utils *utils)

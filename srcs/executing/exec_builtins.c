@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:50:51 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/19 12:29:54 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/23 15:07:47 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,21 +22,21 @@ void	exec_child_builtin_function(t_ms *ms, int i, t_exec *xx)
 	}
 	if (xx->pid[i] == 0)
 	{
-		dup_and_close_child_process(i, xx);
+		dup_and_close_child_process(i, xx, ms);
 		ms->utils->err_code = exec_builtin(ms->pipe, ms->utils, i, ms);
 		free_and_exit(&ms->pipe, &ms->utils, ms, ms->utils->err_code);
 	}
 	else
-		pipe_readend_and_close_parent(i, ms->pipe, xx);
+		pipe_readend_close_parent(i, ms->pipe, xx, ms);
 }
 
 void	exec_builtin_no_pipes(t_ms *ms, int i, t_exec *xx)
 {
 	if (xx->fd[0] > -1)
-		dup2(xx->fd[0], STDIN_FILENO);
+		dup2_and_check(xx->fd[0], STDIN_FILENO, ms);
 	close_if_valid_fd(xx->fd[0]);
 	if (xx->fd[1] > -1)
-		dup2(xx->fd[1], STDOUT_FILENO);
+		dup2_and_check(xx->fd[1], STDOUT_FILENO, ms);
 	close_if_valid_fd(xx->fd[1]);
 	ms->utils->err_code = exec_builtin(ms->pipe, ms->utils, i, ms);
 }

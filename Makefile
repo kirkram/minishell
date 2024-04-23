@@ -17,7 +17,8 @@ SRCS = \
  ./srcs/parsing/parse.c  ./srcs/parsing/parsing_init.c ./srcs/parsing/parsing_utils.c \
  ./srcs/parsing/parsing.c ./srcs/parsing/syntax_check.c ./srcs/parsing/tokens.c \
  ./srcs/signal/signal.c \
- ./srcs/utils/malloc_error.c ./srcs/utils/utils_freeing.c ./srcs/utils/utils.c 
+ ./srcs/utils/malloc_error.c ./srcs/utils/utils_freeing.c ./srcs/utils/utils.c \
+ ./srcs/utils/utils_redir.c
 OBJCTS = $(SRCS:.c=.o)
 RM = rm -f
 
