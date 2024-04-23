@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/23 16:34:30 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/23 17:12:10 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,15 @@ static void	rl_gets_error(t_utils *utils)
 	exit (utils->err_code);
 }
 
+static	void	rl_gets_addhist(char *line_read, t_utils *utils)
+{
+	if (line_read && *line_read && g_signal == 0)
+	{
+		add_history(line_read);
+		utils->was_prev_line_null = 0;
+	}
+}
+
 char	*rl_gets(char *line_read, t_utils *utils, t_ms *ms)
 {
 	int	savestdio;
@@ -82,11 +91,7 @@ char	*rl_gets(char *line_read, t_utils *utils, t_ms *ms)
 			ft_putchar_fd('\n', STDIN_FILENO);
 		utils->was_prev_line_null = 1;
 	}
-	if (line_read && *line_read && g_signal == 0)
-	{
-		add_history(line_read);
-		utils->was_prev_line_null = 0;
-	}
-	close (savestdio);
+	rl_gets_addhist(line_read, utils);
+	close_if_valid_fd (savestdio);
 	return (line_read);
 }

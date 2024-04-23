@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/03 19:03:25 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/15 16:50:16 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/23 17:53:17 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,8 @@ void	parser(char **array, t_pipe ***pipe, t_ms *ms)
 		quote_remover((*pipe)[x], ms);
 		remove_red((*pipe)[x], i, ms);
 		final_args((*pipe)[x], i, ms);
+		(*pipe)[x]->hd_fd[0] = -1;
+		(*pipe)[x]->hd_fd[1] = -2;
 		x++;
 	}
 }

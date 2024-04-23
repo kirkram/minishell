@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/23 16:27:00 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/23 17:50:48 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,22 @@ void	quote_remover(t_pipe *pipe, t_ms *ms)
 	}
 }
 
+int	close_all_hds(t_ms *ms)
+{
+	t_pipe **_pipes;
+	int			i;
+
+	i = 0;
+	_pipes = ms->pipe;
+	while (_pipes[i])
+	{
+		// if (_pipes[i]->tokens[i])
+		close_if_valid_fd(_pipes[i]->hd_fd[0]);
+		i ++;
+	}
+	return (0);
+}
+
 int	parsing(t_ms *ms)
 {
 	char	**array;
@@ -127,6 +143,8 @@ int	parsing(t_ms *ms)
 	free (tokens);
 	parser(array, &ms->pipe, ms);
 	here_doc(&ms->pipe, ms->utils, ms);
+	if (ms->utils->syntax_err == TRUE || g_signal != 0)
+		close_all_hds(ms);
 	if (ms->utils->syntax_err == TRUE || g_signal != 0)
 		return (1);
 	return (0);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_doc.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:06:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/23 16:19:43 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/23 17:54:42 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,16 @@ void	here_doc(t_pipe ***pipe, t_utils *utils, t_ms *ms)
 			if ((*pipe)[x]->tokens[i] == SKIP_HD)
 			{
 				here_doc_open((*pipe)[x]->args[i], (*pipe)[x], utils, ms);
-				close ((*pipe)[x]->hd_fd[0]);
+				close_if_valid_fd((*pipe)[x]->hd_fd[0]);
 			}
 			else if ((*pipe)[x]->tokens[i] == IN_HD)
 				here_doc_open((*pipe)[x]->args[i], (*pipe)[x], utils, ms);
 			handle_sigquit(false);
 			if (g_signal != 0)
+			{
+				close_if_valid_fd((*pipe)[x]->hd_fd[0]);
 				return ;
+			}
 			i++;
 		}
 		x++;
@@ -50,8 +53,9 @@ void	hd_env(char **buff, t_ms *ms)
 	env_variable(ms, quote, dquote, buff);
 }
 
-static void	openpipehd_fd(t_pipe *_pipe_i, t_ms *ms)
+static void	pipe_and_savestdin_hd(t_pipe *_pipe_i, t_ms *ms, int *save_stdin)
 {
+	*save_stdin = dup_and_check(STDIN_FILENO, ms);
 	if (pipe(_pipe_i->hd_fd) == -1)
 	{
 		ft_putendl_fd("Pipe failed to open", 2);
@@ -64,8 +68,7 @@ void	here_doc_open(char *eof, t_pipe *_pipe_i, t_utils *utils, t_ms *ms)
 	char	*buff;
 	int		save_stdin;
 
-	save_stdin = dup_and_check(STDIN_FILENO, ms);
-	openpipehd_fd(_pipe_i, ms);
+	pipe_and_savestdin_hd(_pipe_i, ms, &save_stdin);
 	while (1)
 	{
 		buff = readline("> ");
