@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 11:44:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/15 16:50:32 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/23 16:27:00 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ int	parsing(t_ms *ms)
 	free (tokens);
 	parser(array, &ms->pipe, ms);
 	here_doc(&ms->pipe, ms->utils, ms);
-	if (ms->utils->syntax_err == TRUE)
+	if (ms->utils->syntax_err == TRUE || g_signal != 0)
 		return (1);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 18:44:51 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/18 14:18:23 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/23 14:52:37 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,31 @@ void	env_util(t_ms *ms, int start, int i, char **str)
 	ft_nullfree(&ms->temp);
 }
 
+static int	hd_c(char **str, int *i)
+{
+	int	x;
+
+	x = (*i);
+	x--;
+	while (x >= 0)
+	{
+		while (x > 0 && (((*str)[x] >= 9 \
+			&& (*str)[x] <= 13) || (*str)[x] == 32))
+			x--;
+		if (x > 0 && (*str)[x] == '<')
+			x--;
+		else
+			return (0);
+		if (x > 0 && (*str)[x] == '<' && (*str)[x -1] != '<')
+			return (1);
+		else if (x == 0 && (*str)[x] == '<')
+			return (1);
+		else
+			return (0);
+	}
+	return (0);
+}
+
 void	env_variable(t_ms *ms, bool quote, bool dquote, char **str)
 {
 	int		start;
@@ -58,9 +83,9 @@ void	env_variable(t_ms *ms, bool quote, bool dquote, char **str)
 	{
 		quote_status2(&quote, &dquote, (*str)[i]);
 		if ((*str)[i] == '$' && quote == false && (*str)[i +1] && (((*str)[i +1]
-			>= '0' && (*str)[i +1] <= '9') || ((*str)[i +1] >= 'a' && \
-			(*str)[i +1] <= 'z') || ((*str)[i +1] >= 'A' && (*str)[i +1] \
-			<= 'Z') || (*str)[i +1] == '_' || (*str)[i +1] == '?'))
+			>= '0' && (*str)[i +1] <= '9') || ((*str)[i +1] >= 'a' && (*str) \
+			[i +1] <= 'z') || ((*str)[i +1] >= 'A' && (*str)[i +1] <= 'Z') || \
+			(*str)[i +1] == '_' || (*str)[i +1] == '?') && hd_c(str, &i) == 0)
 		{
 			env_loop(ms, &start, &i, str);
 			ms->temp2 = ft_substr((*str), start, i - start);
@@ -74,31 +99,4 @@ void	env_variable(t_ms *ms, bool quote, bool dquote, char **str)
 	}
 	if (ms->temp)
 		env_util(ms, start, i, str);
-}
-
-char	*get_variable(t_ms *ms)
-{
-	int		i;
-	char	*env_var;
-
-	env_var = NULL;
-	i = 0;
-	if (env_error(&ms->temp2, ms) == 1)
-		return (ft_itoa(ms->utils->err_code));
-	while (ms->utils->envp[i])
-	{
-		if (ft_strnstr(ms->utils->envp[i], ms->temp2, ft_strlen(ms->temp2)))
-		{
-			env_var = ft_substr(ms->utils->envp[i], ft_strlen(ms->temp2),
-					ft_strlen(ms->utils->envp[i]) - ft_strlen(ms->temp2));
-			malloc_check(&env_var, ms);
-			break ;
-		}
-		i++;
-	}
-	if (ms->temp2)
-		ft_nullfree(&ms->temp2);
-	if (!env_var)
-		return (ft_strdup(""));
-	return (env_var);
 }

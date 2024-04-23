@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 12:19:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/20 12:02:29 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/23 14:46:29 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,24 +63,6 @@ static void	add_exp_loop(char ***tmp_arr, t_utils **utils, int *i, t_ms *ms)
 	(*i)++;
 }
 
-static int	replace_export(char *newstr, t_utils **utils, int i, t_ms *ms)
-{
-	char	*temp;
-
-	temp = NULL;
-	temp = ft_strjoin(newstr, "=");
-	malloc_check(&temp, ms);
-	if (ft_strncmp((*utils)->export[i], temp, ft_strlen(temp)) == 0)
-	{
-		free((*utils)->export[i]);
-		(*utils)->export[i] = ft_strdup(newstr);
-		ft_nullfree(&temp);
-		return (1);
-	}
-	ft_nullfree(&temp);
-	return (0);
-}
-
 int	add_exp_var(t_utils **utils, char *newstr, t_ms *ms)
 {
 	int		i;
@@ -91,7 +73,8 @@ int	add_exp_var(t_utils **utils, char *newstr, t_ms *ms)
 	{
 		if (ft_strncmp((*utils)->export[i], newstr, -1) == 0)
 			return (0);
-		if (replace_export(newstr, utils, i, ms) == 1)
+		if ((ft_strncmp((*utils)->export[i], newstr, ft_strlen(newstr)) == 0) \
+			&& (*utils)->export[i][ft_strlen(newstr)] == '=')
 			return (0);
 		i ++;
 	}

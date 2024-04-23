@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_main.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/23 15:08:10 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/23 16:34:30 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ char	*rl_gets(char *line_read, t_utils *utils, t_ms *ms)
 	else if (!line_read && g_signal != 0)
 	{
 		dup2_and_check(savestdio, STDIN_FILENO, ms);
+		utils->err_code = 1;
 		if (utils->was_prev_line_null == 0)
 			ft_putchar_fd('\n', STDIN_FILENO);
 		utils->was_prev_line_null = 1;

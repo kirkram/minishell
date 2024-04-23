@@ -6,7 +6,7 @@
 /*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/20 12:03:03 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/22 10:42:25 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/23 14:53:52 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ int	export_error(char *arg, int prog)
 		x++;
 	if ((arg[x] >= '0' && arg[x] <= '9') || arg[x] == '=')
 		return (print_exp_error(arg, prog));
+	if (arg[x] == '_' && (arg[x +1] == '\0' || arg[x +1] == '='))
+		return (1);
 	while (arg[x] && arg[x] != '=')
 	{
 		if (!((arg[x] >= '0' && arg[x] <= '9') || (arg[x] >= 'a'
@@ -39,6 +41,11 @@ int	export_error(char *arg, int prog)
 					&& arg[x] <= 'Z') || (arg[x] == '_')))
 			return (print_exp_error(arg, prog));
 		x++;
+	}
+	if (prog == 2)
+	{
+		if (arg[x] && arg[x] == '=')
+			return (print_exp_error(arg, prog));
 	}
 	return (0);
 }
