@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_doc.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:06:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/19 12:51:05 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/23 16:19:43 by clundber         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ void	here_doc_open(char *eof, t_pipe *_pipe_i, t_utils *utils, t_ms *ms)
 			close (save_stdin);
 			ft_putendl_fd(">", STDOUT_FILENO);
 			utils->was_prev_line_null = 1;
+			utils->err_code = 1;
 			break ;
 		}
 		if (!buff || ft_strncmp(eof, buff, -1) == 0)
