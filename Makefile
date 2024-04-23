@@ -13,7 +13,7 @@ SRCS = \
  ./srcs/initializing/init_findpath.c ./srcs/initializing/init_main.c ./srcs/initializing/init_utils.c \
  ./srcs/initializing/init_shlvar.c \
  ./srcs/parsing/here_doc.c  ./srcs/parsing/lexer.c ./srcs/parsing/lexer2.c \
- ./srcs/parsing/ms_split.c ./srcs/parsing/parse_env.c \
+ ./srcs/parsing/ms_split.c ./srcs/parsing/parse_env.c ./srcs/parsing/parse_env_utils.c\
  ./srcs/parsing/parse.c  ./srcs/parsing/parsing_init.c ./srcs/parsing/parsing_utils.c \
  ./srcs/parsing/parsing.c ./srcs/parsing/syntax_check.c ./srcs/parsing/tokens.c \
  ./srcs/signal/signal.c \
