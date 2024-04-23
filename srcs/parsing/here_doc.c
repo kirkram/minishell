@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:06:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/19 12:51:05 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/23 15:08:38 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,14 +64,14 @@ void	here_doc_open(char *eof, t_pipe *_pipe_i, t_utils *utils, t_ms *ms)
 	char	*buff;
 	int		save_stdin;
 
-	save_stdin = dup(STDIN_FILENO);
+	save_stdin = dup_and_check(STDIN_FILENO, ms);
 	openpipehd_fd(_pipe_i, ms);
 	while (1)
 	{
 		buff = readline("> ");
 		if (g_signal != 0)
 		{
-			dup2 (save_stdin, STDIN_FILENO);
+			dup2_and_check(save_stdin, STDIN_FILENO, ms);
 			close (save_stdin);
 			ft_putendl_fd(">", STDOUT_FILENO);
 			utils->was_prev_line_null = 1;

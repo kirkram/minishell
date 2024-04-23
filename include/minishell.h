@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: clundber <clundber@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:03:41 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/20 11:58:43 by clundber         ###   ########.fr       */
+/*   Updated: 2024/04/23 15:07:26 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void	handle_sigquit(bool active);
 // INIT
 void	intialize_utils(char **sys_envp, t_utils **utils, t_ms *ms);
 int		interactive_mode_loop(char **envp);
-char	*rl_gets(char *line_read, t_utils *utils);
+char	*rl_gets(char *line_read, t_utils *utils, t_ms *ms);
 void	copy_utils_change_shellvars(char **sys_envp, t_utils **ut, t_ms *ms);
 char	*init_exp(char *str1, char *str2, t_ms *ms);
 char	*shell_level(char *str, t_ms *ms, int i);
@@ -147,9 +147,9 @@ int		exec_redir_out(t_pipe *_pipe_i, int (*fd)[2], int j, int *fd_failed);
 void	exec_child_system_function(t_ms *ms, int i, t_exec *xx);
 void	exec_child_builtin_function(t_ms *ms, int i, t_exec *xx);
 void	exec_builtin_no_pipes(t_ms *ms, int i, t_exec *xx);
-void	exec_fd_fail_pass_pipe(t_pipe **_pipe, int i, t_exec *xx);
-void	dup_and_close_child_process(int i, t_exec *xx);
-void	pipe_readend_and_close_parent(int i, t_pipe **_pipe, t_exec *xx);
+void	exec_fd_fail_pass_pipe(t_pipe **_pipe, int i, t_exec *xx, t_ms *ms);
+void	dup_and_close_child_process(int i, t_exec *xx, t_ms *ms);
+void	pipe_readend_close_parent(int i, t_pipe **_pipe, t_exec *xx, t_ms *ms);
 
 // BUILTINS
 int		exec_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms);
@@ -206,6 +206,8 @@ void	free_one_pipe(t_pipe *_pipe);
 int		close_if_valid_fd(int fd);
 int		check_is_dir(char *path);
 char	*jointhree(char const *s1, char const *s2, char const *s3, t_ms *ms);
+int		dup_and_check(int dup_fd, t_ms *ms);
+void	dup2_and_check(int fd_over, int fd_replaced, t_ms *ms);
 
 # define CMD 1 // 1st CMD is the acctual CMD, others are flags / arguments
 # define PIPE 2

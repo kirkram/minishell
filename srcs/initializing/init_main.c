@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 13:55:30 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/19 12:22:10 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/23 15:08:10 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int	interactive_mode_loop(char **sys_envp)
 	while (1)
 	{
 		g_signal = 0;
-		ms.line = rl_gets(ms.line, ms.utils);
+		ms.line = rl_gets(ms.line, ms.utils, &ms);
 		if (ms.line && parsing(&ms) != 1)
 		{
 			i = -1;
@@ -61,11 +61,11 @@ static void	rl_gets_error(t_utils *utils)
 	exit (utils->err_code);
 }
 
-char	*rl_gets(char *line_read, t_utils *utils)
+char	*rl_gets(char *line_read, t_utils *utils, t_ms *ms)
 {
 	int	savestdio;
 
-	savestdio = dup(STDIN_FILENO);
+	savestdio = dup_and_check(STDIN_FILENO, ms);
 	if (line_read)
 		ft_nullfree(&line_read);
 	g_signal = 0;
@@ -76,7 +76,7 @@ char	*rl_gets(char *line_read, t_utils *utils)
 		rl_gets_error(utils);
 	else if (!line_read && g_signal != 0)
 	{
-		dup2 (savestdio, STDIN_FILENO);
+		dup2_and_check(savestdio, STDIN_FILENO, ms);
 		if (utils->was_prev_line_null == 0)
 			ft_putchar_fd('\n', STDIN_FILENO);
 		utils->was_prev_line_null = 1;
