@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:03:41 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/23 16:12:24 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/24 14:30:29 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,6 +126,7 @@ void	here_doc_open(char *eof, t_pipe *_pipe_i, t_utils *utils, t_ms *ms);
 void	here_doc(t_pipe ***pipe, t_utils *utils, t_ms *ms);
 void	final_args(t_pipe *pipe, int i, t_ms *ms);
 void	remove_red(t_pipe *pipe, int i, t_ms *ms);
+int		close_all_hds(t_ms *ms);
 
 // LEXER/PARSER UTILS
 int		is_builtin(char *str);
@@ -186,7 +187,6 @@ int		exit_builtin(t_pipe **_pipe, t_utils *utils, int i, t_ms *ms);
 int		echo_builtin(char **noio_args, t_utils *utils);
 
 //MS SPLIT
-
 int		str_count(char *str);
 int		ms_splitter(char *str, char ***array, bool quote, bool dquote);
 char	**ms_split(char *str, t_ms *ms);

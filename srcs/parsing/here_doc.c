@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 11:06:47 by clundber          #+#    #+#             */
-/*   Updated: 2024/04/23 17:54:42 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/24 14:28:48 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,11 @@ void	here_doc(t_pipe ***pipe, t_utils *utils, t_ms *ms)
 	int	i;
 	int	x;
 
-	x = 0;
-	while ((*pipe)[x])
+	x = -1;
+	while ((*pipe)[++x])
 	{
-		i = 0;
-		while ((*pipe)[x]->args[i])
+		i = -1;
+		while ((*pipe)[x]->args[++i])
 		{
 			handle_sigquit(true);
 			if ((*pipe)[x]->tokens[i] == SKIP_HD)
@@ -37,9 +37,7 @@ void	here_doc(t_pipe ***pipe, t_utils *utils, t_ms *ms)
 				close_if_valid_fd((*pipe)[x]->hd_fd[0]);
 				return ;
 			}
-			i++;
 		}
-		x++;
 	}
 }
 

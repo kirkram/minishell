@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/23 14:55:11 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/23 15:14:19 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/24 14:29:55 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,4 +35,19 @@ void	dup2_and_check(int fd_over, int fd_replaced, t_ms *ms)
 		ft_putendl_fd("dup2 error", 2);
 		free_and_exit(&ms->pipe, &ms->utils, ms, 1);
 	}
+}
+
+int	close_all_hds(t_ms *ms)
+{
+	t_pipe		**_pipes;
+	int			i;
+
+	i = 0;
+	_pipes = ms->pipe;
+	while (_pipes[i])
+	{
+		close_if_valid_fd(_pipes[i]->hd_fd[0]);
+		i ++;
+	}
+	return (0);
 }
