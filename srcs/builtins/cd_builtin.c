@@ -6,7 +6,7 @@
 /*   By: klukiano <klukiano@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/12 18:27:21 by klukiano          #+#    #+#             */
-/*   Updated: 2024/04/23 16:15:20 by klukiano         ###   ########.fr       */
+/*   Updated: 2024/04/25 18:42:58 by klukiano         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,6 @@ static int	cd_home_chdir_fail(char *home_path, t_utils *utils)
 		ft_putstr_fd(home_path, 2);
 		ft_putendl_fd(": Permission denied", 2);
 	}
-	free (home_path);
 	return (1);
 }
 
